@@ -1,6 +1,5 @@
 package ch.dnsmap.dnsm.wire;
 
-import ch.dnsmap.dnsm.wire.NetworkByte;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 import static java.nio.ByteBuffer.wrap;
 
-public final class NetworkByte implements ReadableByte {
+public final class NetworkByte implements ReadableByte, WriteableByte {
 
     private final ByteBuffer byteBuffer;
 
@@ -69,5 +69,43 @@ public final class NetworkByte implements ReadableByte {
         byte[] data = new byte[nofBytes];
         byteBuffer.get(data);
         return data;
+    }
+
+    @Override
+    public byte[] range(int from, int to) {
+        int rangeSize = to - from;
+        byte[] data = new byte[rangeSize];
+        byteBuffer.get(from, data);
+        return data;
+    }
+
+    @Override
+    public int writeUInt8(int value) {
+        byteBuffer.put((byte) value);
+        return 1;
+    }
+
+    @Override
+    public int writeUInt16(int value) {
+        byteBuffer.putShort((short) value);
+        return 2;
+    }
+
+    @Override
+    public int writeInt32(int value) {
+        byteBuffer.putInt(value);
+        return 4;
+    }
+
+    @Override
+    public int writeByte16(byte[] value) {
+        byteBuffer.put(value);
+        return 2;
+    }
+
+    @Override
+    public int writeByte(byte[] bytes) {
+        byteBuffer.put(bytes);
+        return bytes.length;
     }
 }

@@ -2,8 +2,8 @@ package ch.dnsmap.dnsm.wire;
 
 import ch.dnsmap.dnsm.Header;
 import ch.dnsmap.dnsm.Question;
-import ch.dnsmap.dnsm.wire.record.ResourceRecordParser;
 import ch.dnsmap.dnsm.record.ResourceRecord;
+import ch.dnsmap.dnsm.wire.record.ResourceRecordParser;
 
 import java.util.ArrayList;
 import java.util.List;

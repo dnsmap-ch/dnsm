@@ -1,10 +1,13 @@
 package ch.dnsmap.dnsm.wire;
 
+
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class DomainParser implements ByteParser<Domain> {
 
@@ -54,5 +57,43 @@ public final class DomainParser implements ByteParser<Domain> {
 
     private boolean isPointerCompression(int labelLength) {
         return (labelLength & 0xC0) != 0;
+    }
+
+    @Override
+    public int toWire(WriteableByte wireData, Domain data) {
+        int bytesWritten = 0;
+
+        if (domainCompression != null && domainCompression.contains(data)) {
+            int pointer = domainCompression.getPointer(data);
+            bytesWritten += wireData.writeUInt16(pointer);
+            return bytesWritten;
+        }
+
+        bytesWritten = data.getLabels().stream()
+                .map(label -> {
+                    int length = wireData.writeUInt8(label.length());
+                    length += wireData.writeByte(label.label().getBytes(UTF_8));
+                    return length;
+                })
+                .reduce(0, Integer::sum);
+        bytesWritten += wireData.writeUInt8(DNS_DOMAIN_NAME_TERMINATION);
+        return bytesWritten;
+    }
+
+    public int bytesToWrite(Domain data) {
+        int bytesToWrite = 0;
+        if (domainCompression != null && domainCompression.contains(data)) {
+            return DNS_POINTER_BYTES_LENGTH;
+        }
+
+        bytesToWrite = data.getLabels().stream()
+                .map(label -> {
+                    int length = DNS_LABEL_FIELD_LENGTH;
+                    length += label.label().length();
+                    return length;
+                })
+                .reduce(0, Integer::sum);
+        bytesToWrite += DNS_DOMAIN_NAME_TERMINATION_BYTE_LENGTH;
+        return bytesToWrite;
     }
 }

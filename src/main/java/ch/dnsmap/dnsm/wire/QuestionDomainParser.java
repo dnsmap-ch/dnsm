@@ -20,4 +20,20 @@ public final class QuestionDomainParser implements ByteParser<Question> {
         DnsQueryClass qClass = DnsQueryClass.of(wireData.readUInt16());
         return new Question(qName, qType, qClass);
     }
+
+    @Override
+    public int toWire(WriteableByte wireData, Question data) {
+        int length = domainParser.toWire(wireData, data.questionName());
+        length += wireData.writeUInt16(data.questionType().getValue());
+        length += wireData.writeUInt16(data.questionClass().getValue());
+        return length;
+    }
+
+    @Override
+    public int bytesToWrite(Question data) {
+        int byteToWrite = domainParser.bytesToWrite(data.questionName());
+        byteToWrite += 2;
+        byteToWrite += 2;
+        return byteToWrite;
+    }
 }
