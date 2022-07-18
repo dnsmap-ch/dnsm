@@ -1,8 +1,9 @@
 plugins {
-    id("java")
+    java
+    pmd
 }
 
-group = "ch.dnsmap"
+group = "ch.dnsmap.dnsm"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -17,4 +18,11 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+
+pmd {
+    isConsoleOutput = true
+    toolVersion = "6.21.0"
+    rulesMinimumPriority.set(5)
+    ruleSets = listOf("category/java/errorprone.xml", "category/java/bestpractices.xml")
 }
