@@ -1,6 +1,7 @@
 plugins {
     java
     pmd
+    checkstyle
 }
 
 group = "ch.dnsmap.dnsm"
@@ -25,4 +26,8 @@ pmd {
     toolVersion = "6.21.0"
     rulesMinimumPriority.set(5)
     ruleSets = listOf("category/java/errorprone.xml", "category/java/bestpractices.xml")
+}
+
+checkstyle {
+    toolVersion = "9.0"
 }
