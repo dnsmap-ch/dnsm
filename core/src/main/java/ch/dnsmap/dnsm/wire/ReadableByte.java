@@ -52,8 +52,8 @@ public interface ReadableByte {
   byte[] readByte16();
 
   /**
-   * Read next x byte as an opaque byte array, where x is a one byte length value of the current position.
-   * If x is 0 an empty array of size 0 is returned.
+   * Read next x byte as an opaque byte array, where x is a one byte length value of the current
+   * position. If x is 0 an empty array of size 0 is returned.
    *
    * @return byte array of opaque data
    */
