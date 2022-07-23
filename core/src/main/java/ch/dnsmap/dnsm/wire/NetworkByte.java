@@ -36,6 +36,14 @@ public final class NetworkByte implements ReadableByte, WriteableByte {
   }
 
   @Override
+  public int peakUInt8() {
+    int pos = byteBuffer.position();
+    int ret = readUInt8();
+    byteBuffer.position(pos);
+    return ret;
+  }
+
+  @Override
   public int readUInt8() {
     return byteBuffer.get() & 0xFF;
   }

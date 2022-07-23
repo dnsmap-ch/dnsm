@@ -24,6 +24,13 @@ public interface ReadableByte {
   void jumpToPosition(int newPosition);
 
   /**
+   * Read next byte as an unsigned integer value but stay at current reading position.
+   *
+   * @return integer value from current byte
+   */
+  int peakUInt8();
+
+  /**
    * Read next byte as an unsigned integer value.
    *
    * @return integer value from current byte
