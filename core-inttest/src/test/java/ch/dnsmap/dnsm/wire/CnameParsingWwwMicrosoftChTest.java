@@ -3,6 +3,7 @@ package ch.dnsmap.dnsm.wire;
 import static ch.dnsmap.dnsm.DnsClass.IN;
 import static ch.dnsmap.dnsm.DnsType.A;
 import static ch.dnsmap.dnsm.DnsType.CNAME;
+import static ch.dnsmap.dnsm.Domain.root;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsHeader;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordCname;
@@ -69,7 +70,6 @@ class CnameParsingWwwMicrosoftChTest {
   };
   private static final int MESSAGE_ID = 39600;
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
-  private static final String ROOT = " ";
   private static final String HOST_NAME = "www.microsoft.ch.";
   private static final String DOMAIN_NAME = "microsoft.ch.";
   private static final Label LABEL_WWW = new Label("www");
@@ -139,7 +139,7 @@ class CnameParsingWwwMicrosoftChTest {
 
     assertThat(additional.size()).isEqualTo(1);
     assertThat(additional.get(0)).satisfies(answer -> {
-      assertThat(answer.getName().getCanonical()).isEqualTo(ROOT);
+      assertThat(answer.getName()).isEqualTo(root());
       assertThat(answer.getDnsType()).isEqualTo(DnsType.UNKNOWN);
       assertThat(answer.getDnsClass()).isEqualTo(DnsClass.UNKNOWN);
       assertThat(answer.getTtl()).isEqualTo(0L);

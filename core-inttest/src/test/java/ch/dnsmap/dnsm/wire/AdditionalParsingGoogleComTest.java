@@ -1,18 +1,27 @@
 package ch.dnsmap.dnsm.wire;
 
 import static ch.dnsmap.dnsm.DnsClass.IN;
+import static ch.dnsmap.dnsm.Domain.root;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsHeader;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
+import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordIp4;
+import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordIp6;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordNs;
+import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAdditionalSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAnswerSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAuthoritySection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToQuestionSection;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.dnsmap.dnsm.DnsClass;
 import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
+import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
+import ch.dnsmap.dnsm.record.ResourceRecordOpaque;
+import ch.dnsmap.dnsm.record.type.Ip4;
+import ch.dnsmap.dnsm.record.type.Ip6;
 import ch.dnsmap.dnsm.record.type.Ns;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -128,5 +137,29 @@ public final class AdditionalParsingGoogleComTest {
     assertDnsRecordNs(authorities.get(1), HOST_NAME, IN, TTL, NS1);
     assertDnsRecordNs(authorities.get(2), HOST_NAME, IN, TTL, NS3);
     assertDnsRecordNs(authorities.get(3), HOST_NAME, IN, TTL, NS4);
+  }
+
+  @Test
+  void testDnsAdditionalInputParsing() {
+    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+
+    var additional = jumpToAdditionalSection(dnsInput);
+
+    assertThat(additional.size()).isEqualTo(9);
+    assertDnsRecordIp6(additional.get(0), "ns2.google.com.", IN, TTL, Ip6.of("2001:4860:4802:34::a"));
+    assertDnsRecordIp4(additional.get(1), "ns2.google.com.", IN, TTL, Ip4.of("216.239.34.10"));
+    assertDnsRecordIp6(additional.get(2), "ns1.google.com.", IN, TTL, Ip6.of("2001:4860:4802:32::a"));
+    assertDnsRecordIp4(additional.get(3), "ns1.google.com.", IN, TTL, Ip4.of("216.239.32.10"));
+    assertDnsRecordIp6(additional.get(4), "ns3.google.com.", IN, TTL, Ip6.of("2001:4860:4802:36::a"));
+    assertDnsRecordIp4(additional.get(5), "ns3.google.com.", IN, TTL, Ip4.of("216.239.36.10"));
+    assertDnsRecordIp6(additional.get(6), "ns4.google.com.", IN, TTL, Ip6.of("2001:4860:4802:38::a"));
+    assertDnsRecordIp4(additional.get(7), "ns4.google.com.", IN, TTL, Ip4.of("216.239.38.10"));
+    assertThat(additional.get(8)).satisfies(answer -> {
+      assertThat(answer.getName()).isEqualTo(root());
+      assertThat(answer.getDnsType()).isEqualTo(DnsType.UNKNOWN);
+      assertThat(answer.getDnsClass()).isEqualTo(DnsClass.UNKNOWN);
+      assertThat(answer.getTtl()).isEqualTo(0L);
+      assertThat(((ResourceRecordOpaque) answer).getOpaqueData().opaque()).isEqualTo(new byte[0]);
+    });
   }
 }
