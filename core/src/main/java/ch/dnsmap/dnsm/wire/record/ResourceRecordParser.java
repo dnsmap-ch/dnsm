@@ -5,11 +5,13 @@ import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
+import ch.dnsmap.dnsm.record.ResourceRecordAaaa;
 import ch.dnsmap.dnsm.record.ResourceRecordCname;
 import ch.dnsmap.dnsm.record.ResourceRecordNs;
 import ch.dnsmap.dnsm.record.ResourceRecordOpaque;
 import ch.dnsmap.dnsm.record.type.Cname;
 import ch.dnsmap.dnsm.record.type.Ip4;
+import ch.dnsmap.dnsm.record.type.Ip6;
 import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
 import ch.dnsmap.dnsm.wire.ByteParser;
@@ -26,6 +28,7 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
 
   private final DomainParser domainParser;
   private final ResourceRecordAParser rrAParser;
+  private final ResourceRecordAAAAParser rrAaaaParser;
   private final ResourceRecordCnameParser rrCnameParser;
   private final ResourceRecordNsParser rrNsParser;
   private final ResourceRecordOpaqueParser rrOpaqueParser;
@@ -33,6 +36,7 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
   public ResourceRecordParser() {
     domainParser = new DomainParser();
     rrAParser = new ResourceRecordAParser();
+    rrAaaaParser = new ResourceRecordAAAAParser();
     rrCnameParser = new ResourceRecordCnameParser(domainParser);
     rrNsParser = new ResourceRecordNsParser(domainParser);
     rrOpaqueParser = new ResourceRecordOpaqueParser();
@@ -53,6 +57,10 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
       case A -> {
         Ip4 ip4 = rrAParser.fromWire(wireData);
         return new ResourceRecordA(name, dnsType, dnsClass, ttl, ip4);
+      }
+      case AAAA -> {
+        Ip6 ip6 = rrAaaaParser.fromWire(wireData);
+        return new ResourceRecordAaaa(name, dnsType, dnsClass, ttl, ip6);
       }
       case CNAME -> {
         int rdLength = wireData.readUInt16();
@@ -86,6 +94,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
         bytesWritten += rrAParser.toWire(wireData, aData.getIp4());
         return bytesWritten;
       }
+      case AAAA -> {
+        ResourceRecordAaaa aaaaData = (ResourceRecordAaaa) data;
+        bytesWritten += rrAaaaParser.toWire(wireData, aaaaData.getIp6());
+        return bytesWritten;
+      }
       case CNAME -> {
         ResourceRecordCname cnameData = (ResourceRecordCname) data;
         bytesWritten += rrCnameParser.toWire(wireData, cnameData.getCname());
@@ -117,6 +130,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
       case A -> {
         ResourceRecordA rrA = (ResourceRecordA) data;
         bytesToWrite += rrAParser.bytesToWrite(rrA.getIp4());
+        return bytesToWrite;
+      }
+      case AAAA -> {
+        ResourceRecordAaaa rrAaaa = (ResourceRecordAaaa) data;
+        bytesToWrite += rrAaaaParser.bytesToWrite(rrAaaa.getIp6());
         return bytesToWrite;
       }
       case CNAME -> {

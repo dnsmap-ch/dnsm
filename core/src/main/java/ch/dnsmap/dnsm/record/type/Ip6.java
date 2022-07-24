@@ -3,37 +3,37 @@ package ch.dnsmap.dnsm.record.type;
 import static java.net.InetAddress.getByAddress;
 import static java.net.InetAddress.getByName;
 
-import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.UnknownHostException;
 import java.util.Objects;
 
-public final class Ip4 {
+public final class Ip6 {
 
-  private final Inet4Address ip;
+  private final Inet6Address ip;
 
-  private Ip4(Inet4Address ip) {
+  private Ip6(Inet6Address ip) {
     this.ip = ip;
   }
 
-  public static Ip4 of(byte[] ip4bytes) {
+  public static Ip6 of(byte[] ip6bytes) {
     try {
-      Inet4Address ip4 = (Inet4Address) getByAddress(ip4bytes);
-      return new Ip4(ip4);
+      Inet6Address ip6 = (Inet6Address) getByAddress(ip6bytes);
+      return new Ip6(ip6);
     } catch (UnknownHostException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public static Ip4 of(String ip4String) {
+  public static Ip6 of(String ip6String) {
     try {
-      Inet4Address ip4 = (Inet4Address) getByName(ip4String);
-      return new Ip4(ip4);
+      Inet6Address ip6 = (Inet6Address) getByName(ip6String);
+      return new Ip6(ip6);
     } catch (UnknownHostException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public Inet4Address getIp() {
+  public Inet6Address getIp() {
     return ip;
   }
 
@@ -45,7 +45,7 @@ public final class Ip4 {
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
-    var that = (Ip4) obj;
+    var that = (Ip6) obj;
     return Objects.equals(this.ip, that.ip);
   }
 
@@ -56,6 +56,6 @@ public final class Ip4 {
 
   @Override
   public String toString() {
-    return "Ip4[" + "ip=" + ip + ']';
+    return "Ip6[" + "ip=" + ip + ']';
   }
 }

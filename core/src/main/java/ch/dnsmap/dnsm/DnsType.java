@@ -24,7 +24,12 @@ public enum DnsType {
   HINFO(13),
   MINFO(14),
   MX(15),
-  TXT(16);
+  TXT(16),
+
+  /**
+   * RFC 3596 2.1 AAAA record type
+   */
+  AAAA(28);
 
   private final int value;
 

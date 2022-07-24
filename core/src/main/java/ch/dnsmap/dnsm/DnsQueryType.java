@@ -25,6 +25,11 @@ public enum DnsQueryType {
   TXT(16),
 
   /**
+   * RFC 3596 2.1 AAAA record type
+   */
+  AAAA(28),
+
+  /**
    * RFC 1035 3.2.2 QTYPE values
    */
   AXFR(252),
