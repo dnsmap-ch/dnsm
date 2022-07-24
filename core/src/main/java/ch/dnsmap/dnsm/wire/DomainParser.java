@@ -1,6 +1,5 @@
 package ch.dnsmap.dnsm.wire;
 
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import ch.dnsmap.dnsm.Domain;
@@ -69,32 +68,64 @@ public final class DomainParser implements ByteParser<Domain> {
 
   @Override
   public int toWire(WriteableByte wireData, Domain data) {
-    int bytesWritten = 0;
 
-    if (domainCompression != null && domainCompression.contains(data)) {
-      int pointer = domainCompression.getPointer(data);
-      bytesWritten += wireData.writeUInt16(pointer);
-      return bytesWritten;
+    if (domainCompression == null) {
+      return writeFullDomain(wireData, data);
     }
 
-    bytesWritten = data.getLabels().stream()
-        .map(label -> {
-          int length = wireData.writeUInt8(label.length());
-          length += wireData.writeByte(label.label().getBytes(UTF_8));
-          return length;
-        })
+    if (domainCompression.contains(data)) {
+      return writePointerToDomain(wireData, domainCompression.getPointer(data));
+    }
+
+    domainCompression.addDomain(data, wireData.getPosition());
+    int bytesWritten = writeLabel(wireData, data.getFirstLabel());
+
+    return bytesWritten + toWire(wireData, data.getDomainWithoutFirstLabel());
+  }
+
+  private static int writeFullDomain(WriteableByte wireData, Domain data) {
+    int bytesWritten = data.getLabels().stream()
+        .map(label -> writeLabel(wireData, label))
         .reduce(0, Integer::sum);
     bytesWritten += wireData.writeUInt8(DNS_DOMAIN_NAME_TERMINATION);
     return bytesWritten;
   }
 
+  private static int writePointerToDomain(WriteableByte wireData, int pointer) {
+    return wireData.writeUInt16(pointer);
+  }
+
+  private static int writeLabel(WriteableByte wireData, Label label) {
+    int bytesWritten = wireData.writeUInt8(label.length());
+    bytesWritten += wireData.writeByte(label.label().getBytes(UTF_8));
+    return bytesWritten;
+  }
+
+  /**
+   * Count amount of bytes a domain name requires to be written to the network. Each label has a one
+   * byte size prefix, a domain name has an ending zero byte and compression pointers have neither
+   * of both.
+   *
+   * @param data domain name to count its labels total length
+   * @return the length in bytes of a domains label
+   */
   public int bytesToWrite(Domain data) {
-    int bytesToWrite;
-    if (domainCompression != null && domainCompression.contains(data)) {
+
+    if (domainCompression == null) {
+      return countDomainWithoutCompression(data);
+    }
+
+    if (domainCompression.contains(data)) {
       return DNS_POINTER_BYTES_LENGTH;
     }
 
-    bytesToWrite = data.getLabels().stream()
+    int bytesToWrite = DNS_LABEL_FIELD_LENGTH + data.getFirstLabel().length();
+    bytesToWrite += bytesToWrite(data.getDomainWithoutFirstLabel());
+    return bytesToWrite;
+  }
+
+  private static int countDomainWithoutCompression(Domain data) {
+    int bytesToWrite = data.getLabels().stream()
         .map(label -> {
           int length = DNS_LABEL_FIELD_LENGTH;
           length += label.label().length();

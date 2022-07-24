@@ -14,14 +14,21 @@ public final class DomainCompression {
   }
 
   public void addDomain(Domain domain, int startPosition) {
-    Pointer pointer = new Pointer(startPosition);
-    domainPositionMap.put(domain, pointer);
+    if (domain.equals(Domain.root())) {
+      return;
+    }
 
-    Domain parentDomain = Domain.of(domain.getLabels().stream().skip(1).toList());
-    startPosition += domain.getLabels().get(0).length() + 1;
+    if (!domainPositionMap.containsKey(domain)) {
+      Pointer pointer = new Pointer(startPosition);
 
-    if (parentDomain.getLabelCount() > 0) {
-      addDomain(parentDomain, startPosition);
+      domainPositionMap.put(domain, pointer);
+
+      Domain parentDomain = domain.getDomainWithoutFirstLabel();
+      startPosition += domain.getLabels().get(0).length() + 1;
+
+      if (parentDomain.getLabelCount() > 0) {
+        addDomain(parentDomain, startPosition);
+      }
     }
   }
 
