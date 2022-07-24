@@ -11,8 +11,8 @@ public final class ResourceRecordCnameParser implements ByteParser<Cname> {
 
   private final DomainParser domainParser;
 
-  public ResourceRecordCnameParser(DomainParser domainParser1) {
-    this.domainParser = domainParser1;
+  public ResourceRecordCnameParser(DomainParser domainParser) {
+    this.domainParser = domainParser;
   }
 
   @Override

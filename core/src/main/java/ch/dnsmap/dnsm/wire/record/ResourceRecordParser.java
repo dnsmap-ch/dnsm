@@ -6,9 +6,11 @@ import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
 import ch.dnsmap.dnsm.record.ResourceRecordCname;
+import ch.dnsmap.dnsm.record.ResourceRecordNs;
 import ch.dnsmap.dnsm.record.ResourceRecordOpaque;
 import ch.dnsmap.dnsm.record.type.Cname;
 import ch.dnsmap.dnsm.record.type.Ip4;
+import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
 import ch.dnsmap.dnsm.wire.ByteParser;
 import ch.dnsmap.dnsm.wire.DomainCompression;
@@ -25,12 +27,14 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
   private final DomainParser domainParser;
   private final ResourceRecordAParser rrAParser;
   private final ResourceRecordCnameParser rrCnameParser;
+  private final ResourceRecordNsParser rrNsParser;
   private final ResourceRecordOpaqueParser rrOpaqueParser;
 
   public ResourceRecordParser() {
     domainParser = new DomainParser();
     rrAParser = new ResourceRecordAParser();
     rrCnameParser = new ResourceRecordCnameParser(domainParser);
+    rrNsParser = new ResourceRecordNsParser(domainParser);
     rrOpaqueParser = new ResourceRecordOpaqueParser();
   }
 
@@ -47,19 +51,21 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
 
     switch (dnsType) {
       case A -> {
-        ResourceRecordAParser parser = new ResourceRecordAParser();
-        Ip4 ip4 = parser.fromWire(wireData);
+        Ip4 ip4 = rrAParser.fromWire(wireData);
         return new ResourceRecordA(name, dnsType, dnsClass, ttl, ip4);
       }
       case CNAME -> {
-        ResourceRecordCnameParser parser = new ResourceRecordCnameParser(new DomainParser());
         int rdLength = wireData.readUInt16();
-        Cname cname = parser.fromWire(wireData);
+        Cname cname = rrCnameParser.fromWire(wireData);
         return new ResourceRecordCname(name, dnsType, dnsClass, ttl, rdLength, cname);
       }
+      case NS -> {
+        int rdLength = wireData.readUInt16();
+        Ns ns = rrNsParser.fromWire(wireData);
+        return new ResourceRecordNs(name, dnsType, dnsClass, ttl, rdLength, ns);
+      }
       default -> {
-        ResourceRecordOpaqueParser parser = new ResourceRecordOpaqueParser();
-        OpaqueData opaqueData = parser.fromWire(wireData);
+        OpaqueData opaqueData = rrOpaqueParser.fromWire(wireData);
         return new ResourceRecordOpaque(name, dnsType, dnsClass, ttl, opaqueData);
       }
     }
@@ -83,6 +89,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
       case CNAME -> {
         ResourceRecordCname cnameData = (ResourceRecordCname) data;
         bytesWritten += rrCnameParser.toWire(wireData, cnameData.getCname());
+        return bytesWritten;
+      }
+      case NS -> {
+        ResourceRecordNs nsData = (ResourceRecordNs) data;
+        bytesWritten += rrNsParser.toWire(wireData, nsData.getNs());
         return bytesWritten;
       }
       default -> {
@@ -111,6 +122,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
       case CNAME -> {
         ResourceRecordCname rrCname = (ResourceRecordCname) data;
         bytesToWrite += rrCnameParser.bytesToWrite(rrCname.getCname());
+        return bytesToWrite;
+      }
+      case NS -> {
+        ResourceRecordNs rrNs = (ResourceRecordNs) data;
+        bytesToWrite += rrNsParser.bytesToWrite(rrNs.getNs());
         return bytesToWrite;
       }
       default -> {

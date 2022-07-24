@@ -1,5 +1,8 @@
 package ch.dnsmap.dnsm.wire.util;
 
+import static ch.dnsmap.dnsm.DnsType.A;
+import static ch.dnsmap.dnsm.DnsType.CNAME;
+import static ch.dnsmap.dnsm.DnsType.NS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.dnsmap.dnsm.DnsClass;
@@ -11,8 +14,10 @@ import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
 import ch.dnsmap.dnsm.record.ResourceRecordCname;
+import ch.dnsmap.dnsm.record.ResourceRecordNs;
 import ch.dnsmap.dnsm.record.type.Cname;
 import ch.dnsmap.dnsm.record.type.Ip4;
+import ch.dnsmap.dnsm.record.type.Ns;
 import java.util.List;
 
 public final class DnsAssert {
@@ -40,17 +45,21 @@ public final class DnsAssert {
   }
 
   public static void assertDnsRecordCname(ResourceRecord resourceRecord, String domainName,
-                                          DnsType dnsType, DnsClass dnsClass, long ttl,
-                                          Cname cname) {
-    assertDnsRecord(resourceRecord, domainName, dnsType, dnsClass, ttl);
+                                          DnsClass dnsClass, long ttl, Cname cname) {
+    assertDnsRecord(resourceRecord, domainName, CNAME, dnsClass, ttl);
     assertThat(((ResourceRecordCname) resourceRecord).getCname()).isEqualTo(cname);
   }
 
   public static void assertDnsRecordIp4(ResourceRecord resourceRecord, String domainName,
-                                        DnsType dnsType, DnsClass dnsClass, long ttl,
-                                        Ip4 ip4) {
-    assertDnsRecord(resourceRecord, domainName, dnsType, dnsClass, ttl);
+                                        DnsClass dnsClass, long ttl, Ip4 ip4) {
+    assertDnsRecord(resourceRecord, domainName, A, dnsClass, ttl);
     assertThat(((ResourceRecordA) resourceRecord).getIp4()).isEqualTo(ip4);
+  }
+
+  public static void assertDnsRecordNs(ResourceRecord resourceRecord, String domainName,
+                                       DnsClass dnsClass, long ttl, Ns ns) {
+    assertDnsRecord(resourceRecord, domainName, NS, dnsClass, ttl);
+    assertThat(((ResourceRecordNs) resourceRecord).getNs()).isEqualTo(ns);
   }
 
   private static void assertDnsRecord(ResourceRecord resourceRecord, String domainName,

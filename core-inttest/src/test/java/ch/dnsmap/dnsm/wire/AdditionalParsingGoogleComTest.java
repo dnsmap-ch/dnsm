@@ -1,16 +1,19 @@
 package ch.dnsmap.dnsm.wire;
 
-import static ch.dnsmap.dnsm.DnsType.NS;
+import static ch.dnsmap.dnsm.DnsClass.IN;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsHeader;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
+import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordNs;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAnswerSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAuthoritySection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToQuestionSection;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ch.dnsmap.dnsm.DnsClass;
 import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
+import ch.dnsmap.dnsm.Domain;
+import ch.dnsmap.dnsm.Label;
+import ch.dnsmap.dnsm.record.type.Ns;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,6 +75,14 @@ public final class AdditionalParsingGoogleComTest {
   private static final int MESSAGE_ID = 40833;
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x00};
   private static final String HOST_NAME = "google.com.";
+  private static final Ns NS1 =
+      new Ns(Domain.of(new Label("ns1"), new Label("google"), new Label("com")));
+  private static final Ns NS2 =
+      new Ns(Domain.of(new Label("ns2"), new Label("google"), new Label("com")));
+  private static final Ns NS3 =
+      new Ns(Domain.of(new Label("ns3"), new Label("google"), new Label("com")));
+  private static final Ns NS4 =
+      new Ns(Domain.of(new Label("ns4"), new Label("google"), new Label("com")));
   private static final long TTL = 172800;
 
   private ByteArrayOutputStream dnsBytes;
@@ -113,29 +124,9 @@ public final class AdditionalParsingGoogleComTest {
     var authorities = jumpToAuthoritySection(dnsInput);
 
     assertThat(authorities.size()).isEqualTo(4);
-    assertThat(authorities.get(0)).satisfies(authority -> {
-      assertThat(authority.getName().getCanonical()).isEqualTo(HOST_NAME);
-      assertThat(authority.getDnsType()).isEqualTo(NS);
-      assertThat(authority.getDnsClass()).isEqualTo(DnsClass.IN);
-      assertThat(authority.getTtl()).isEqualTo(TTL);
-    });
-    assertThat(authorities.get(1)).satisfies(authority -> {
-      assertThat(authority.getName().getCanonical()).isEqualTo(HOST_NAME);
-      assertThat(authority.getDnsType()).isEqualTo(NS);
-      assertThat(authority.getDnsClass()).isEqualTo(DnsClass.IN);
-      assertThat(authority.getTtl()).isEqualTo(TTL);
-    });
-    assertThat(authorities.get(2)).satisfies(authority -> {
-      assertThat(authority.getName().getCanonical()).isEqualTo(HOST_NAME);
-      assertThat(authority.getDnsType()).isEqualTo(NS);
-      assertThat(authority.getDnsClass()).isEqualTo(DnsClass.IN);
-      assertThat(authority.getTtl()).isEqualTo(TTL);
-    });
-    assertThat(authorities.get(3)).satisfies(authority -> {
-      assertThat(authority.getName().getCanonical()).isEqualTo(HOST_NAME);
-      assertThat(authority.getDnsType()).isEqualTo(NS);
-      assertThat(authority.getDnsClass()).isEqualTo(DnsClass.IN);
-      assertThat(authority.getTtl()).isEqualTo(TTL);
-    });
+    assertDnsRecordNs(authorities.get(0), HOST_NAME, IN, TTL, NS2);
+    assertDnsRecordNs(authorities.get(1), HOST_NAME, IN, TTL, NS1);
+    assertDnsRecordNs(authorities.get(2), HOST_NAME, IN, TTL, NS3);
+    assertDnsRecordNs(authorities.get(3), HOST_NAME, IN, TTL, NS4);
   }
 }

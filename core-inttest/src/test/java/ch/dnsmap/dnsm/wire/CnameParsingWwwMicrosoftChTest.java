@@ -116,12 +116,12 @@ class CnameParsingWwwMicrosoftChTest {
     var answers = jumpToAnswerSection(dnsInput);
 
     assertThat(answers.size()).isEqualTo(6);
-    assertDnsRecordCname(answers.get(0), HOST_NAME, CNAME, IN, TTL, new Cname(DOMAIN));
-    assertDnsRecordIp4(answers.get(1), DOMAIN_NAME, A, IN, TTL, IP_V4_1);
-    assertDnsRecordIp4(answers.get(2), DOMAIN_NAME, A, IN, TTL, IP_V4_2);
-    assertDnsRecordIp4(answers.get(3), DOMAIN_NAME, A, IN, TTL, IP_V4_3);
-    assertDnsRecordIp4(answers.get(4), DOMAIN_NAME, A, IN, TTL, IP_V4_4);
-    assertDnsRecordIp4(answers.get(5), DOMAIN_NAME, A, IN, TTL, IP_V4_5);
+    assertDnsRecordCname(answers.get(0), HOST_NAME, IN, TTL, new Cname(DOMAIN));
+    assertDnsRecordIp4(answers.get(1), DOMAIN_NAME, IN, TTL, IP_V4_1);
+    assertDnsRecordIp4(answers.get(2), DOMAIN_NAME, IN, TTL, IP_V4_2);
+    assertDnsRecordIp4(answers.get(3), DOMAIN_NAME, IN, TTL, IP_V4_3);
+    assertDnsRecordIp4(answers.get(4), DOMAIN_NAME, IN, TTL, IP_V4_4);
+    assertDnsRecordIp4(answers.get(5), DOMAIN_NAME, IN, TTL, IP_V4_5);
   }
 
   @Test
