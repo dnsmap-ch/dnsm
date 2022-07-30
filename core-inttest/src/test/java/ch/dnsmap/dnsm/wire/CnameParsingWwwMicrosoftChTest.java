@@ -152,9 +152,10 @@ class CnameParsingWwwMicrosoftChTest {
     var header = composeHeader();
     var question = composeQuestion();
     var answer = composeAnswer();
+    var authoritative = new LinkedList<ResourceRecord>();
     var additional = new LinkedList<ResourceRecord>();
 
-    var dnsOutput = DnsOutput.toWire(header, question, answer, additional);
+    var dnsOutput = DnsOutput.toWire(header, question, answer, authoritative, additional);
 
     assertThat(dnsOutput.getHeader()).isEqualTo(DNS_BYTES_HEADER);
     assertThat(dnsOutput.getQuestion()).isEqualTo(DNS_BYTES_QUESTION);
@@ -172,13 +173,13 @@ class CnameParsingWwwMicrosoftChTest {
   private static List<ResourceRecord> composeAnswer() {
     List<ResourceRecord> answers = new ArrayList<>(6);
     answers.add(
-        new ResourceRecordCname(Domain.of(LABEL_WWW, LABEL_MICROSOFT, LABEL_CH), CNAME, IN, TTL, 2,
+        new ResourceRecordCname(Domain.of(LABEL_WWW, LABEL_MICROSOFT, LABEL_CH), IN, TTL, 2,
             new Cname(Domain.of(LABEL_MICROSOFT, LABEL_CH))));
-    answers.add(new ResourceRecordA(DOMAIN, A, IN, TTL, IP_V4_1));
-    answers.add(new ResourceRecordA(DOMAIN, A, IN, TTL, IP_V4_2));
-    answers.add(new ResourceRecordA(DOMAIN, A, IN, TTL, IP_V4_3));
-    answers.add(new ResourceRecordA(DOMAIN, A, IN, TTL, IP_V4_4));
-    answers.add(new ResourceRecordA(DOMAIN, A, IN, TTL, IP_V4_5));
+    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_1));
+    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_2));
+    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_3));
+    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_4));
+    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_5));
     return answers;
   }
 }

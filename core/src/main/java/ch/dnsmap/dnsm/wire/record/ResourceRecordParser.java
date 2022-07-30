@@ -56,21 +56,21 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
     switch (dnsType) {
       case A -> {
         Ip4 ip4 = rrAParser.fromWire(wireData);
-        return new ResourceRecordA(name, dnsType, dnsClass, ttl, ip4);
+        return new ResourceRecordA(name, dnsClass, ttl, ip4);
       }
       case AAAA -> {
         Ip6 ip6 = rrAaaaParser.fromWire(wireData);
-        return new ResourceRecordAaaa(name, dnsType, dnsClass, ttl, ip6);
+        return new ResourceRecordAaaa(name, dnsClass, ttl, ip6);
       }
       case CNAME -> {
         int rdLength = wireData.readUInt16();
         Cname cname = rrCnameParser.fromWire(wireData);
-        return new ResourceRecordCname(name, dnsType, dnsClass, ttl, rdLength, cname);
+        return new ResourceRecordCname(name, dnsClass, ttl, rdLength, cname);
       }
       case NS -> {
         int rdLength = wireData.readUInt16();
         Ns ns = rrNsParser.fromWire(wireData);
-        return new ResourceRecordNs(name, dnsType, dnsClass, ttl, rdLength, ns);
+        return new ResourceRecordNs(name, dnsClass, ttl, rdLength, ns);
       }
       default -> {
         OpaqueData opaqueData = rrOpaqueParser.fromWire(wireData);

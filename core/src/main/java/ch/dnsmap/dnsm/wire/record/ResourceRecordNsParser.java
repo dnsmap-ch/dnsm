@@ -24,7 +24,7 @@ public final class ResourceRecordNsParser implements ByteParser<Ns> {
   @Override
   public int toWire(WriteableByte wireData, Ns data) {
     int bytesWritten = 0;
-    bytesWritten += wireData.writeUInt16(data.ns().getLabelCount());
+    bytesWritten += wireData.writeUInt16(domainParser.bytesToWrite(data.ns()));
     bytesWritten += domainParser.toWire(wireData, data.ns());
     return bytesWritten;
   }

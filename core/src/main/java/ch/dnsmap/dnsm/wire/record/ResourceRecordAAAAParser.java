@@ -7,7 +7,7 @@ import ch.dnsmap.dnsm.wire.WriteableByte;
 
 public final class ResourceRecordAAAAParser implements ByteParser<Ip6> {
 
-  private static final int IPV6_BYTE_LENGTH = 8;
+  private static final int IPV6_BYTE_LENGTH = 16;
 
   public Ip6 fromWire(ReadableByte wireData) {
     int rdLength = wireData.readUInt16();

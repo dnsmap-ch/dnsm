@@ -17,6 +17,7 @@ public final class DnsOutput {
   private final Header header;
   private final Question question;
   private final List<ResourceRecord> answers;
+  private final List<ResourceRecord> authoritatives;
   private final List<ResourceRecord> additionals;
   private final QuestionDomainParser questionDomainParser;
   private final ResourceRecordParser resourceRecordParser;
@@ -25,23 +26,26 @@ public final class DnsOutput {
   private int headerTo;
   private int questionTo;
   private int answerTo;
+  private int authoritativeTo;
   private int additionalTo;
 
   private DnsOutput(Header header, Question question, List<ResourceRecord> answers,
-                    List<ResourceRecord> additionals) {
+                    List<ResourceRecord> authoritatives, List<ResourceRecord> additionals) {
     this.header = header;
     this.question = question;
     this.answers = answers;
+    this.authoritatives = authoritatives;
     this.additionals = additionals;
     this.questionDomainParser = new QuestionDomainParser();
     this.resourceRecordParser = new ResourceRecordParser();
-    int capacity = getCapacity(question, answers, additionals);
+    int capacity = getCapacity(question, answers, authoritatives, additionals);
     networkByte = NetworkByte.of(capacity);
   }
 
   public static DnsOutput toWire(Header header, Question question, List<ResourceRecord> answers,
+                                 List<ResourceRecord> authoritatives,
                                  List<ResourceRecord> additionals) {
-    return new DnsOutput(header, question, answers, additionals);
+    return new DnsOutput(header, question, answers, authoritatives, additionals);
   }
 
   public byte[] getHeader() {
@@ -81,22 +85,35 @@ public final class DnsOutput {
     return networkByte.range(questionTo, answerTo);
   }
 
+  public byte[] getAuthoritatives() {
+    if (authoritativeTo == 0) {
+      authoritativeTo += answerTo;
+      authoritativeTo += authoritatives.stream()
+          .map(authoritativeElement -> resourceRecordParser.toWire(networkByte,
+              authoritativeElement))
+          .reduce(0, Integer::sum);
+    }
+    return networkByte.range(answerTo, authoritativeTo);
+  }
+
   public byte[] getAdditional() {
     if (additionalTo == 0) {
-      additionalTo += questionTo;
+      additionalTo += authoritativeTo;
       additionalTo += additionals.stream()
           .map(additionalElement -> resourceRecordParser.toWire(networkByte, additionalElement))
           .reduce(0, Integer::sum);
     }
-    return networkByte.range(answerTo, questionTo);
+    return networkByte.range(authoritativeTo, additionalTo);
   }
 
   private int getCapacity(Question question, List<ResourceRecord> answers,
+                          List<ResourceRecord> authoritatives,
                           List<ResourceRecord> additionals) {
     return getHeaderByteSize()
         + getQuestionByteSize(question)
         + getAnswerByteSize(answers)
-        + getAdditionalByteSize(additionals);
+        + getResourceRecordByteSize(authoritatives)
+        + getResourceRecordByteSize(additionals);
   }
 
   private static int getHeaderByteSize() {
@@ -116,7 +133,7 @@ public final class DnsOutput {
         .reduce(0, Integer::sum);
   }
 
-  private int getAdditionalByteSize(List<ResourceRecord> resourceRecords) {
+  private int getResourceRecordByteSize(List<ResourceRecord> resourceRecords) {
     return resourceRecords.stream()
         .map(resourceRecordParser::bytesToWrite)
         .reduce(0, Integer::sum);

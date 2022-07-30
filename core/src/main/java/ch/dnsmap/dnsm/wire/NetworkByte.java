@@ -80,8 +80,16 @@ public final class NetworkByte implements ReadableByte, WriteableByte {
   }
 
   @Override
+  public int getPosition() {
+    return byteBuffer.position();
+  }
+
+  @Override
   public byte[] range(int from, int to) {
     int rangeSize = to - from;
+    if (rangeSize == 0) {
+      return new byte[0];
+    }
     byte[] data = new byte[rangeSize];
     byteBuffer.get(from, data);
     return data;

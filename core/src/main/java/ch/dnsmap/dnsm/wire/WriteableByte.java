@@ -2,6 +2,8 @@ package ch.dnsmap.dnsm.wire;
 
 public interface WriteableByte {
 
+  int getPosition();
+
   byte[] range(int from, int to);
 
   int writeUInt8(int value);
