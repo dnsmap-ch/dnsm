@@ -90,15 +90,15 @@ public final class AdditionalParsingGoogleComTest {
   private static final int MESSAGE_ID = 40833;
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x00};
   private static final String HOST_NAME = "google.com.";
-  private static final Domain HOST = Domain.of(new Label("google"), new Label("com"));
+  private static final Domain HOST = Domain.of(Label.of("google"), Label.of("com"));
   private static final Ns NS1 =
-      new Ns(Domain.of(new Label("ns1"), new Label("google"), new Label("com")));
+      new Ns(Domain.of(Label.of("ns1"), Label.of("google"), Label.of("com")));
   private static final Ns NS2 =
-      new Ns(Domain.of(new Label("ns2"), new Label("google"), new Label("com")));
+      new Ns(Domain.of(Label.of("ns2"), Label.of("google"), Label.of("com")));
   private static final Ns NS3 =
-      new Ns(Domain.of(new Label("ns3"), new Label("google"), new Label("com")));
+      new Ns(Domain.of(Label.of("ns3"), Label.of("google"), Label.of("com")));
   private static final Ns NS4 =
-      new Ns(Domain.of(new Label("ns4"), new Label("google"), new Label("com")));
+      new Ns(Domain.of(Label.of("ns4"), Label.of("google"), Label.of("com")));
   private static final long TTL = 172800;
 
   private ByteArrayOutputStream dnsBytes;

@@ -1,8 +1,6 @@
 package ch.dnsmap.dnsm.wire;
 
 import static ch.dnsmap.dnsm.DnsClass.IN;
-import static ch.dnsmap.dnsm.DnsType.A;
-import static ch.dnsmap.dnsm.DnsType.CNAME;
 import static ch.dnsmap.dnsm.Domain.root;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsHeader;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
@@ -72,9 +70,9 @@ class CnameParsingWwwMicrosoftChTest {
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
   private static final String HOST_NAME = "www.microsoft.ch.";
   private static final String DOMAIN_NAME = "microsoft.ch.";
-  private static final Label LABEL_WWW = new Label("www");
-  private static final Label LABEL_MICROSOFT = new Label("microsoft");
-  private static final Label LABEL_CH = new Label("ch");
+  private static final Label LABEL_WWW = Label.of("www");
+  private static final Label LABEL_MICROSOFT = Label.of("microsoft");
+  private static final Label LABEL_CH = Label.of("ch");
   private static final Domain HOST = Domain.of(LABEL_WWW, LABEL_MICROSOFT, LABEL_CH);
   private static final Domain DOMAIN = Domain.of(LABEL_MICROSOFT, LABEL_CH);
   private static final int TTL = 3600;
@@ -173,7 +171,7 @@ class CnameParsingWwwMicrosoftChTest {
   private static List<ResourceRecord> composeAnswer() {
     List<ResourceRecord> answers = new ArrayList<>(6);
     answers.add(
-        new ResourceRecordCname(Domain.of(LABEL_WWW, LABEL_MICROSOFT, LABEL_CH), IN, TTL, 2,
+        new ResourceRecordCname(Domain.of(LABEL_WWW, LABEL_MICROSOFT, LABEL_CH), IN, TTL,
             new Cname(Domain.of(LABEL_MICROSOFT, LABEL_CH))));
     answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_1));
     answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_2));

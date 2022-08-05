@@ -16,9 +16,9 @@ class DomainParserTest {
   // 6 characters: dnsmap 2 characters: ch ending zero
   private static final byte[] DOMAIN_BYTES =
       new byte[] {0x06, 0x64, 0x6e, 0x73, 0x6d, 0x61, 0x70, 0x02, 0x63, 0x68, 0x00};
-  private static final Domain DOMAIN = Domain.of(new Label("dnsmap"), new Label("ch"));
+  private static final Domain DOMAIN = Domain.of(Label.of("dnsmap"), Label.of("ch"));
   private static final Domain HOST =
-      Domain.of(new Label("www"), new Label("dnsmap"), new Label("ch"));
+      Domain.of(Label.of("www"), Label.of("dnsmap"), Label.of("ch"));
 
   @Nested
   class FromWire {

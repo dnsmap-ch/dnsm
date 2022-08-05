@@ -1,6 +1,24 @@
 package ch.dnsmap.dnsm;
 
-public record Label(String label) {
+public class Label {
+
+  private final String label;
+
+  private Label(String label) {
+    this.label = label;
+  }
+
+  public static Label of(String label) {
+    return new Label(label);
+  }
+
+  public static Label of(byte[] label) {
+    return of(new String(label));
+  }
+
+  public String getLabel() {
+    return label;
+  }
 
   public int length() {
     return label.length();

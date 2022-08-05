@@ -89,7 +89,7 @@ public final class Domain {
    * @return domain of the string labels
    */
   public static Domain of(String domainString) {
-    List<Label> labels = stream(domainString.split("\\.")).map(Label::new).toList();
+    List<Label> labels = stream(domainString.split("\\.")).map(Label::of).toList();
     return of(labels);
   }
 
@@ -150,7 +150,7 @@ public final class Domain {
       return " ";
     }
     return labels.stream()
-        .map(Label::label)
+        .map(Label::getLabel)
         .map(String::toLowerCase)
         .collect(joining(".", "", "."));
   }
