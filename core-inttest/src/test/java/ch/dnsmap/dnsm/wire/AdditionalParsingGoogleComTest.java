@@ -196,10 +196,10 @@ public final class AdditionalParsingGoogleComTest {
 
   private static List<ResourceRecord> composeAuthoritative() {
     List<ResourceRecord> authorities = new ArrayList<>(4);
-    authorities.add(new ResourceRecordNs(HOST, IN, TTL, 6, NS2));
-    authorities.add(new ResourceRecordNs(HOST, IN, TTL, 6, NS1));
-    authorities.add(new ResourceRecordNs(HOST, IN, TTL, 6, NS3));
-    authorities.add(new ResourceRecordNs(HOST, IN, TTL, 6, NS4));
+    authorities.add(new ResourceRecordNs(HOST, IN, TTL, NS2));
+    authorities.add(new ResourceRecordNs(HOST, IN, TTL, NS1));
+    authorities.add(new ResourceRecordNs(HOST, IN, TTL, NS3));
+    authorities.add(new ResourceRecordNs(HOST, IN, TTL, NS4));
     return authorities;
   }
 

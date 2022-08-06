@@ -64,13 +64,13 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
       }
       case CNAME -> {
         int rdLength = wireData.readUInt16();
-        Cname cname = rrCnameParser.fromWire(wireData);
-        return new ResourceRecordCname(name, dnsClass, ttl, rdLength, cname);
+        Cname cname = rrCnameParser.fromWire(wireData, rdLength);
+        return new ResourceRecordCname(name, dnsClass, ttl, cname);
       }
       case NS -> {
         int rdLength = wireData.readUInt16();
-        Ns ns = rrNsParser.fromWire(wireData);
-        return new ResourceRecordNs(name, dnsClass, ttl, rdLength, ns);
+        Ns ns = rrNsParser.fromWire(wireData, rdLength);
+        return new ResourceRecordNs(name, dnsClass, ttl, ns);
       }
       default -> {
         OpaqueData opaqueData = rrOpaqueParser.fromWire(wireData);

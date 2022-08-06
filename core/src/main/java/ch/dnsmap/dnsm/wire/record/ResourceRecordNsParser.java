@@ -21,6 +21,11 @@ public final class ResourceRecordNsParser implements ByteParser<Ns> {
     return new Ns(domain);
   }
 
+  public Ns fromWire(ReadableByte wireData, int length) {
+    Domain domain = domainParser.fromWire(wireData, length);
+    return new Ns(domain);
+  }
+
   @Override
   public int toWire(WriteableByte wireData, Ns data) {
     int bytesWritten = 0;

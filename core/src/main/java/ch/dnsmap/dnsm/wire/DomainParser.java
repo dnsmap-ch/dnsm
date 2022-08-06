@@ -24,22 +24,55 @@ public final class DomainParser implements ByteParser<Domain> {
   public Domain fromWire(ReadableByte wireData) {
     List<Label> labels = new ArrayList<>();
 
-    int peakByte;
-    if ((peakByte = wireData.peakUInt8()) == 0) {
+    int peakByte = wireData.peakUInt8();
+    if (peakByte == 0) {
       wireData.readUInt8();
-      return Domain.of(labels.toArray(new Label[0]));
+      return Domain.of(labels);
     }
 
     if (isPointerCompression(peakByte)) {
       Domain domain = readPointer(wireData);
       labels.addAll(domain.getLabels());
-    } else {
-      Domain domain = readLabel(wireData);
-      labels.addAll(domain.getLabels());
-      Domain subdomain = fromWire(wireData);
-      labels.addAll(subdomain.getLabels());
+      return Domain.of(labels);
     }
-    return Domain.of(labels.toArray(new Label[0]));
+
+    int labelLength = wireData.readUInt8();
+    byte[] labelBytes = wireData.readByte(labelLength);
+    labels.add(Label.of(labelBytes));
+
+    Domain subdomain = fromWire(wireData);
+    labels.addAll(subdomain.getLabels());
+    return Domain.of(labels);
+  }
+
+  public Domain fromWire(ReadableByte wireData, int length) {
+    List<Label> labels = new ArrayList<>(length);
+    int bytesRead = 0;
+
+    int peakByte = wireData.peakUInt8();
+    if (peakByte == 0) {
+      return Domain.of(labels);
+    }
+
+    if (isPointerCompression(peakByte)) {
+      Domain domain = readPointer(wireData);
+      labels.addAll(domain.getLabels());
+      return Domain.of(labels);
+    }
+
+    int labelLength = wireData.readUInt8();
+    bytesRead += labelLength;
+    if (bytesRead > length) {
+      // TODO add logging this is a special case where the domain is potential longer than bytes to read
+      return Domain.of(labels);
+    }
+
+    byte[] labelBytes = wireData.readByte(labelLength);
+    labels.add(Label.of(labelBytes));
+
+    Domain subdomain = fromWire(wireData, length - bytesRead);
+    labels.addAll(subdomain.getLabels());
+    return Domain.of(labels);
   }
 
   private Domain readPointer(ReadableByte wireData) {
@@ -49,13 +82,6 @@ public final class DomainParser implements ByteParser<Domain> {
     Domain domain = fromWire(wireData);
     wireData.restorePosition(restorePosition);
     return domain;
-  }
-
-  private static Domain readLabel(ReadableByte wireData) {
-    int labelLength = wireData.readUInt8();
-    byte[] labelBytes = wireData.readByte(labelLength);
-    String labelString = new String(labelBytes);
-    return Domain.of(new Label(labelString));
   }
 
   private static boolean isPointerCompression(int labelLength) {
@@ -97,7 +123,7 @@ public final class DomainParser implements ByteParser<Domain> {
 
   private static int writeLabel(WriteableByte wireData, Label label) {
     int bytesWritten = wireData.writeUInt8(label.length());
-    bytesWritten += wireData.writeByte(label.label().getBytes(UTF_8));
+    bytesWritten += wireData.writeByte(label.getLabel().getBytes(UTF_8));
     return bytesWritten;
   }
 
@@ -128,7 +154,7 @@ public final class DomainParser implements ByteParser<Domain> {
     int bytesToWrite = data.getLabels().stream()
         .map(label -> {
           int length = DNS_LABEL_FIELD_LENGTH;
-          length += label.label().length();
+          length += label.getLabel().length();
           return length;
         })
         .reduce(0, Integer::sum);

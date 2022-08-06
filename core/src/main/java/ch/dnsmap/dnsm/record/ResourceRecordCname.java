@@ -8,13 +8,10 @@ import ch.dnsmap.dnsm.record.type.Cname;
 
 public final class ResourceRecordCname extends ResourceRecord {
 
-  private final int rdLength;
   private final Cname cname;
 
-  public ResourceRecordCname(Domain name, DnsClass dnsClass, long ttl,
-                             int rdLength, Cname cname) {
+  public ResourceRecordCname(Domain name, DnsClass dnsClass, long ttl, Cname cname) {
     super(name, CNAME, dnsClass, ttl);
-    this.rdLength = rdLength;
     this.cname = cname;
   }
 

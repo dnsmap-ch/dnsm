@@ -8,13 +8,10 @@ import ch.dnsmap.dnsm.record.type.Ns;
 
 public final class ResourceRecordNs extends ResourceRecord {
 
-  private final int rdLength;
   private final Ns ns;
 
-  public ResourceRecordNs(Domain name, DnsClass dnsClass, long ttl,
-                          int rdLength, Ns ns) {
+  public ResourceRecordNs(Domain name, DnsClass dnsClass, long ttl, Ns ns) {
     super(name, NS, dnsClass, ttl);
-    this.rdLength = rdLength;
     this.ns = ns;
   }
 

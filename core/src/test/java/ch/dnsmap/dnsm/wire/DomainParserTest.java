@@ -91,6 +91,86 @@ class DomainParserTest {
   }
 
   @Nested
+  class FromWireWithLength {
+
+    @Test
+    void testRootFromWire() {
+      var networkBytes = NetworkByte.of(new byte[] {0});
+      DomainParser domainParser = new DomainParser();
+
+      var domain = domainParser.fromWire(networkBytes, 1);
+
+      assertThat(domain).isEqualTo(root());
+    }
+
+    @Test
+    void testASequenceOfLabelsEndingInAZeroOctetFromWire() {
+      var networkBytes = NetworkByte.of(DOMAIN_BYTES);
+      DomainParser domainParser = new DomainParser();
+
+      var domain = domainParser.fromWire(networkBytes, DOMAIN_BYTES.length);
+
+      assertThat(domain).isEqualTo(DOMAIN);
+    }
+
+    @Test
+    void testASequenceOfLabelsEndingInAZeroOctetFromWireReadOnlyFirstLabel() {
+      var networkBytes = NetworkByte.of(DOMAIN_BYTES);
+      DomainParser domainParser = new DomainParser();
+
+      var domain = domainParser.fromWire(networkBytes, 6);
+
+      assertThat(domain).isEqualTo(Domain.of("dnsmap"));
+    }
+
+    @Test
+    void testAPointerFromWire() throws IOException {
+      var networkBytes = addEndingPointer();
+      DomainParser domainParser = new DomainParser();
+
+      var domain = domainParser.fromWire(networkBytes, 42);
+
+      assertThat(domain).isEqualTo(DOMAIN);
+    }
+
+    @Test
+    void testASequenceOfLabelsEndingWithAPointer() throws IOException {
+      var networkBytes = addEndingLabelAndPointer();
+      DomainParser domainParser = new DomainParser();
+
+      var domain = domainParser.fromWire(networkBytes, 42);
+
+      assertThat(domain).isEqualTo(HOST);
+    }
+
+    private static NetworkByte addEndingPointer() throws IOException {
+      var byteArrayOutputStream = createByteStreamWithData();
+      byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
+      return setByteStreamPositionAfterData(byteArrayOutputStream);
+    }
+
+    private static NetworkByte addEndingLabelAndPointer() throws IOException {
+      var byteArrayOutputStream = createByteStreamWithData();
+      byteArrayOutputStream.write(new byte[] {0x03, 0x77, 0x77, 0x77});
+      byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
+      return setByteStreamPositionAfterData(byteArrayOutputStream);
+    }
+
+    private static ByteArrayOutputStream createByteStreamWithData() throws IOException {
+      var byteArrayOutputStream = new ByteArrayOutputStream();
+      byteArrayOutputStream.write(DOMAIN_BYTES);
+      return byteArrayOutputStream;
+    }
+
+    private static NetworkByte setByteStreamPositionAfterData(
+        ByteArrayOutputStream byteArrayOutputStream) {
+      var networkBytes = NetworkByte.of(byteArrayOutputStream.toByteArray());
+      networkBytes.jumpToPosition(11);
+      return networkBytes;
+    }
+  }
+
+  @Nested
   class ToWire {
 
     @Test
