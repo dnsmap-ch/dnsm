@@ -9,6 +9,7 @@ public final class ResourceRecordAAAAParser implements ByteParser<Ip6> {
 
   private static final int IPV6_BYTE_LENGTH = 16;
 
+  @Override
   public Ip6 fromWire(ReadableByte wireData) {
     int rdLength = wireData.readUInt16();
     byte[] ip6Bytes = wireData.readByte(rdLength);
@@ -23,6 +24,7 @@ public final class ResourceRecordAAAAParser implements ByteParser<Ip6> {
   }
 
 
+  @Override
   public int bytesToWrite(Ip6 data) {
     return data.getIp().getAddress().length;
   }

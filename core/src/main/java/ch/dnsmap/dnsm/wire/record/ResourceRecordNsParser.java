@@ -34,6 +34,7 @@ public final class ResourceRecordNsParser implements ByteParser<Ns> {
     return bytesWritten;
   }
 
+  @Override
   public int bytesToWrite(Ns data) {
     int bytesToWrite = 0;
     bytesToWrite += data.ns().getLabelCount();

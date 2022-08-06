@@ -31,7 +31,8 @@ pmd {
     isConsoleOutput = true
     toolVersion = "6.48.0"
     rulesMinimumPriority.set(5)
-    ruleSets = listOf("category/java/errorprone.xml", "category/java/bestpractices.xml")
+    ruleSets = emptyList()
+    ruleSetFiles = files("$rootDir/config/pmd/ruleset.xml")
 }
 
 checkstyle {

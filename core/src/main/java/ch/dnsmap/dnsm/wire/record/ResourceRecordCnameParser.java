@@ -34,6 +34,7 @@ public final class ResourceRecordCnameParser implements ByteParser<Cname> {
     return bytesWritten;
   }
 
+  @Override
   public int bytesToWrite(Cname data) {
     int bytesToWrite = 0;
     bytesToWrite += data.cname().getLabelCount();

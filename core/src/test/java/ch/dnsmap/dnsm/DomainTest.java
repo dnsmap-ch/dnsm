@@ -12,6 +12,7 @@ class DomainTest {
   private static final Label LABEL_3 = Label.of("foO");
   private static final Domain DOMAIN_1 = Domain.of(LABEL_2);
   private static final Domain DOMAIN_2 = Domain.of(DOMAIN_1, LABEL_3);
+  private static final String BAR_FOO_BAZ = "bar.foo.baz.";
 
   @Test
   void testCanonicalOnEmpty() {
@@ -40,43 +41,43 @@ class DomainTest {
   @Test
   void testCanonicalOnLongerDomainAndLabel() {
     var domain = Domain.of(DOMAIN_2, LABEL_1);
-    assertThat(domain.getCanonical()).isEqualTo("bar.foo.baz.");
+    assertThat(domain.getCanonical()).isEqualTo(BAR_FOO_BAZ);
   }
 
   @Test
   void testCanonicalOnStringDomain() {
-    var domain = Domain.of("bar.foo.baz.");
-    assertThat(domain.getCanonical()).isEqualTo("bar.foo.baz.");
+    var domain = Domain.of(BAR_FOO_BAZ);
+    assertThat(domain.getCanonical()).isEqualTo(BAR_FOO_BAZ);
   }
 
   @Test
   void testFirstLabelOfDomain() {
-    var domain = Domain.of("bar.foo.baz.");
+    var domain = Domain.of(BAR_FOO_BAZ);
     assertThat(domain.getFirstLabel()).isEqualTo(LABEL_2);
   }
 
   @Test
   void testLastLabelOfDomain() {
-    var domain = Domain.of("bar.foo.baz.");
+    var domain = Domain.of(BAR_FOO_BAZ);
     assertThat(domain.getLastLabel()).isEqualTo(LABEL_1);
   }
 
   @Test
   void testDomainWithoutFirstLabel() {
-    var domain = Domain.of("bar.foo.baz.");
+    var domain = Domain.of(BAR_FOO_BAZ);
     assertThat(domain.getDomainWithoutFirstLabel()).isEqualTo(Domain.of("foo.baz."));
   }
 
   @Test
   void testDomainWithoutLastLabel() {
-    var domain = Domain.of("bar.foo.baz.");
+    var domain = Domain.of(BAR_FOO_BAZ);
     assertThat(domain.getDomainWithoutLastLabel()).isEqualTo(Domain.of("bar.foo."));
   }
 
   @Test
   void testCompareSameDomains() {
-    var domain1 = Domain.of("bar.foo.baz.");
-    var domain2 = Domain.of("bar.foo.baz.");
+    var domain1 = Domain.of(BAR_FOO_BAZ);
+    var domain2 = Domain.of(BAR_FOO_BAZ);
     assertThat(domain1).isEqualTo(domain2);
   }
 

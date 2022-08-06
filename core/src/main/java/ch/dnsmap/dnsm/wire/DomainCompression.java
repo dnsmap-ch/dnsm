@@ -24,10 +24,10 @@ public final class DomainCompression {
       domainPositionMap.put(domain, pointer);
 
       Domain parentDomain = domain.getDomainWithoutFirstLabel();
-      startPosition += domain.getLabels().get(0).length() + 1;
+      int newStartPosition = startPosition + domain.getLabels().get(0).length() + 1;
 
       if (parentDomain.getLabelCount() > 0) {
-        addDomain(parentDomain, startPosition);
+        addDomain(parentDomain, newStartPosition);
       }
     }
   }

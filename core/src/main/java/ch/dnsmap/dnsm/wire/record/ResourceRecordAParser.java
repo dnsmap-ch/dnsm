@@ -9,6 +9,7 @@ public final class ResourceRecordAParser implements ByteParser<Ip4> {
 
   private static final int IPV4_BYTE_LENGTH = 4;
 
+  @Override
   public Ip4 fromWire(ReadableByte wireData) {
     int rdLength = wireData.readUInt16();
     byte[] ip4Bytes = wireData.readByte(rdLength);
@@ -23,6 +24,7 @@ public final class ResourceRecordAParser implements ByteParser<Ip4> {
   }
 
 
+  @Override
   public int bytesToWrite(Ip4 data) {
     return data.getIp().getAddress().length;
   }

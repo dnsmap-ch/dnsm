@@ -136,6 +136,7 @@ public final class DomainParser implements ByteParser<Domain> {
    * @param data domain name to count its labels total length
    * @return the length in bytes of a domains label
    */
+  @Override
   public int bytesToWrite(Domain data) {
 
     if (domainCompression == null) {

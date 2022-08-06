@@ -14,6 +14,7 @@ public final class QuestionDomainParser implements ByteParser<Question> {
     domainParser = new DomainParser();
   }
 
+  @Override
   public Question fromWire(ReadableByte wireData) {
     Domain qName = domainParser.fromWire(wireData);
     DnsQueryType qType = DnsQueryType.of(wireData.readUInt16());
