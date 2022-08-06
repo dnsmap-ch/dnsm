@@ -63,7 +63,8 @@ public final class DomainParser implements ByteParser<Domain> {
     int labelLength = wireData.readUInt8();
     bytesRead += labelLength;
     if (bytesRead > length) {
-      // TODO add logging this is a special case where the domain is potential longer than bytes to read
+      // TODO add logging this is a special case where the domain is potential longer than bytes to
+      //  read
       return Domain.of(labels);
     }
 

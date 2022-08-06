@@ -45,8 +45,6 @@ public class Label {
 
   @Override
   public String toString() {
-    return "Label{" +
-        "label='" + label + '\'' +
-        '}';
+    return "Label{label='" + label + '\'' + '}';
   }
 }

@@ -141,7 +141,8 @@ public final class Domain {
   }
 
   /**
-   * Cannibalised representation of the domain. Labels are joined by a single dot including ending dot in lower case.
+   * Cannibalised representation of the domain. Labels are joined by a single dot including ending
+   * dot in lower case.
    *
    * @return canonical representation of this domain
    */
@@ -185,8 +186,6 @@ public final class Domain {
 
   @Override
   public String toString() {
-    return "Domain{" +
-        "labels=" + labels +
-        '}';
+    return "Domain{labels=" + labels + '}';
   }
 }
