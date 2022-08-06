@@ -29,7 +29,7 @@ tasks.getByName<Test>("test") {
 
 pmd {
     isConsoleOutput = true
-    toolVersion = "6.21.0"
+    toolVersion = "6.48.0"
     rulesMinimumPriority.set(5)
     ruleSets = listOf("category/java/errorprone.xml", "category/java/bestpractices.xml")
 }
