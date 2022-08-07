@@ -9,11 +9,13 @@ import ch.dnsmap.dnsm.record.ResourceRecordAaaa;
 import ch.dnsmap.dnsm.record.ResourceRecordCname;
 import ch.dnsmap.dnsm.record.ResourceRecordNs;
 import ch.dnsmap.dnsm.record.ResourceRecordOpaque;
+import ch.dnsmap.dnsm.record.ResourceRecordTxt;
 import ch.dnsmap.dnsm.record.type.Cname;
 import ch.dnsmap.dnsm.record.type.Ip4;
 import ch.dnsmap.dnsm.record.type.Ip6;
 import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
+import ch.dnsmap.dnsm.record.type.Txt;
 import ch.dnsmap.dnsm.wire.ByteParser;
 import ch.dnsmap.dnsm.wire.DomainCompression;
 import ch.dnsmap.dnsm.wire.DomainParser;
@@ -27,11 +29,12 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
   private static final int DNS_TTL_FIELD_LENGTH = 4;
 
   private final DomainParser domainParser;
-  private final ResourceRecordAParser rrAParser;
   private final ResourceRecordAAAAParser rrAaaaParser;
+  private final ResourceRecordAParser rrAParser;
   private final ResourceRecordCnameParser rrCnameParser;
   private final ResourceRecordNsParser rrNsParser;
   private final ResourceRecordOpaqueParser rrOpaqueParser;
+  private final ResourceRecordTxtParser rrTxtParser;
 
   public ResourceRecordParser() {
     domainParser = new DomainParser();
@@ -40,6 +43,7 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
     rrCnameParser = new ResourceRecordCnameParser(domainParser);
     rrNsParser = new ResourceRecordNsParser(domainParser);
     rrOpaqueParser = new ResourceRecordOpaqueParser();
+    rrTxtParser = new ResourceRecordTxtParser();
   }
 
   public void setDomainPositionMap(DomainCompression domainCompression) {
@@ -71,6 +75,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
         int rdLength = wireData.readUInt16();
         Ns ns = rrNsParser.fromWire(wireData, rdLength);
         return new ResourceRecordNs(name, dnsClass, ttl, ns);
+      }
+      case TXT -> {
+        int rdLength = wireData.readUInt16();
+        Txt txt = rrTxtParser.fromWire(wireData, rdLength);
+        return new ResourceRecordTxt(name, dnsClass, ttl, txt);
       }
       default -> {
         OpaqueData opaqueData = rrOpaqueParser.fromWire(wireData);
@@ -109,6 +118,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
         bytesWritten += rrNsParser.toWire(wireData, nsData.getNs());
         return bytesWritten;
       }
+      case TXT -> {
+        ResourceRecordTxt txtData = (ResourceRecordTxt) data;
+        bytesWritten += rrTxtParser.toWire(wireData, txtData.getTxt());
+        return bytesWritten;
+      }
       default -> {
         ResourceRecordOpaque opaqueData = (ResourceRecordOpaque) data;
         bytesWritten += rrOpaqueParser.toWire(wireData, opaqueData.getOpaqueData());
@@ -145,6 +159,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
       case NS -> {
         ResourceRecordNs rrNs = (ResourceRecordNs) data;
         bytesToWrite += rrNsParser.bytesToWrite(rrNs.getNs());
+        return bytesToWrite;
+      }
+      case TXT -> {
+        ResourceRecordTxt rrTxt = (ResourceRecordTxt) data;
+        bytesToWrite += rrTxtParser.bytesToWrite(rrTxt.getTxt());
         return bytesToWrite;
       }
       default -> {

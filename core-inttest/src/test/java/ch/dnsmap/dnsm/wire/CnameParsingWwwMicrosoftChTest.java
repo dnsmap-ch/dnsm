@@ -18,7 +18,6 @@ import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
-import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
@@ -36,46 +35,17 @@ import org.junit.jupiter.api.Test;
 
 class CnameParsingWwwMicrosoftChTest {
 
-  private static final byte[] DNS_BYTES_HEADER = new byte[] {
-      (byte) 0x9a, (byte) 0xb0, (byte) 0x81, (byte) 0x80, (byte) 0x00, (byte) 0x01, (byte) 0x00,
-      (byte) 0x06, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01
-  };
-  private static final byte[] DNS_BYTES_QUESTION = new byte[] {
-      (byte) 0x03, (byte) 0x77, (byte) 0x77, (byte) 0x77, (byte) 0x09, (byte) 0x6d, (byte) 0x69,
-      (byte) 0x63, (byte) 0x72, (byte) 0x6f, (byte) 0x73, (byte) 0x6f, (byte) 0x66, (byte) 0x74,
-      (byte) 0x02, (byte) 0x63, (byte) 0x68, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00,
-      (byte) 0x01
-  };
-  private static final byte[] DNS_BYTES_ANSWER = new byte[] {
-      (byte) 0xc0, (byte) 0x0c, (byte) 0x00, (byte) 0x05, (byte) 0x00, (byte) 0x01, (byte) 0x00,
-      (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x02, (byte) 0xc0, (byte) 0x10,
-      (byte) 0xc0, (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x00,
-      (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x04, (byte) 0x14, (byte) 0x67,
-      (byte) 0x55, (byte) 0x21, (byte) 0xc0, (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00,
-      (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x04,
-      (byte) 0x14, (byte) 0x70, (byte) 0x34, (byte) 0x1d, (byte) 0xc0, (byte) 0x10, (byte) 0x00,
-      (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x0e, (byte) 0x10,
-      (byte) 0x00, (byte) 0x04, (byte) 0x14, (byte) 0x35, (byte) 0xcb, (byte) 0x32, (byte) 0xc0,
-      (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00,
-      (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x04, (byte) 0x14, (byte) 0x51, (byte) 0x6f,
-      (byte) 0x55, (byte) 0xc0, (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x01,
-      (byte) 0x00, (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x04, (byte) 0x14,
-      (byte) 0x54, (byte) 0xb5, (byte) 0x3e
-  };
-  private static final byte[] DNS_BYTES_ADDITIONAL = new byte[] {
-      (byte) 0x00, (byte) 0x00, (byte) 0x29, (byte) 0x04, (byte) 0xd0, (byte) 0x00, (byte) 0x00,
-      (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
-  };
+  private static final String MICROSOFT_CH = "microsoft.ch.";
+  private static final String WWW_MICROSOFT_CH = "www.microsoft.ch.";
+
   private static final int MESSAGE_ID = 39600;
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
-  private static final String HOST_NAME = "www.microsoft.ch.";
-  private static final String DOMAIN_NAME = "microsoft.ch.";
-  private static final Label LABEL_WWW = Label.of("www");
-  private static final Label LABEL_MICROSOFT = Label.of("microsoft");
-  private static final Label LABEL_CH = Label.of("ch");
-  private static final Domain HOST = Domain.of(LABEL_WWW, LABEL_MICROSOFT, LABEL_CH);
-  private static final Domain DOMAIN = Domain.of(LABEL_MICROSOFT, LABEL_CH);
+  private static final Domain DOMAIN = Domain.of(WWW_MICROSOFT_CH);
+  private static final Domain QUESTION_DOMAIN = DOMAIN;
+  private static final Domain ANSWER_DOMAIN = Domain.of(MICROSOFT_CH);
+  private static final Cname ANSWER_CNAME = new Cname(Domain.of(MICROSOFT_CH));
   private static final int TTL = 3600;
+
   private static final Ip4 IP_V4_1 = Ip4.of("20.103.85.33");
   private static final Ip4 IP_V4_2 = Ip4.of("20.112.52.29");
   private static final Ip4 IP_V4_3 = Ip4.of("20.53.203.50");
@@ -104,7 +74,7 @@ class CnameParsingWwwMicrosoftChTest {
   void testDnsQuestionInputParsing() {
     var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
     var questions = jumpToQuestionSection(dnsInput);
-    assertDnsQuestion(questions, HOST_NAME, DnsQueryType.A, DnsQueryClass.IN);
+    assertDnsQuestion(questions, QUESTION_DOMAIN, DnsQueryType.A, DnsQueryClass.IN);
   }
 
   @Test
@@ -114,12 +84,12 @@ class CnameParsingWwwMicrosoftChTest {
     var answers = jumpToAnswerSection(dnsInput);
 
     assertThat(answers.size()).isEqualTo(6);
-    assertDnsRecordCname(answers.get(0), HOST_NAME, IN, TTL, new Cname(DOMAIN));
-    assertDnsRecordIp4(answers.get(1), DOMAIN_NAME, IN, TTL, IP_V4_1);
-    assertDnsRecordIp4(answers.get(2), DOMAIN_NAME, IN, TTL, IP_V4_2);
-    assertDnsRecordIp4(answers.get(3), DOMAIN_NAME, IN, TTL, IP_V4_3);
-    assertDnsRecordIp4(answers.get(4), DOMAIN_NAME, IN, TTL, IP_V4_4);
-    assertDnsRecordIp4(answers.get(5), DOMAIN_NAME, IN, TTL, IP_V4_5);
+    assertDnsRecordCname(answers.get(0), QUESTION_DOMAIN, IN, TTL, ANSWER_CNAME);
+    assertDnsRecordIp4(answers.get(1), ANSWER_DOMAIN, IN, TTL, IP_V4_1);
+    assertDnsRecordIp4(answers.get(2), ANSWER_DOMAIN, IN, TTL, IP_V4_2);
+    assertDnsRecordIp4(answers.get(3), ANSWER_DOMAIN, IN, TTL, IP_V4_3);
+    assertDnsRecordIp4(answers.get(4), ANSWER_DOMAIN, IN, TTL, IP_V4_4);
+    assertDnsRecordIp4(answers.get(5), ANSWER_DOMAIN, IN, TTL, IP_V4_5);
   }
 
   @Test
@@ -165,19 +135,51 @@ class CnameParsingWwwMicrosoftChTest {
   }
 
   private static Question composeQuestion() {
-    return new Question(HOST, DnsQueryType.A, DnsQueryClass.IN);
+    return new Question(QUESTION_DOMAIN, DnsQueryType.A, DnsQueryClass.IN);
   }
 
   private static List<ResourceRecord> composeAnswer() {
     List<ResourceRecord> answers = new ArrayList<>(6);
-    answers.add(
-        new ResourceRecordCname(Domain.of(LABEL_WWW, LABEL_MICROSOFT, LABEL_CH), IN, TTL,
-            new Cname(Domain.of(LABEL_MICROSOFT, LABEL_CH))));
-    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_1));
-    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_2));
-    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_3));
-    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_4));
-    answers.add(new ResourceRecordA(DOMAIN, IN, TTL, IP_V4_5));
+    answers.add(new ResourceRecordCname(QUESTION_DOMAIN, IN, TTL, new Cname(ANSWER_DOMAIN)));
+    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_1));
+    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_2));
+    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_3));
+    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_4));
+    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_5));
     return answers;
   }
+
+  private static final byte[] DNS_BYTES_HEADER = new byte[] {
+      (byte) 0x9a, (byte) 0xb0, (byte) 0x81, (byte) 0x80, (byte) 0x00, (byte) 0x01, (byte) 0x00,
+      (byte) 0x06, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01
+  };
+
+  private static final byte[] DNS_BYTES_QUESTION = new byte[] {
+      (byte) 0x03, (byte) 0x77, (byte) 0x77, (byte) 0x77, (byte) 0x09, (byte) 0x6d, (byte) 0x69,
+      (byte) 0x63, (byte) 0x72, (byte) 0x6f, (byte) 0x73, (byte) 0x6f, (byte) 0x66, (byte) 0x74,
+      (byte) 0x02, (byte) 0x63, (byte) 0x68, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00,
+      (byte) 0x01
+  };
+
+  private static final byte[] DNS_BYTES_ANSWER = new byte[] {
+      (byte) 0xc0, (byte) 0x0c, (byte) 0x00, (byte) 0x05, (byte) 0x00, (byte) 0x01, (byte) 0x00,
+      (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x02, (byte) 0xc0, (byte) 0x10,
+      (byte) 0xc0, (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x00,
+      (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x04, (byte) 0x14, (byte) 0x67,
+      (byte) 0x55, (byte) 0x21, (byte) 0xc0, (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00,
+      (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x04,
+      (byte) 0x14, (byte) 0x70, (byte) 0x34, (byte) 0x1d, (byte) 0xc0, (byte) 0x10, (byte) 0x00,
+      (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x0e, (byte) 0x10,
+      (byte) 0x00, (byte) 0x04, (byte) 0x14, (byte) 0x35, (byte) 0xcb, (byte) 0x32, (byte) 0xc0,
+      (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x00,
+      (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x04, (byte) 0x14, (byte) 0x51, (byte) 0x6f,
+      (byte) 0x55, (byte) 0xc0, (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x01,
+      (byte) 0x00, (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x04, (byte) 0x14,
+      (byte) 0x54, (byte) 0xb5, (byte) 0x3e
+  };
+
+  private static final byte[] DNS_BYTES_ADDITIONAL = new byte[] {
+      (byte) 0x00, (byte) 0x00, (byte) 0x29, (byte) 0x04, (byte) 0xd0, (byte) 0x00, (byte) 0x00,
+      (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
+  };
 }
