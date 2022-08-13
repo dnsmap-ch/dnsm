@@ -260,7 +260,7 @@ class DomainParserTest {
     @Test
     void testDomainWithCompression() {
       var domain = Domain.of("a.bc.def.ghij.klmno.");
-      var domainParser = domainParserWithCompression("asf.", ".ghij.klmno.", "foo.baz.");
+      var domainParser = domainParserWithCompression("asf.", "ghij.klmno.", "foo.baz.");
 
       var nofBytes = domainParser.bytesToWrite(domain);
 
