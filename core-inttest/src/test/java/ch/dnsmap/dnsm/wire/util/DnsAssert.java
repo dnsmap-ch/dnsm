@@ -14,6 +14,7 @@ import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
 import ch.dnsmap.dnsm.record.ResourceRecordAaaa;
@@ -52,37 +53,37 @@ public final class DnsAssert {
   }
 
   public static void assertDnsRecordCname(ResourceRecord resourceRecord, Domain domainName,
-                                          DnsClass dnsClass, long ttl, Cname cname) {
+                                          DnsClass dnsClass, Ttl ttl, Cname cname) {
     assertDnsRecord(resourceRecord, domainName, CNAME, dnsClass, ttl);
     assertThat(((ResourceRecordCname) resourceRecord).getCname()).isEqualTo(cname);
   }
 
   public static void assertDnsRecordIp4(ResourceRecord resourceRecord, Domain domainName,
-                                        DnsClass dnsClass, long ttl, Ip4 ip4) {
+                                        DnsClass dnsClass, Ttl ttl, Ip4 ip4) {
     assertDnsRecord(resourceRecord, domainName, A, dnsClass, ttl);
     assertThat(((ResourceRecordA) resourceRecord).getIp4()).isEqualTo(ip4);
   }
 
   public static void assertDnsRecordIp6(ResourceRecord resourceRecord, Domain domainName,
-                                        DnsClass dnsClass, long ttl, Ip6 ip6) {
+                                        DnsClass dnsClass, Ttl ttl, Ip6 ip6) {
     assertDnsRecord(resourceRecord, domainName, AAAA, dnsClass, ttl);
     assertThat(((ResourceRecordAaaa) resourceRecord).getIp6()).isEqualTo(ip6);
   }
 
   public static void assertDnsRecordNs(ResourceRecord resourceRecord, Domain domainName,
-                                       DnsClass dnsClass, long ttl, Ns ns) {
+                                       DnsClass dnsClass, Ttl ttl, Ns ns) {
     assertDnsRecord(resourceRecord, domainName, NS, dnsClass, ttl);
     assertThat(((ResourceRecordNs) resourceRecord).getNs()).isEqualTo(ns);
   }
 
   public static void assertDnsRecordTxt(ResourceRecord resourceRecord, Domain domainName,
-                                       DnsClass dnsClass, long ttl, Txt txt) {
+                                       DnsClass dnsClass, Ttl ttl, Txt txt) {
     assertDnsRecord(resourceRecord, domainName, TXT, dnsClass, ttl);
     assertThat(((ResourceRecordTxt) resourceRecord).getTxt()).isEqualTo(txt);
   }
 
   private static void assertDnsRecord(ResourceRecord resourceRecord, Domain domainName,
-                                      DnsType dnsType, DnsClass dnsClass, long ttl) {
+                                      DnsType dnsType, DnsClass dnsClass, Ttl ttl) {
     assertThat(resourceRecord.getName()).isEqualTo(domainName);
     assertThat(resourceRecord.getDnsType()).isEqualTo(dnsType);
     assertThat(resourceRecord.getDnsClass()).isEqualTo(dnsClass);

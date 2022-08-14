@@ -3,6 +3,7 @@ package ch.dnsmap.dnsm.wire.record;
 import ch.dnsmap.dnsm.DnsClass;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
+import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
 import ch.dnsmap.dnsm.record.ResourceRecordAaaa;
@@ -55,7 +56,7 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
     Domain name = domainParser.fromWire(wireData);
     DnsType dnsType = DnsType.of(wireData.readUInt16());
     DnsClass dnsClass = DnsClass.of(wireData.readUInt16());
-    int ttl = wireData.readInt32();
+    Ttl ttl = Ttl.of(wireData.readInt32());
 
     switch (dnsType) {
       case A -> {
@@ -95,7 +96,7 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
     bytesWritten += domainParser.toWire(wireData, data.getName());
     bytesWritten += wireData.writeUInt16(data.getDnsType().getValue());
     bytesWritten += wireData.writeUInt16(data.getDnsClass().getValue());
-    bytesWritten += wireData.writeInt32((int) data.getTtl());
+    bytesWritten += wireData.writeInt32((int) data.getTtl().getTtl());
 
     switch (data.getDnsType()) {
       case A -> {

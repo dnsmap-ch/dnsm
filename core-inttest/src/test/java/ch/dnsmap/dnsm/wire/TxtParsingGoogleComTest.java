@@ -15,6 +15,7 @@ import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordTxt;
 import ch.dnsmap.dnsm.record.type.Txt;
@@ -35,7 +36,7 @@ public final class TxtParsingGoogleComTest {
   private static final Domain DOMAIN = Domain.of(GOOGLE_COM);
   private static final Domain QUESTION_DOMAIN = DOMAIN;
   private static final Domain ANSWER_DOMAIN = DOMAIN;
-  private static final int TTL = 3600;
+  private static final Ttl TTL = Ttl.of(3600);
 
   private static final String TXT_01 = "v=spf1 include:_spf.google.com ~all";
   private static final String TXT_02 =

@@ -19,6 +19,7 @@ import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
 import ch.dnsmap.dnsm.record.ResourceRecordCname;
@@ -44,7 +45,7 @@ class CnameParsingWwwMicrosoftChTest {
   private static final Domain QUESTION_DOMAIN = DOMAIN;
   private static final Domain ANSWER_DOMAIN = Domain.of(MICROSOFT_CH);
   private static final Cname ANSWER_CNAME = new Cname(Domain.of(MICROSOFT_CH));
-  private static final int TTL = 3600;
+  private static final Ttl TTL = Ttl.of(3600);
 
   private static final Ip4 IP_V4_1 = Ip4.of("20.103.85.33");
   private static final Ip4 IP_V4_2 = Ip4.of("20.112.52.29");
@@ -110,7 +111,7 @@ class CnameParsingWwwMicrosoftChTest {
       assertThat(answer.getName()).isEqualTo(root());
       assertThat(answer.getDnsType()).isEqualTo(DnsType.UNKNOWN);
       assertThat(answer.getDnsClass()).isEqualTo(DnsClass.UNKNOWN);
-      assertThat(answer.getTtl()).isEqualTo(0L);
+      assertThat(answer.getTtl()).isEqualTo(Ttl.of(0));
       assertThat(((ResourceRecordOpaque) answer).getOpaqueData().opaque()).isEqualTo(new byte[0]);
     });
   }

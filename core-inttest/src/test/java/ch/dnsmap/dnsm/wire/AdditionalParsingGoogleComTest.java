@@ -17,6 +17,7 @@ import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
 import ch.dnsmap.dnsm.record.ResourceRecordAaaa;
@@ -45,7 +46,7 @@ public final class AdditionalParsingGoogleComTest {
   private static final Domain DOMAIN = Domain.of(GOOGLE_COM);
   private static final Domain QUESTION_DOMAIN = DOMAIN;
   private static final Domain AUTHORITY_DOMAIN = DOMAIN;
-  private static final long TTL = 172800;
+  private static final Ttl TTL = Ttl.of(172800);
 
   private static final Domain NS1_DOMAIN = Domain.of(NS_1_GOOGLE_COM);
   private static final Domain NS2_DOMAIN = Domain.of(NS_2_GOOGLE_COM);

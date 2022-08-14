@@ -3,15 +3,16 @@ package ch.dnsmap.dnsm.record;
 import ch.dnsmap.dnsm.DnsClass;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
+import ch.dnsmap.dnsm.Ttl;
 
 public abstract class ResourceRecord {
 
   private Domain name;
   private DnsType dnsType;
   private DnsClass dnsClass;
-  long ttl;
+  private Ttl ttl;
 
-  protected ResourceRecord(Domain name, DnsType dnsType, DnsClass dnsClass, long ttl) {
+  protected ResourceRecord(Domain name, DnsType dnsType, DnsClass dnsClass, Ttl ttl) {
     this.name = name;
     this.dnsType = dnsType;
     this.dnsClass = dnsClass;
@@ -30,7 +31,7 @@ public abstract class ResourceRecord {
     return dnsClass;
   }
 
-  public long getTtl() {
+  public Ttl getTtl() {
     return ttl;
   }
 }
