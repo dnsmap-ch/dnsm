@@ -2,6 +2,7 @@ package ch.dnsmap.dnsm;
 
 import static ch.dnsmap.dnsm.Domain.root;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
@@ -86,5 +87,24 @@ class DomainTest {
     var domain1 = Domain.of("bar.baz.");
     var domain2 = Domain.of("foo.baz.");
     assertThat(domain1).isNotEqualTo(domain2);
+  }
+
+  @Test
+  void testInvalidNullLabel() {
+    assertThatThrownBy(() -> Domain.of((String) null))
+        .isInstanceOf(NullPointerException.class)
+        .hasMessage("domain string must not be null");
+  }
+
+  @Test
+  void testInvalidTooLongLabelLength() {
+    var invalidLabel = "this.value.is.too.long.for.a.label.abcdefghijklmnopqrstuvwxyz.this.value.is"
+        + ".too.long.for.a.label.abcdefghijklmnopqrstuvwxyz.is.value.is.too.long.for.a.label.abcdef"
+        + "ghijklmnopqrstuvwxyz.this.value.is.too.long.for.a.label.abcdefghijklmnopqrstuvwxyz.is.va"
+        + "lue.is.too.long.for.a.label.abcdefghijklmnopqrstuvwxyz.this.value.is.too.long.for.a.labe"
+        + "l.abcdefghijklmnopqrstuvwxyz";
+    assertThatThrownBy(() -> Domain.of(invalidLabel))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("domain name exceeds max length of 255");
   }
 }

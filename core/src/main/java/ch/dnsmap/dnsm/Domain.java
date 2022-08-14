@@ -8,11 +8,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Domain name consists of an empty or multiple labels.
+ */
 public final class Domain {
+
+  /**
+   * Domain name must be 255 characters or less, as specified in RFC 1035, 2.3.4. Size limits.
+   */
+  private static final int MAX_LENGTH = 255;
 
   private final List<Label> labels;
 
   private Domain(Label... labels) {
+    Objects.requireNonNull(labels, "labels must not be null");
+
+    int totalLength = stream(labels).map(label -> label.length() + 1).reduce(0, Integer::sum);
+    if (totalLength > MAX_LENGTH) {
+      throw new IllegalArgumentException("domain name exceeds max length of " + MAX_LENGTH);
+    }
+
     this.labels = List.of(labels);
   }
 
@@ -30,6 +45,8 @@ public final class Domain {
    *
    * @param label label to create a domain of
    * @return domain containing single label
+   * @throws IllegalArgumentException if {@code label} does not fulfill RFC 1035 requirements
+   * @throws NullPointerException     if {@code label} is null
    */
   public static Domain of(Label label) {
     return new Domain(label);
@@ -40,6 +57,8 @@ public final class Domain {
    *
    * @param labels labels to create a domain of
    * @return domain of the labels
+   * @throws IllegalArgumentException if {@code labels} does not fulfill RFC 1035 requirements
+   * @throws NullPointerException     if {@code labels} is null
    */
   public static Domain of(Label... labels) {
     return new Domain(labels);
@@ -50,8 +69,11 @@ public final class Domain {
    *
    * @param labels labels to create a domain of
    * @return domain of the labels
+   * @throws IllegalArgumentException if {@code labels} does not fulfill RFC 1035 requirements
+   * @throws NullPointerException     if {@code labels} is null
    */
   public static Domain of(List<Label> labels) {
+    Objects.requireNonNull(labels, "labels must not be null");
     return of(labels.toArray(new Label[0]));
   }
 
@@ -61,8 +83,14 @@ public final class Domain {
    * @param domain domain before label
    * @param label  label after domain
    * @return domain with appended label
+   * @throws IllegalArgumentException if {@code label} or {@code domain} does not fulfill RFC 1035
+   *                                  requirements
+   * @throws NullPointerException     if {@code label} or {@code domain} is null
    */
   public static Domain of(Domain domain, Label label) {
+    Objects.requireNonNull(label, "label must not be null");
+    Objects.requireNonNull(domain, "domain name must not be null");
+
     List<Label> labels = new ArrayList<>(domain.getLabels());
     labels.add(label);
     return of(labels);
@@ -74,8 +102,14 @@ public final class Domain {
    * @param label  label before domain
    * @param domain domain after label
    * @return domain with prepended label
+   * @throws IllegalArgumentException if {@code label} or {@code domain}  does not fulfill RFC 1035
+   *                                  requirements
+   * @throws NullPointerException     if {@code label} or {@code domain} is null
    */
   public static Domain of(Label label, Domain domain) {
+    Objects.requireNonNull(label, "label must not be null");
+    Objects.requireNonNull(domain, "domain name must not be null");
+
     List<Label> labels = new ArrayList<>(1 + domain.getLabelCount());
     labels.add(label);
     labels.addAll(domain.getLabels());
@@ -87,8 +121,13 @@ public final class Domain {
    *
    * @param domainString domain name in form of a string
    * @return domain of the string labels
+   * @throws IllegalArgumentException if {@code domainString } does not fulfill RFC 1035
+   *                                  requirements
+   * @throws NullPointerException     if {@code domainString} is null
    */
   public static Domain of(String domainString) {
+    Objects.requireNonNull(domainString, "domain string must not be null");
+
     List<Label> labels = stream(domainString.split("\\.")).map(Label::of).toList();
     return of(labels);
   }
