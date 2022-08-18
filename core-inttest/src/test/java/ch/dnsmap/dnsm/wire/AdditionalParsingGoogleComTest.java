@@ -124,7 +124,7 @@ public final class AdditionalParsingGoogleComTest {
   }
 
   @Test
-  void testCnameOutputParsing() {
+  void testOutputParsing() {
     var header = composeHeader();
     var question = composeQuestion();
     var answer = new LinkedList<ResourceRecord>();
