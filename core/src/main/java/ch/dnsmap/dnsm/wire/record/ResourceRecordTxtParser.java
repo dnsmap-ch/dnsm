@@ -14,6 +14,7 @@ public final class ResourceRecordTxtParser implements ByteParser<Txt> {
     return null;
   }
 
+  @Override
   public Txt fromWire(ReadableByte wireData, int length) {
     int txtLength = wireData.readUInt8();
     byte[] txtBytes = wireData.readByte(txtLength);

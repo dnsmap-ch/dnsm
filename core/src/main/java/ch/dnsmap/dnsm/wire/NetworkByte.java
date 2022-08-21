@@ -21,7 +21,7 @@ public final class NetworkByte implements ReadableByte, WriteableByte {
   }
 
   @Override
-  public int savePosition() {
+  public int createRestorePosition() {
     return byteBuffer.position();
   }
 

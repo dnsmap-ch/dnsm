@@ -21,6 +21,7 @@ public final class ResourceRecordCnameParser implements ByteParser<Cname> {
     return new Cname(domain);
   }
 
+  @Override
   public Cname fromWire(ReadableByte wireData, int length) {
     Domain domain = domainParser.fromWire(wireData, length);
     return new Cname(domain);

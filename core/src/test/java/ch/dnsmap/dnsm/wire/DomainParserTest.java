@@ -183,7 +183,7 @@ class DomainParserTest {
       var bytes = domainParser.toWire(networkBytes, root());
 
       assertThat(bytes).isEqualTo(1);
-      assertThat(networkBytes.savePosition()).isEqualTo(1);
+      assertThat(networkBytes.createRestorePosition()).isEqualTo(1);
       networkBytes.jumpToPosition(0);
       assertThat(networkBytes.readByte(1)).isEqualTo(new byte[] {0x00});
     }
@@ -198,7 +198,7 @@ class DomainParserTest {
       var bytes = domainParser.toWire(networkBytes, Domain.of("dnsmap.ch"));
 
       assertThat(bytes).isEqualTo(11);
-      assertThat(networkBytes.savePosition()).isEqualTo(11);
+      assertThat(networkBytes.createRestorePosition()).isEqualTo(11);
       networkBytes.jumpToPosition(0);
       assertThat(networkBytes.readByte(11)).isEqualTo(DOMAIN_BYTES);
     }
@@ -217,7 +217,7 @@ class DomainParserTest {
       var bytes = domainParser.toWire(networkBytes, Domain.of("asdf.dnsmap.ch"));
 
       assertThat(bytes).isEqualTo(7);
-      assertThat(networkBytes.savePosition()).isEqualTo(23);
+      assertThat(networkBytes.createRestorePosition()).isEqualTo(23);
       networkBytes.jumpToPosition(16);
       assertThat(networkBytes.readByte(7)).isEqualTo(
           new byte[] {0x04, 0x61, 0x73, 0x64, 0x66, (byte) 0xC0, 0x05});

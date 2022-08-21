@@ -99,6 +99,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
   }
 
   @Override
+  public ResourceRecord fromWire(ReadableByte wireData, int length) {
+    return null;
+  }
+
+  @Override
   public int toWire(WriteableByte wireData, ResourceRecord data) {
     int bytesWritten = 0;
 

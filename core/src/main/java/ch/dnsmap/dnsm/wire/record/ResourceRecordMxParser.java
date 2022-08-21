@@ -22,6 +22,7 @@ public final class ResourceRecordMxParser implements ByteParser<Mx> {
     return Mx.of(preference, domain);
   }
 
+  @Override
   public Mx fromWire(ReadableByte wireData, int length) {
     int preference = wireData.readUInt16();
     Domain domain = domainParser.fromWire(wireData, length - 2);

@@ -23,6 +23,11 @@ public final class QuestionDomainParser implements ByteParser<Question> {
   }
 
   @Override
+  public Question fromWire(ReadableByte wireData, int length) {
+    return null;
+  }
+
+  @Override
   public int toWire(WriteableByte wireData, Question data) {
     int length = domainParser.toWire(wireData, data.questionName());
     length += wireData.writeUInt16(data.questionType().getValue());
