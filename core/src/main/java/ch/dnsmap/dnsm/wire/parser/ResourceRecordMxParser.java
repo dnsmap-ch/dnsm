@@ -1,11 +1,9 @@
-package ch.dnsmap.dnsm.wire.record;
+package ch.dnsmap.dnsm.wire.parser;
 
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.record.type.Mx;
-import ch.dnsmap.dnsm.wire.ByteParser;
-import ch.dnsmap.dnsm.wire.DomainParser;
-import ch.dnsmap.dnsm.wire.ReadableByte;
-import ch.dnsmap.dnsm.wire.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
 public final class ResourceRecordMxParser implements ByteParser<Mx> {
 

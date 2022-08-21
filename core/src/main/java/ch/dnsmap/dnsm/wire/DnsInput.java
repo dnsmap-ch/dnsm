@@ -5,7 +5,10 @@ import static java.util.stream.IntStream.range;
 import ch.dnsmap.dnsm.Header;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.record.ResourceRecord;
-import ch.dnsmap.dnsm.wire.record.ResourceRecordParser;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
+import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
 import java.util.ArrayList;
 import java.util.List;
 

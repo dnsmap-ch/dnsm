@@ -1,11 +1,10 @@
-package ch.dnsmap.dnsm.wire.record;
+package ch.dnsmap.dnsm.wire.parser;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import ch.dnsmap.dnsm.record.type.Txt;
-import ch.dnsmap.dnsm.wire.ByteParser;
-import ch.dnsmap.dnsm.wire.ReadableByte;
-import ch.dnsmap.dnsm.wire.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
 public final class ResourceRecordTxtParser implements ByteParser<Txt> {
 

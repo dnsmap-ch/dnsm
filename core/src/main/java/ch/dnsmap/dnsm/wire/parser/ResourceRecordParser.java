@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.wire.record;
+package ch.dnsmap.dnsm.wire.parser;
 
 import ch.dnsmap.dnsm.DnsClass;
 import ch.dnsmap.dnsm.DnsType;
@@ -19,11 +19,9 @@ import ch.dnsmap.dnsm.record.type.Mx;
 import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
 import ch.dnsmap.dnsm.record.type.Txt;
-import ch.dnsmap.dnsm.wire.ByteParser;
 import ch.dnsmap.dnsm.wire.DomainCompression;
-import ch.dnsmap.dnsm.wire.DomainParser;
-import ch.dnsmap.dnsm.wire.ReadableByte;
-import ch.dnsmap.dnsm.wire.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
 public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
 

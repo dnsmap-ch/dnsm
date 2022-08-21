@@ -1,9 +1,8 @@
-package ch.dnsmap.dnsm.wire.record;
+package ch.dnsmap.dnsm.wire.parser;
 
 import ch.dnsmap.dnsm.record.type.Ip6;
-import ch.dnsmap.dnsm.wire.ByteParser;
-import ch.dnsmap.dnsm.wire.ReadableByte;
-import ch.dnsmap.dnsm.wire.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
 public final class ResourceRecordAAAAParser implements ByteParser<Ip6> {
 

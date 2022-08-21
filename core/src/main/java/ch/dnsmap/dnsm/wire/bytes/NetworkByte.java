@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.wire;
+package ch.dnsmap.dnsm.wire.bytes;
 
 import static java.nio.ByteBuffer.wrap;
 

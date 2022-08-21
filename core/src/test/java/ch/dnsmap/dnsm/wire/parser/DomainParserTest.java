@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.wire;
+package ch.dnsmap.dnsm.wire.parser;
 
 import static ch.dnsmap.dnsm.Domain.root;
 import static java.util.Arrays.stream;
@@ -6,6 +6,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
+import ch.dnsmap.dnsm.wire.DomainCompression;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
+import ch.dnsmap.dnsm.wire.parser.DomainParser;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.jupiter.api.Nested;

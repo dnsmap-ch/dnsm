@@ -1,10 +1,12 @@
-package ch.dnsmap.dnsm.wire;
+package ch.dnsmap.dnsm.wire.parser;
 
 
 import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
 public final class QuestionDomainParser implements ByteParser<Question> {
 

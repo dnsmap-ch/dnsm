@@ -4,7 +4,10 @@ import ch.dnsmap.dnsm.Header;
 import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.record.ResourceRecord;
-import ch.dnsmap.dnsm.wire.record.ResourceRecordParser;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
+import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
 import java.util.List;
 
 public final class DnsOutput {

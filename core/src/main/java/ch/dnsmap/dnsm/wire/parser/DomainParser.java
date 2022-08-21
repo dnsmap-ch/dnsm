@@ -1,9 +1,12 @@
-package ch.dnsmap.dnsm.wire;
+package ch.dnsmap.dnsm.wire.parser;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
+import ch.dnsmap.dnsm.wire.DomainCompression;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 import java.util.ArrayList;
 import java.util.List;
 

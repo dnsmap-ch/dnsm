@@ -1,4 +1,7 @@
-package ch.dnsmap.dnsm.wire;
+package ch.dnsmap.dnsm.wire.parser;
+
+import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
 public interface ByteParser<T> {
 
