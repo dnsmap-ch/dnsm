@@ -6,12 +6,8 @@ import ch.dnsmap.dnsm.record.type.Txt;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
-public final class ResourceRecordTxtParser implements ByteParser<Txt> {
-
-  @Override
-  public Txt fromWire(ReadableByte wireData) {
-    return null;
-  }
+public final class ResourceRecordTxtParser implements WireWritable<Txt>,
+    WireTypeReadable<Txt> {
 
   @Override
   public Txt fromWire(ReadableByte wireData, int length) {

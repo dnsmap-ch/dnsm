@@ -10,7 +10,8 @@ import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class DomainParser implements ByteParser<Domain> {
+public final class DomainParser
+    implements WireWritable<Domain>, WireReadable<Domain>, WireTypeReadable<Domain> {
 
   private static final int END_OF_DOMAIN = 0;
   private static final int DNS_DOMAIN_NAME_TERMINATION_BYTE_LENGTH = 1;

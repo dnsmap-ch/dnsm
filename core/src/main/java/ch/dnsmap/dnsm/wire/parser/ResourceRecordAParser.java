@@ -4,20 +4,14 @@ import ch.dnsmap.dnsm.record.type.Ip4;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
-public final class ResourceRecordAParser implements ByteParser<Ip4> {
+public final class ResourceRecordAParser implements WireWritable<Ip4>, WireTypeReadable<Ip4> {
 
   private static final int IPV4_BYTE_LENGTH = 4;
 
   @Override
-  public Ip4 fromWire(ReadableByte wireData) {
-    int rdLength = wireData.readUInt16();
-    byte[] ip4Bytes = wireData.readByte(rdLength);
-    return Ip4.of(ip4Bytes);
-  }
-
-  @Override
   public Ip4 fromWire(ReadableByte wireData, int length) {
-    return null;
+    byte[] ip4Bytes = wireData.readByte(length);
+    return Ip4.of(ip4Bytes);
   }
 
   @Override
@@ -26,7 +20,6 @@ public final class ResourceRecordAParser implements ByteParser<Ip4> {
     bytesWritten += wireData.writeByte(data.getIp().getAddress());
     return bytesWritten;
   }
-
 
   @Override
   public int bytesToWrite(Ip4 data) {

@@ -5,18 +5,13 @@ import ch.dnsmap.dnsm.record.type.Cname;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
-public final class ResourceRecordCnameParser implements ByteParser<Cname> {
+public final class ResourceRecordCnameParser
+    implements WireWritable<Cname>, WireTypeReadable<Cname> {
 
   private final DomainParser domainParser;
 
   public ResourceRecordCnameParser(DomainParser domainParser) {
     this.domainParser = domainParser;
-  }
-
-  @Override
-  public Cname fromWire(ReadableByte wireData) {
-    Domain domain = domainParser.fromWire(wireData);
-    return new Cname(domain);
   }
 
   @Override

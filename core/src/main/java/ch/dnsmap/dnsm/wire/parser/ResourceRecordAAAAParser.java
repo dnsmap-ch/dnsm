@@ -4,20 +4,14 @@ import ch.dnsmap.dnsm.record.type.Ip6;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
-public final class ResourceRecordAAAAParser implements ByteParser<Ip6> {
+public final class ResourceRecordAAAAParser implements WireWritable<Ip6>, WireTypeReadable<Ip6> {
 
   private static final int IPV6_BYTE_LENGTH = 16;
 
   @Override
-  public Ip6 fromWire(ReadableByte wireData) {
-    int rdLength = wireData.readUInt16();
-    byte[] ip6Bytes = wireData.readByte(rdLength);
-    return Ip6.of(ip6Bytes);
-  }
-
-  @Override
   public Ip6 fromWire(ReadableByte wireData, int length) {
-    return null;
+    byte[] ip6Bytes = wireData.readByte(length);
+    return Ip6.of(ip6Bytes);
   }
 
   @Override
@@ -26,7 +20,6 @@ public final class ResourceRecordAAAAParser implements ByteParser<Ip6> {
     bytesWritten += wireData.writeByte(data.getIp().getAddress());
     return bytesWritten;
   }
-
 
   @Override
   public int bytesToWrite(Ip6 data) {

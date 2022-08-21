@@ -4,18 +4,13 @@ import ch.dnsmap.dnsm.record.type.OpaqueData;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
-public final class ResourceRecordOpaqueParser implements ByteParser<OpaqueData> {
-
-  @Override
-  public OpaqueData fromWire(ReadableByte wireData) {
-    int rdLength = wireData.readUInt16();
-    byte[] opaqueBytes = wireData.readByte(rdLength);
-    return new OpaqueData(opaqueBytes);
-  }
+public final class ResourceRecordOpaqueParser
+    implements WireWritable<OpaqueData>, WireTypeReadable<OpaqueData> {
 
   @Override
   public OpaqueData fromWire(ReadableByte wireData, int length) {
-    return null;
+    byte[] opaqueBytes = wireData.readByte(length);
+    return new OpaqueData(opaqueBytes);
   }
 
   @Override

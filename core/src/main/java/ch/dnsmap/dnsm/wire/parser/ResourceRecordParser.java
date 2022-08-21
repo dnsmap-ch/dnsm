@@ -23,7 +23,8 @@ import ch.dnsmap.dnsm.wire.DomainCompression;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
-public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
+public final class ResourceRecordParser
+    implements WireWritable<ResourceRecord>, WireReadable<ResourceRecord> {
 
   private static final int DNS_TYPE_FIELD_LENGTH = 2;
   private static final int DNS_CLASS_FIELD_LENGTH = 2;
@@ -62,11 +63,13 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
 
     switch (dnsType) {
       case A -> {
-        Ip4 ip4 = rrAParser.fromWire(wireData);
+        int rdLength = wireData.readUInt16();
+        Ip4 ip4 = rrAParser.fromWire(wireData, rdLength);
         return new ResourceRecordA(name, dnsClass, ttl, ip4);
       }
       case AAAA -> {
-        Ip6 ip6 = rrAaaaParser.fromWire(wireData);
+        int rdLength = wireData.readUInt16();
+        Ip6 ip6 = rrAaaaParser.fromWire(wireData, rdLength);
         return new ResourceRecordAaaa(name, dnsClass, ttl, ip6);
       }
       case CNAME -> {
@@ -90,15 +93,11 @@ public final class ResourceRecordParser implements ByteParser<ResourceRecord> {
         return new ResourceRecordTxt(name, dnsClass, ttl, txt);
       }
       default -> {
-        OpaqueData opaqueData = rrOpaqueParser.fromWire(wireData);
+        int rdLength = wireData.readUInt16();
+        OpaqueData opaqueData = rrOpaqueParser.fromWire(wireData, rdLength);
         return new ResourceRecordOpaque(name, dnsType, dnsClass, ttl, opaqueData);
       }
     }
-  }
-
-  @Override
-  public ResourceRecord fromWire(ReadableByte wireData, int length) {
-    return null;
   }
 
   @Override

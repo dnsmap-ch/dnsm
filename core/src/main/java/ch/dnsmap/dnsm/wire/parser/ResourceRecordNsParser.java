@@ -5,18 +5,12 @@ import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
-public final class ResourceRecordNsParser implements ByteParser<Ns> {
+public final class ResourceRecordNsParser implements WireWritable<Ns>, WireTypeReadable<Ns> {
 
   private final DomainParser domainParser;
 
   public ResourceRecordNsParser(DomainParser domainParser) {
     this.domainParser = domainParser;
-  }
-
-  @Override
-  public Ns fromWire(ReadableByte wireData) {
-    Domain domain = domainParser.fromWire(wireData);
-    return new Ns(domain);
   }
 
   @Override

@@ -5,19 +5,12 @@ import ch.dnsmap.dnsm.record.type.Mx;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
 
-public final class ResourceRecordMxParser implements ByteParser<Mx> {
+public final class ResourceRecordMxParser implements WireWritable<Mx>, WireTypeReadable<Mx> {
 
   private final DomainParser domainParser;
 
   public ResourceRecordMxParser(DomainParser domainParser) {
     this.domainParser = domainParser;
-  }
-
-  @Override
-  public Mx fromWire(ReadableByte wireData) {
-    int preference = wireData.readUInt16();
-    Domain domain = domainParser.fromWire(wireData);
-    return Mx.of(preference, domain);
   }
 
   @Override
