@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm;
+package ch.dnsmap.dnsm.header;
 
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;

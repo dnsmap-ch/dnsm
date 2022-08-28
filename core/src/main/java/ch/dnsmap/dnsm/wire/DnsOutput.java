@@ -1,11 +1,12 @@
 package ch.dnsmap.dnsm.wire;
 
-import ch.dnsmap.dnsm.Header;
 import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.header.Header;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
 import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
 import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
 import java.util.List;
@@ -22,6 +23,7 @@ public final class DnsOutput {
   private final List<ResourceRecord> answers;
   private final List<ResourceRecord> authoritatives;
   private final List<ResourceRecord> additionals;
+  private final HeaderFlagsParser headerFlagsParser;
   private final QuestionDomainParser questionDomainParser;
   private final ResourceRecordParser resourceRecordParser;
   private final WriteableByte networkByte;
@@ -39,6 +41,7 @@ public final class DnsOutput {
     this.answers = answers;
     this.authoritatives = authoritatives;
     this.additionals = additionals;
+    this.headerFlagsParser = new HeaderFlagsParser();
     this.questionDomainParser = new QuestionDomainParser();
     this.resourceRecordParser = new ResourceRecordParser();
     int capacity = getCapacity(question, answers, authoritatives, additionals);
@@ -52,16 +55,15 @@ public final class DnsOutput {
   }
 
   public byte[] getHeader() {
-    int headerFrom = 0;
     if (headerTo == 0) {
       headerTo += networkByte.writeUInt16(header.id().getId());
-      headerTo += networkByte.writeByte16(header.flags());
+      headerTo += headerFlagsParser.toWire(networkByte, header.flags());
       headerTo += networkByte.writeUInt16(header.count().getQdCount());
       headerTo += networkByte.writeUInt16(header.count().getAnCount());
       headerTo += networkByte.writeUInt16(header.count().getNsCount());
       headerTo += networkByte.writeUInt16(header.count().getArCount());
     }
-    return networkByte.range(headerFrom, headerTo);
+    return networkByte.range(0, headerTo);
   }
 
   public byte[] getQuestion() {

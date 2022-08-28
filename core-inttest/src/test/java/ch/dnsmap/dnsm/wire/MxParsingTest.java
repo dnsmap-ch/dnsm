@@ -1,6 +1,11 @@
 package ch.dnsmap.dnsm.wire;
 
 import static ch.dnsmap.dnsm.DnsClass.IN;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.QR;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.RA;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.RD;
+import static ch.dnsmap.dnsm.header.HeaderOpcode.QUERY;
+import static ch.dnsmap.dnsm.header.HeaderRcode.NO_ERROR;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsHeader;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordMx;
@@ -11,11 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
-import ch.dnsmap.dnsm.Header;
-import ch.dnsmap.dnsm.HeaderCount;
-import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
+import ch.dnsmap.dnsm.header.Header;
+import ch.dnsmap.dnsm.header.HeaderCount;
+import ch.dnsmap.dnsm.header.HeaderFlags;
+import ch.dnsmap.dnsm.header.HeaderId;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordMx;
 import ch.dnsmap.dnsm.record.type.Mx;
@@ -33,8 +39,9 @@ public final class MxParsingTest {
   private static final String MX_ADDERE_CH = "mx1.addere.ch.";
 
   private static final HeaderId MESSAGE_ID = HeaderId.of(50614);
-  private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
+  private static final HeaderFlags FLAGS = new HeaderFlags(QUERY, NO_ERROR, RA, QR, RD);
   private static final HeaderCount COUNT = HeaderCount.of(1, 1, 0, 0);
+  private static final Header HEADER = new Header(MESSAGE_ID, FLAGS, COUNT);
   private static final Domain DOMAIN = Domain.of(ADDERE_CH);
   private static final Domain QUESTION_DOMAIN = DOMAIN;
   private static final Domain ANSWER_DOMAIN = Domain.of(MX_ADDERE_CH);
@@ -57,7 +64,7 @@ public final class MxParsingTest {
   void testDnsHeaderInputParsing() {
     var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
     var header = dnsInput.getHeader();
-    assertDnsHeader(header, MESSAGE_ID, FLAGS, COUNT);
+    assertDnsHeader(HEADER, header);
   }
 
   @Test

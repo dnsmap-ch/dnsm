@@ -2,13 +2,15 @@ package ch.dnsmap.dnsm.wire;
 
 import static java.util.stream.IntStream.range;
 
-import ch.dnsmap.dnsm.Header;
-import ch.dnsmap.dnsm.HeaderCount;
-import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.header.Header;
+import ch.dnsmap.dnsm.header.HeaderCount;
+import ch.dnsmap.dnsm.header.HeaderFlags;
+import ch.dnsmap.dnsm.header.HeaderId;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
 import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
 import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.List;
 public final class DnsInput {
 
   private final ReadableByte networkByte;
+  private final HeaderFlagsParser headerFlagsParser;
   private final QuestionDomainParser questionDomainParser;
   private final ResourceRecordParser resourceRecordParser;
 
@@ -28,6 +31,7 @@ public final class DnsInput {
 
   private DnsInput(ReadableByte networkByte) {
     this.networkByte = networkByte;
+    this.headerFlagsParser = new HeaderFlagsParser();
     this.questionDomainParser = new QuestionDomainParser();
     this.resourceRecordParser = new ResourceRecordParser();
   }
@@ -41,7 +45,7 @@ public final class DnsInput {
       return header;
     }
     HeaderId id = HeaderId.of(networkByte.readUInt16());
-    byte[] flags = networkByte.readByte16();
+    HeaderFlags flags = headerFlagsParser.fromWire(networkByte, 2);
     int qdCount = networkByte.readUInt16();
     int anCount = networkByte.readUInt16();
     int nsCount = networkByte.readUInt16();

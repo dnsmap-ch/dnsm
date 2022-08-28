@@ -1,5 +1,6 @@
 package ch.dnsmap.dnsm;
 
+import ch.dnsmap.dnsm.header.Header;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 
 public record Message(

@@ -8,7 +8,6 @@ import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.wire.DomainCompression;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
-import ch.dnsmap.dnsm.wire.parser.DomainParser;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.jupiter.api.Nested;

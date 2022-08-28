@@ -1,8 +1,9 @@
-package ch.dnsmap.dnsm;
+package ch.dnsmap.dnsm.header;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import ch.dnsmap.dnsm.header.HeaderCount;
 import org.junit.jupiter.api.Test;
 
 class HeaderCountTest {

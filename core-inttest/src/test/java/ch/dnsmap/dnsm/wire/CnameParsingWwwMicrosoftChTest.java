@@ -2,6 +2,11 @@ package ch.dnsmap.dnsm.wire;
 
 import static ch.dnsmap.dnsm.DnsClass.IN;
 import static ch.dnsmap.dnsm.Domain.root;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.QR;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.RA;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.RD;
+import static ch.dnsmap.dnsm.header.HeaderOpcode.QUERY;
+import static ch.dnsmap.dnsm.header.HeaderRcode.NO_ERROR;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsHeader;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordCname;
@@ -17,11 +22,12 @@ import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
-import ch.dnsmap.dnsm.Header;
-import ch.dnsmap.dnsm.HeaderCount;
-import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
+import ch.dnsmap.dnsm.header.Header;
+import ch.dnsmap.dnsm.header.HeaderCount;
+import ch.dnsmap.dnsm.header.HeaderFlags;
+import ch.dnsmap.dnsm.header.HeaderId;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
 import ch.dnsmap.dnsm.record.ResourceRecordCname;
@@ -42,8 +48,9 @@ class CnameParsingWwwMicrosoftChTest {
   private static final String WWW_MICROSOFT_CH = "www.microsoft.ch.";
 
   private static final HeaderId MESSAGE_ID = HeaderId.of(39600);
-  private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
+  private static final HeaderFlags FLAGS = new HeaderFlags(QUERY, NO_ERROR, RD, RA, QR);
   private static final HeaderCount COUNT = HeaderCount.of(1, 6, 0, 1);
+  private static final Header HEADER = new Header(MESSAGE_ID, FLAGS, COUNT);
   private static final Domain DOMAIN = Domain.of(WWW_MICROSOFT_CH);
   private static final Domain QUESTION_DOMAIN = DOMAIN;
   private static final Domain ANSWER_DOMAIN = Domain.of(MICROSOFT_CH);
@@ -71,7 +78,7 @@ class CnameParsingWwwMicrosoftChTest {
   void testDnsHeaderInputParsing() {
     var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
     var header = dnsInput.getHeader();
-    assertDnsHeader(header, MESSAGE_ID, FLAGS, COUNT);
+    assertDnsHeader(HEADER, header);
   }
 
   @Test

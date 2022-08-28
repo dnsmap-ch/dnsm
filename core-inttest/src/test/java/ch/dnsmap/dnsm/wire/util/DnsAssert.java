@@ -13,11 +13,10 @@ import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
-import ch.dnsmap.dnsm.Header;
-import ch.dnsmap.dnsm.HeaderCount;
-import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
+import ch.dnsmap.dnsm.header.Header;
+import ch.dnsmap.dnsm.header.HeaderBitFlags;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordA;
 import ch.dnsmap.dnsm.record.ResourceRecordAaaa;
@@ -35,16 +34,11 @@ import java.util.List;
 
 public final class DnsAssert {
 
-  public static void assertDnsHeader(Header header, HeaderId msgId, byte[] flags,
-                                     HeaderCount count) {
-    assertThat(header).satisfies(headerField -> {
-      assertThat(headerField.id()).isEqualTo(msgId);
-      assertThat(headerField.flags()).isEqualTo(flags);
-      assertThat(headerField.count().getQdCount()).isEqualTo(count.getQdCount());
-      assertThat(headerField.count().getAnCount()).isEqualTo(count.getAnCount());
-      assertThat(headerField.count().getNsCount()).isEqualTo(count.getNsCount());
-      assertThat(headerField.count().getArCount()).isEqualTo(count.getArCount());
-    });
+  public static void assertDnsHeader(Header expected, Header result) {
+    assertThat(expected.id()).isEqualTo(result.id());
+    assertThat(expected.count()).isEqualTo(result.count());
+    assertThat(expected.flags().getFlags()).containsExactlyInAnyOrder(
+        result.flags().getFlags().toArray(new HeaderBitFlags[0]));
   }
 
   public static void assertDnsQuestion(List<Question> questions, Domain questionName,

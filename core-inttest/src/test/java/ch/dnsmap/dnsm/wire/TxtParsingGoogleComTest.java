@@ -1,6 +1,11 @@
 package ch.dnsmap.dnsm.wire;
 
 import static ch.dnsmap.dnsm.DnsClass.IN;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.QR;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.RA;
+import static ch.dnsmap.dnsm.header.HeaderBitFlags.RD;
+import static ch.dnsmap.dnsm.header.HeaderOpcode.QUERY;
+import static ch.dnsmap.dnsm.header.HeaderRcode.NO_ERROR;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsHeader;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordTxt;
@@ -13,11 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
-import ch.dnsmap.dnsm.Header;
-import ch.dnsmap.dnsm.HeaderCount;
-import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
+import ch.dnsmap.dnsm.header.Header;
+import ch.dnsmap.dnsm.header.HeaderCount;
+import ch.dnsmap.dnsm.header.HeaderFlags;
+import ch.dnsmap.dnsm.header.HeaderId;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.record.ResourceRecordTxt;
 import ch.dnsmap.dnsm.record.type.Txt;
@@ -34,8 +40,9 @@ public final class TxtParsingGoogleComTest {
   public static final String GOOGLE_COM = "google.com.";
 
   private static final HeaderId MESSAGE_ID = HeaderId.of(57546);
-  private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
+  private static final HeaderFlags FLAGS = new HeaderFlags(QUERY, NO_ERROR, QR, RA, RD);
   private static final HeaderCount COUNT = HeaderCount.of(1, 11, 0, 0);
+  private static final Header HEADER = new Header(MESSAGE_ID, FLAGS, COUNT);
   private static final Domain DOMAIN = Domain.of(GOOGLE_COM);
   private static final Domain QUESTION_DOMAIN = DOMAIN;
   private static final Domain ANSWER_DOMAIN = DOMAIN;
@@ -74,7 +81,7 @@ public final class TxtParsingGoogleComTest {
   void testDnsHeaderInputParsing() {
     var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
     var header = dnsInput.getHeader();
-    assertDnsHeader(header, MESSAGE_ID, FLAGS, COUNT);
+    assertDnsHeader(HEADER, header);
   }
 
   @Test
@@ -120,21 +127,16 @@ public final class TxtParsingGoogleComTest {
 
   @Test
   void testOutputParsing() {
-    var header = composeHeader();
     var question = composeQuestion();
     var answer = composeAnswer();
     var authoritative = new LinkedList<ResourceRecord>();
     var additional = new LinkedList<ResourceRecord>();
 
-    var dnsOutput = DnsOutput.toWire(header, question, answer, authoritative, additional);
+    var dnsOutput = DnsOutput.toWire(HEADER, question, answer, authoritative, additional);
 
     assertThat(dnsOutput.getHeader()).isEqualTo(DNS_BYTES_HEADER);
     assertThat(dnsOutput.getQuestion()).isEqualTo(DNS_BYTES_QUESTION);
     assertThat(dnsOutput.getAnswers()).isEqualTo(DNS_BYTES_ANSWER);
-  }
-
-  private static Header composeHeader() {
-    return new Header(MESSAGE_ID, FLAGS, COUNT);
   }
 
   private static Question composeQuestion() {

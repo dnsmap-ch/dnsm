@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm;
+package ch.dnsmap.dnsm.header;
 
 /**
  * Message count value object for question-, anser-, name server and additional-count. Each value
