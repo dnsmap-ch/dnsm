@@ -9,7 +9,7 @@ public final class Ttl {
    * TTL must be a positive value of a singed 32-bit number, as specified in RFC 1035, 2.3.4. Size
    * limits.
    */
-  public static final double MAX_VALUE = Math.pow(2, 31) - 1;
+  private static final long MAX_VALUE = (long) (Math.pow(2, 31) - 1);
   private final long ttl;
 
   private Ttl(long ttl) {
