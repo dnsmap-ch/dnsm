@@ -18,6 +18,7 @@ import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderCount;
 import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
@@ -42,6 +43,7 @@ class CnameParsingWwwMicrosoftChTest {
 
   private static final HeaderId MESSAGE_ID = HeaderId.of(39600);
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
+  private static final HeaderCount COUNT = HeaderCount.of(1, 6, 0, 1);
   private static final Domain DOMAIN = Domain.of(WWW_MICROSOFT_CH);
   private static final Domain QUESTION_DOMAIN = DOMAIN;
   private static final Domain ANSWER_DOMAIN = Domain.of(MICROSOFT_CH);
@@ -69,7 +71,7 @@ class CnameParsingWwwMicrosoftChTest {
   void testDnsHeaderInputParsing() {
     var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
     var header = dnsInput.getHeader();
-    assertDnsHeader(header, MESSAGE_ID, FLAGS, 1, 6, 0, 1);
+    assertDnsHeader(header, MESSAGE_ID, FLAGS, COUNT);
   }
 
   @Test
@@ -133,7 +135,7 @@ class CnameParsingWwwMicrosoftChTest {
   }
 
   private static Header composeHeader() {
-    return new Header(MESSAGE_ID, FLAGS, 1, 6, 0, 1);
+    return new Header(MESSAGE_ID, FLAGS, COUNT);
   }
 
   private static Question composeQuestion() {

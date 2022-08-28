@@ -14,6 +14,7 @@ import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderCount;
 import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
@@ -34,16 +35,15 @@ import java.util.List;
 
 public final class DnsAssert {
 
-  public static void assertDnsHeader(Header header, HeaderId msgId, byte[] flags, int qd, int an,
-                                     int ns,
-                                     int ar) {
+  public static void assertDnsHeader(Header header, HeaderId msgId, byte[] flags,
+                                     HeaderCount count) {
     assertThat(header).satisfies(headerField -> {
       assertThat(headerField.id()).isEqualTo(msgId);
       assertThat(headerField.flags()).isEqualTo(flags);
-      assertThat(headerField.qdCount()).isEqualTo(qd);
-      assertThat(headerField.anCount()).isEqualTo(an);
-      assertThat(headerField.nsCount()).isEqualTo(ns);
-      assertThat(headerField.arCount()).isEqualTo(ar);
+      assertThat(headerField.count().getQdCount()).isEqualTo(count.getQdCount());
+      assertThat(headerField.count().getAnCount()).isEqualTo(count.getAnCount());
+      assertThat(headerField.count().getNsCount()).isEqualTo(count.getNsCount());
+      assertThat(headerField.count().getArCount()).isEqualTo(count.getArCount());
     });
   }
 

@@ -56,10 +56,10 @@ public final class DnsOutput {
     if (headerTo == 0) {
       headerTo += networkByte.writeUInt16(header.id().getId());
       headerTo += networkByte.writeByte16(header.flags());
-      headerTo += networkByte.writeUInt16(header.qdCount());
-      headerTo += networkByte.writeUInt16(header.anCount());
-      headerTo += networkByte.writeUInt16(header.nsCount());
-      headerTo += networkByte.writeUInt16(header.arCount());
+      headerTo += networkByte.writeUInt16(header.count().getQdCount());
+      headerTo += networkByte.writeUInt16(header.count().getAnCount());
+      headerTo += networkByte.writeUInt16(header.count().getNsCount());
+      headerTo += networkByte.writeUInt16(header.count().getArCount());
     }
     return networkByte.range(headerFrom, headerTo);
   }

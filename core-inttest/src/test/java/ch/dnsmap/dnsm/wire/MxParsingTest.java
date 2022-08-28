@@ -12,6 +12,7 @@ import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderCount;
 import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
@@ -33,6 +34,7 @@ public final class MxParsingTest {
 
   private static final HeaderId MESSAGE_ID = HeaderId.of(50614);
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
+  private static final HeaderCount COUNT = HeaderCount.of(1, 1, 0, 0);
   private static final Domain DOMAIN = Domain.of(ADDERE_CH);
   private static final Domain QUESTION_DOMAIN = DOMAIN;
   private static final Domain ANSWER_DOMAIN = Domain.of(MX_ADDERE_CH);
@@ -55,7 +57,7 @@ public final class MxParsingTest {
   void testDnsHeaderInputParsing() {
     var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
     var header = dnsInput.getHeader();
-    assertDnsHeader(header, MESSAGE_ID, FLAGS, 1, 1, 0, 0);
+    assertDnsHeader(header, MESSAGE_ID, FLAGS, COUNT);
   }
 
   @Test
@@ -93,7 +95,7 @@ public final class MxParsingTest {
   }
 
   private static Header composeHeader() {
-    return new Header(MESSAGE_ID, FLAGS, 1, 1, 0, 0);
+    return new Header(MESSAGE_ID, FLAGS, COUNT);
   }
 
   private static Question composeQuestion() {

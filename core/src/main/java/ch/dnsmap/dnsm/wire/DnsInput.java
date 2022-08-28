@@ -3,6 +3,7 @@ package ch.dnsmap.dnsm.wire;
 import static java.util.stream.IntStream.range;
 
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderCount;
 import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.record.ResourceRecord;
@@ -45,19 +46,20 @@ public final class DnsInput {
     int anCount = networkByte.readUInt16();
     int nsCount = networkByte.readUInt16();
     int arCount = networkByte.readUInt16();
+    HeaderCount count = HeaderCount.of(qdCount, anCount, nsCount, arCount);
 
     question = new ArrayList<>(qdCount);
     answer = new ArrayList<>(anCount);
     authority = new ArrayList<>(nsCount);
     additional = new ArrayList<>(arCount);
 
-    header = new Header(id, flags, qdCount, anCount, nsCount, arCount);
+    header = new Header(id, flags, count);
     return header;
   }
 
   public List<Question> getQuestion() {
     if (question.isEmpty()) {
-      range(0, getHeader().qdCount()).forEach(
+      range(0, getHeader().count().getQdCount()).forEach(
           element -> question.add(questionDomainParser.fromWire(networkByte)));
     }
     return question;
@@ -65,7 +67,7 @@ public final class DnsInput {
 
   public List<ResourceRecord> getAnswer() {
     if (answer.isEmpty()) {
-      range(0, getHeader().anCount()).forEach(
+      range(0, getHeader().count().getAnCount()).forEach(
           element -> answer.add(resourceRecordParser.fromWire(networkByte)));
     }
     return answer;
@@ -73,7 +75,7 @@ public final class DnsInput {
 
   public List<ResourceRecord> getAuthority() {
     if (authority.isEmpty()) {
-      range(0, getHeader().nsCount()).forEach(
+      range(0, getHeader().count().getNsCount()).forEach(
           element -> authority.add(resourceRecordParser.fromWire(networkByte)));
     }
     return authority;
@@ -81,7 +83,7 @@ public final class DnsInput {
 
   public List<ResourceRecord> getAdditional() {
     if (additional.isEmpty()) {
-      range(0, getHeader().arCount()).forEach(
+      range(0, getHeader().count().getArCount()).forEach(
           element -> additional.add(resourceRecordParser.fromWire(networkByte)));
     }
     return additional;
