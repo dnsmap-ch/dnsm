@@ -54,7 +54,7 @@ public final class DnsOutput {
   public byte[] getHeader() {
     int headerFrom = 0;
     if (headerTo == 0) {
-      headerTo += networkByte.writeUInt16(header.id());
+      headerTo += networkByte.writeUInt16(header.id().getId());
       headerTo += networkByte.writeByte16(header.flags());
       headerTo += networkByte.writeUInt16(header.qdCount());
       headerTo += networkByte.writeUInt16(header.anCount());

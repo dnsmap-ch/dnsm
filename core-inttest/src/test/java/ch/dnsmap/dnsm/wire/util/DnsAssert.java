@@ -14,6 +14,7 @@ import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
@@ -33,7 +34,8 @@ import java.util.List;
 
 public final class DnsAssert {
 
-  public static void assertDnsHeader(Header header, int msgId, byte[] flags, int qd, int an, int ns,
+  public static void assertDnsHeader(Header header, HeaderId msgId, byte[] flags, int qd, int an,
+                                     int ns,
                                      int ar) {
     assertThat(header).satisfies(headerField -> {
       assertThat(headerField.id()).isEqualTo(msgId);

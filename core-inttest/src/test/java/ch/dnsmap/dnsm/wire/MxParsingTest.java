@@ -12,6 +12,7 @@ import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
@@ -30,7 +31,7 @@ public final class MxParsingTest {
   private static final String ADDERE_CH = "addere.ch.";
   private static final String MX_ADDERE_CH = "mx1.addere.ch.";
 
-  private static final int MESSAGE_ID = 50614;
+  private static final HeaderId MESSAGE_ID = HeaderId.of(50614);
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
   private static final Domain DOMAIN = Domain.of(ADDERE_CH);
   private static final Domain QUESTION_DOMAIN = DOMAIN;

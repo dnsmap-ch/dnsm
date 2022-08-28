@@ -16,6 +16,7 @@ import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
@@ -41,7 +42,7 @@ public final class AdditionalParsingGoogleComTest {
   private static final String NS_3_GOOGLE_COM = "ns3.google.com";
   private static final String NS_4_GOOGLE_COM = "ns4.google.com";
 
-  private static final int MESSAGE_ID = 40833;
+  private static final HeaderId MESSAGE_ID = HeaderId.of(40833);
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x00};
   private static final Domain DOMAIN = Domain.of(GOOGLE_COM);
   private static final Domain QUESTION_DOMAIN = DOMAIN;

@@ -18,6 +18,7 @@ import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.ResourceRecord;
@@ -39,7 +40,7 @@ class CnameParsingWwwMicrosoftChTest {
   private static final String MICROSOFT_CH = "microsoft.ch.";
   private static final String WWW_MICROSOFT_CH = "www.microsoft.ch.";
 
-  private static final int MESSAGE_ID = 39600;
+  private static final HeaderId MESSAGE_ID = HeaderId.of(39600);
   private static final byte[] FLAGS = {(byte) 0x81, (byte) 0x80};
   private static final Domain DOMAIN = Domain.of(WWW_MICROSOFT_CH);
   private static final Domain QUESTION_DOMAIN = DOMAIN;

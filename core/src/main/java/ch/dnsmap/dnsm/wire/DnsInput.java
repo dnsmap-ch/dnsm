@@ -3,6 +3,7 @@ package ch.dnsmap.dnsm.wire;
 import static java.util.stream.IntStream.range;
 
 import ch.dnsmap.dnsm.Header;
+import ch.dnsmap.dnsm.HeaderId;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
@@ -38,7 +39,7 @@ public final class DnsInput {
     if (header != null) {
       return header;
     }
-    int id = networkByte.readUInt16();
+    HeaderId id = HeaderId.of(networkByte.readUInt16());
     byte[] flags = networkByte.readByte16();
     int qdCount = networkByte.readUInt16();
     int anCount = networkByte.readUInt16();
