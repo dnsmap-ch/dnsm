@@ -5,6 +5,7 @@ import static ch.dnsmap.dnsm.DnsType.AAAA;
 import static ch.dnsmap.dnsm.DnsType.CNAME;
 import static ch.dnsmap.dnsm.DnsType.MX;
 import static ch.dnsmap.dnsm.DnsType.NS;
+import static ch.dnsmap.dnsm.DnsType.SOA;
 import static ch.dnsmap.dnsm.DnsType.TXT;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,12 +24,14 @@ import ch.dnsmap.dnsm.record.ResourceRecordAaaa;
 import ch.dnsmap.dnsm.record.ResourceRecordCname;
 import ch.dnsmap.dnsm.record.ResourceRecordMx;
 import ch.dnsmap.dnsm.record.ResourceRecordNs;
+import ch.dnsmap.dnsm.record.ResourceRecordSoa;
 import ch.dnsmap.dnsm.record.ResourceRecordTxt;
 import ch.dnsmap.dnsm.record.type.Cname;
 import ch.dnsmap.dnsm.record.type.Ip4;
 import ch.dnsmap.dnsm.record.type.Ip6;
 import ch.dnsmap.dnsm.record.type.Mx;
 import ch.dnsmap.dnsm.record.type.Ns;
+import ch.dnsmap.dnsm.record.type.Soa;
 import ch.dnsmap.dnsm.record.type.Txt;
 import java.util.List;
 
@@ -79,6 +82,12 @@ public final class DnsAssert {
                                        DnsClass dnsClass, Ttl ttl, Mx mx) {
     assertDnsRecord(resourceRecord, domainName, MX, dnsClass, ttl);
     assertThat(((ResourceRecordMx) resourceRecord).getMx()).isEqualTo(mx);
+  }
+
+  public static void assertDnsRecordSoa(ResourceRecord resourceRecord, Domain domainName,
+                                        DnsClass dnsClass, Ttl ttl, Soa soa) {
+    assertDnsRecord(resourceRecord, domainName, SOA, dnsClass, ttl);
+    assertThat(((ResourceRecordSoa) resourceRecord).getSoa()).isEqualTo(soa);
   }
 
   public static void assertDnsRecordTxt(ResourceRecord resourceRecord, Domain domainName,

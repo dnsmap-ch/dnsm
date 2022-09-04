@@ -13,6 +13,7 @@ import ch.dnsmap.dnsm.record.ResourceRecordCname;
 import ch.dnsmap.dnsm.record.ResourceRecordMx;
 import ch.dnsmap.dnsm.record.ResourceRecordNs;
 import ch.dnsmap.dnsm.record.ResourceRecordOpaque;
+import ch.dnsmap.dnsm.record.ResourceRecordSoa;
 import ch.dnsmap.dnsm.record.ResourceRecordTxt;
 import ch.dnsmap.dnsm.record.type.Cname;
 import ch.dnsmap.dnsm.record.type.Ip4;
@@ -20,6 +21,7 @@ import ch.dnsmap.dnsm.record.type.Ip6;
 import ch.dnsmap.dnsm.record.type.Mx;
 import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
+import ch.dnsmap.dnsm.record.type.Soa;
 import ch.dnsmap.dnsm.record.type.Txt;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
@@ -35,6 +37,7 @@ public final class ResourceRecordParser
   private final ResourceRecordMxParser rrMxParser;
   private final ResourceRecordNsParser rrNsParser;
   private final ResourceRecordOpaqueParser rrOpaqueParser;
+  private final ResourceRecordSoaParser rrSoaParser;
   private final ResourceRecordTxtParser rrTxtParser;
 
   public ResourceRecordParser(DomainParser domainParser) {
@@ -45,6 +48,7 @@ public final class ResourceRecordParser
     rrMxParser = new ResourceRecordMxParser(domainParser);
     rrNsParser = new ResourceRecordNsParser(domainParser);
     rrOpaqueParser = new ResourceRecordOpaqueParser();
+    rrSoaParser = new ResourceRecordSoaParser(domainParser);
     rrTxtParser = new ResourceRecordTxtParser();
   }
 
@@ -80,6 +84,11 @@ public final class ResourceRecordParser
         int rdLength = wireData.readUInt16();
         Ns ns = rrNsParser.fromWire(wireData, rdLength);
         return new ResourceRecordNs(name, dnsClass, ttl, ns);
+      }
+      case SOA -> {
+        int rdLength = wireData.readUInt16();
+        Soa soa = rrSoaParser.fromWire(wireData, rdLength);
+        return new ResourceRecordSoa(name, dnsClass, ttl, soa);
       }
       case TXT -> {
         int rdLength = wireData.readUInt16();
@@ -133,6 +142,12 @@ public final class ResourceRecordParser
         ResourceRecordNs nsData = (ResourceRecordNs) data;
         int nsSize = rrNsParser.toWire(rrBuffer, nsData.getNs());
         bytesWritten += wireData.writeBuffer16(rrBuffer, nsSize);
+        return bytesWritten;
+      }
+      case SOA -> {
+        ResourceRecordSoa soaData = (ResourceRecordSoa) data;
+        int soaSize = rrSoaParser.toWire(rrBuffer, soaData.getSoa());
+        bytesWritten += wireData.writeBuffer16(rrBuffer, soaSize);
         return bytesWritten;
       }
       case TXT -> {
