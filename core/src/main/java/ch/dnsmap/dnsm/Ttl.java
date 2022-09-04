@@ -1,26 +1,25 @@
 package ch.dnsmap.dnsm;
 
+import java.util.Objects;
+
 /**
  * Time-to-live within DNS as specified in RFC 1035.
  */
 public final class Ttl {
 
-  /**
-   * TTL must be a positive value of a singed 32-bit number, as specified in RFC 1035, 2.3.4. Size
-   * limits.
-   */
-  private static final long MAX_VALUE = (long) (Math.pow(2, 31) - 1);
-  private final long ttl;
+  private final Uint32 ttl;
 
   private Ttl(long ttl) {
-    if (ttl < 0 || ttl > MAX_VALUE) {
-      throw new IllegalArgumentException("invalid TTL value: " + ttl);
+    try {
+      this.ttl = Uint32.of(ttl);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("invalid TTL value", e);
     }
-    this.ttl = ttl;
   }
 
   /**
-   * Create a {@link Ttl} from a long value.
+   * Create a {@link Ttl} from a long value. TTL must be a positive value of a singed 32-bit number,
+   * as specified in RFC 1035, 2.3.4. Size limits.
    *
    * @param ttl value to make a TTL of
    * @return new {@link Ttl}
@@ -36,7 +35,7 @@ public final class Ttl {
    * @return TTL as long
    */
   public long getTtl() {
-    return ttl;
+    return ttl.getValue();
   }
 
   @Override
@@ -50,16 +49,16 @@ public final class Ttl {
 
     Ttl ttl1 = (Ttl) o;
 
-    return ttl == ttl1.ttl;
+    return Objects.equals(ttl, ttl1.ttl);
   }
 
   @Override
   public int hashCode() {
-    return (int) (ttl ^ (ttl >>> 32));
+    return ttl != null ? ttl.hashCode() : 0;
   }
 
   @Override
   public String toString() {
-    return "Ttl{ttl=" + ttl + '}';
+    return "Ttl{ttl=" + ttl.getValue() + '}';
   }
 }
