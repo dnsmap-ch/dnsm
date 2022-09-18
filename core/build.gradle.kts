@@ -20,12 +20,6 @@ java {
 
 dependencies {
     testImplementation(libs.assertj.core)
-    testImplementation(libs.junit.jupiter.api)
-    testRuntimeOnly(libs.junit.jupiter.engine)
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
 }
 
 pmd {
@@ -38,4 +32,34 @@ pmd {
 
 checkstyle {
     toolVersion = "9.0"
+}
+
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+        }
+
+        val integrationTest by registering(JvmTestSuite::class) {
+            dependencies {
+                implementation(project)
+                // add testImplementation dependencies
+                configurations.testImplementation {
+                    dependencies.forEach(::implementation)
+                }
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(testing.suites.named("integrationTest"))
 }
