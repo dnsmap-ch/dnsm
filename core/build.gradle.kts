@@ -4,6 +4,7 @@ plugins {
     checkstyle
 }
 
+description = "DNS core components and wire format generation and parsing."
 group = "ch.dnsmap.dnsm"
 version = "1.0-SNAPSHOT"
 
