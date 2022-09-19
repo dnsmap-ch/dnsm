@@ -1,7 +1,8 @@
 plugins {
+    checkstyle
+    jacoco
     java
     pmd
-    checkstyle
 }
 
 description = "DNS core components and wire format generation and parsing."
@@ -62,4 +63,19 @@ testing {
 
 tasks.named("check") {
     dependsOn(testing.suites.named("integrationTest"))
+    dependsOn("jacocoTestCoverageVerification")
+}
+
+tasks.named("jacocoTestReport") {
+    dependsOn(testing.suites.named("test"))
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.35".toBigDecimal()
+            }
+        }
+    }
 }
