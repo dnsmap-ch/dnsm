@@ -35,7 +35,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public final class TxtParsingGoogleComTest {
+final class TxtParsingGoogleComTest {
 
   public static final String GOOGLE_COM = "google.com.";
 

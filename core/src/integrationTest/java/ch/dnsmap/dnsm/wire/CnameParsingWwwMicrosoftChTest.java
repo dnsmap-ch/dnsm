@@ -42,7 +42,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class CnameParsingWwwMicrosoftChTest {
+final class CnameParsingWwwMicrosoftChTest {
 
   private static final String MICROSOFT_CH = "microsoft.ch.";
   private static final String WWW_MICROSOFT_CH = "www.microsoft.ch.";

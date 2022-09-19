@@ -20,6 +20,7 @@
         <exclude name="AbstractClassWithoutAbstractMethod"/>
         <exclude name="JUnitTestContainsTooManyAsserts"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+        <exclude name="AvoidUsingHardCodedIP"/>
     </rule>
 
 </ruleset>

@@ -33,7 +33,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public final class MxParsingTest {
+final class MxParsingTest {
 
   private static final String ADDERE_CH = "addere.ch.";
   private static final String MX_ADDERE_CH = "mx1.addere.ch.";
