@@ -1,23 +1,23 @@
 package ch.dnsmap.dnsm.wire.parser;
 
 import ch.dnsmap.dnsm.record.type.OpaqueData;
-import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
-import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
 public final class ResourceRecordOpaqueParser
     implements WireWritable<OpaqueData>, WireTypeReadable<OpaqueData> {
 
   @Override
-  public OpaqueData fromWire(ReadableByte wireData, int length) {
-    byte[] opaqueBytes = wireData.readByte(length);
+  public OpaqueData fromWire(ReadableByteBuffer wireData, int length) {
+    byte[] opaqueBytes = wireData.readData(length);
     return new OpaqueData(opaqueBytes);
   }
 
   @Override
-  public int toWire(WriteableByte wireData, OpaqueData data) {
+  public int toWire(WriteableByteBuffer wireData, OpaqueData data) {
     int rdLength = data.opaque().length;
     wireData.writeUInt16(rdLength);
-    return wireData.writeByte(data.opaque());
+    return wireData.writeData(data.opaque());
   }
 
   @Override

@@ -20,8 +20,8 @@ import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
 import ch.dnsmap.dnsm.record.type.Txt;
 import ch.dnsmap.dnsm.wire.DomainCompression;
-import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
-import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
 public final class ResourceRecordParser
     implements WireWritable<ResourceRecord>, WireReadable<ResourceRecord> {
@@ -55,11 +55,11 @@ public final class ResourceRecordParser
   }
 
   @Override
-  public ResourceRecord fromWire(ReadableByte wireData) {
+  public ResourceRecord fromWire(ReadableByteBuffer wireData) {
     Domain name = domainParser.fromWire(wireData);
     DnsType dnsType = DnsType.of(wireData.readUInt16());
     DnsClass dnsClass = DnsClass.of(wireData.readUInt16());
-    Ttl ttl = Ttl.of(wireData.readInt32());
+    Ttl ttl = Ttl.of(wireData.readUInt32());
 
     switch (dnsType) {
       case A -> {
@@ -101,13 +101,13 @@ public final class ResourceRecordParser
   }
 
   @Override
-  public int toWire(WriteableByte wireData, ResourceRecord data) {
+  public int toWire(WriteableByteBuffer wireData, ResourceRecord data) {
     int bytesWritten = 0;
 
     bytesWritten += domainParser.toWire(wireData, data.getName());
     bytesWritten += wireData.writeUInt16(data.getDnsType().getValue());
     bytesWritten += wireData.writeUInt16(data.getDnsClass().getValue());
-    bytesWritten += wireData.writeInt32((int) data.getTtl().getTtl());
+    bytesWritten += wireData.writeUInt32((int) data.getTtl().getTtl());
 
     switch (data.getDnsType()) {
       case A -> {

@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import ch.dnsmap.dnsm.header.HeaderFlags;
 import ch.dnsmap.dnsm.header.HeaderOpcode;
 import ch.dnsmap.dnsm.header.HeaderRcode;
-import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -115,48 +115,48 @@ class HeaderFlagsParserTest {
       assertThat(headerFlags.getFlags()).isEmpty();
     }
 
-    private static NetworkByte minimalNetworkBytes() {
-      return NetworkByte.of(new byte[] {0, 0});
+    private static NetworkByteBuffer minimalNetworkBytes() {
+      return NetworkByteBuffer.of(new byte[] {0, 0});
     }
 
-    private static NetworkByte maximalNetworkBytes() {
-      return NetworkByte.of(new byte[] {(byte) 0b1001_0111, (byte) 0b1000_0101});
+    private static NetworkByteBuffer maximalNetworkBytes() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b1001_0111, (byte) 0b1000_0101});
     }
 
-    private static NetworkByte opcodeQuery() {
-      return NetworkByte.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0000});
+    private static NetworkByteBuffer opcodeQuery() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0000});
     }
 
-    private static NetworkByte opcodeIquery() {
-      return NetworkByte.of(new byte[] {(byte) 0b000_1000, (byte) 0b0000_0000});
+    private static NetworkByteBuffer opcodeIquery() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_1000, (byte) 0b0000_0000});
     }
 
-    private static NetworkByte opcodeStatus() {
-      return NetworkByte.of(new byte[] {(byte) 0b001_0000, (byte) 0b0000_0000});
+    private static NetworkByteBuffer opcodeStatus() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b001_0000, (byte) 0b0000_0000});
     }
 
-    private static NetworkByte rcodeNoError() {
-      return NetworkByte.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0000});
+    private static NetworkByteBuffer rcodeNoError() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0000});
     }
 
-    private static NetworkByte rcodeFormatError() {
-      return NetworkByte.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0001});
+    private static NetworkByteBuffer rcodeFormatError() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0001});
     }
 
-    private static NetworkByte rcodeServerFailure() {
-      return NetworkByte.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0010});
+    private static NetworkByteBuffer rcodeServerFailure() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0010});
     }
 
-    private static NetworkByte rcodeNameError() {
-      return NetworkByte.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0011});
+    private static NetworkByteBuffer rcodeNameError() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0011});
     }
 
-    private static NetworkByte rcodeNotImplemented() {
-      return NetworkByte.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0100});
+    private static NetworkByteBuffer rcodeNotImplemented() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0100});
     }
 
-    private static NetworkByte rcodeRefused() {
-      return NetworkByte.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0101});
+    private static NetworkByteBuffer rcodeRefused() {
+      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0101});
     }
   }
 
@@ -166,7 +166,7 @@ class HeaderFlagsParserTest {
     @Test
     void testOpcodeQuery() {
       var flags = new HeaderFlags(QUERY, NO_ERROR);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -176,7 +176,7 @@ class HeaderFlagsParserTest {
     @Test
     void testOpcodeIquery() {
       var flags = new HeaderFlags(IQUERY, NO_ERROR);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -186,7 +186,7 @@ class HeaderFlagsParserTest {
     @Test
     void testOpcodeStatus() {
       var flags = new HeaderFlags(STATUS, NO_ERROR);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -196,7 +196,7 @@ class HeaderFlagsParserTest {
     @Test
     void testRcodeNoError() {
       var flags = new HeaderFlags(QUERY, NO_ERROR);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -206,7 +206,7 @@ class HeaderFlagsParserTest {
     @Test
     void testRcodeFormatError() {
       var flags = new HeaderFlags(QUERY, FORMAT_ERROR);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -216,7 +216,7 @@ class HeaderFlagsParserTest {
     @Test
     void testRcodeServerFailure() {
       var flags = new HeaderFlags(QUERY, SERVER_FAILURE);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -226,7 +226,7 @@ class HeaderFlagsParserTest {
     @Test
     void testRcodeNameError() {
       var flags = new HeaderFlags(QUERY, NAME_ERROR);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -236,7 +236,7 @@ class HeaderFlagsParserTest {
     @Test
     void testRcodeNotImplemented() {
       var flags = new HeaderFlags(QUERY, NOT_IMPLEMENTED);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -246,7 +246,7 @@ class HeaderFlagsParserTest {
     @Test
     void testRcodeRefused() {
       var flags = new HeaderFlags(QUERY, REFUSED);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -256,7 +256,7 @@ class HeaderFlagsParserTest {
     @Test
     void testAllFlagsSetInQuery() {
       var flags = new HeaderFlags(QUERY, NO_ERROR, QR, AA, TC, RD, RA);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
@@ -266,17 +266,17 @@ class HeaderFlagsParserTest {
     @Test
     void testAllFlagsSetInResponse() {
       var flags = new HeaderFlags(QUERY, NO_ERROR, AA, TC, RD, RA);
-      var networkBytes = NetworkByte.of(2);
+      var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
       assertFlags(networkBytes, bytes, new byte[] {(byte) 0x87, (byte) (byte) 0x80});
     }
 
-    private void assertFlags(NetworkByte networkBytes, int bytes, byte[] flagBytes) {
-      networkBytes.jumpToPosition(0);
+    private void assertFlags(NetworkByteBuffer networkBytesBuffer, int bytes, byte[] flagBytes) {
+      networkBytesBuffer.jumpToPosition(0);
       assertThat(bytes).isEqualTo(2);
-      assertThat(networkBytes.readByte16()).isEqualTo(flagBytes);
+      assertThat(networkBytesBuffer.readData(2)).isEqualTo(flagBytes);
     }
   }
 

@@ -1,6 +1,6 @@
 package ch.dnsmap.dnsm.wire.parser;
 
-import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 
 public interface WireTypeReadable<T> {
 
@@ -11,5 +11,5 @@ public interface WireTypeReadable<T> {
    * @param length   number of bytes to read from {@code wireData} buffer
    * @return a DNS object of type T
    */
-  T fromWire(ReadableByte wireData, int length);
+  T fromWire(ReadableByteBuffer wireData, int length);
 }

@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.wire.DomainCompression;
-import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +27,7 @@ class DomainParserTest {
 
     @Test
     void testRootFromWire() {
-      var networkBytes = NetworkByte.of(new byte[] {0});
+      var networkBytes = NetworkByteBuffer.of(new byte[] {0});
       DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes);
@@ -37,7 +37,7 @@ class DomainParserTest {
 
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWire() {
-      var networkBytes = NetworkByte.of(DOMAIN_BYTES);
+      var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
       DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes);
@@ -65,13 +65,13 @@ class DomainParserTest {
       assertThat(domain).isEqualTo(HOST);
     }
 
-    private static NetworkByte addEndingPointer() throws IOException {
+    private static NetworkByteBuffer addEndingPointer() throws IOException {
       var byteArrayOutputStream = createByteStreamWithData();
       byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
       return setByteStreamPositionAfterData(byteArrayOutputStream);
     }
 
-    private static NetworkByte addEndingLabelAndPointer() throws IOException {
+    private static NetworkByteBuffer addEndingLabelAndPointer() throws IOException {
       var byteArrayOutputStream = createByteStreamWithData();
       byteArrayOutputStream.write(new byte[] {0x03, 0x77, 0x77, 0x77});
       byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
@@ -84,9 +84,9 @@ class DomainParserTest {
       return byteArrayOutputStream;
     }
 
-    private static NetworkByte setByteStreamPositionAfterData(
+    private static NetworkByteBuffer setByteStreamPositionAfterData(
         ByteArrayOutputStream byteArrayOutputStream) {
-      var networkBytes = NetworkByte.of(byteArrayOutputStream.toByteArray());
+      var networkBytes = NetworkByteBuffer.of(byteArrayOutputStream.toByteArray());
       networkBytes.jumpToPosition(11);
       return networkBytes;
     }
@@ -97,7 +97,7 @@ class DomainParserTest {
 
     @Test
     void testRootFromWire() {
-      var networkBytes = NetworkByte.of(new byte[] {0});
+      var networkBytes = NetworkByteBuffer.of(new byte[] {0});
       DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes, 1);
@@ -107,7 +107,7 @@ class DomainParserTest {
 
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWire() {
-      var networkBytes = NetworkByte.of(DOMAIN_BYTES);
+      var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
       DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes, DOMAIN_BYTES.length);
@@ -117,7 +117,7 @@ class DomainParserTest {
 
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWireReadOnlyFirstLabel() {
-      var networkBytes = NetworkByte.of(DOMAIN_BYTES);
+      var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
       DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes, 6);
@@ -145,13 +145,13 @@ class DomainParserTest {
       assertThat(domain).isEqualTo(HOST);
     }
 
-    private static NetworkByte addEndingPointer() throws IOException {
+    private static NetworkByteBuffer addEndingPointer() throws IOException {
       var byteArrayOutputStream = createByteStreamWithData();
       byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
       return setByteStreamPositionAfterData(byteArrayOutputStream);
     }
 
-    private static NetworkByte addEndingLabelAndPointer() throws IOException {
+    private static NetworkByteBuffer addEndingLabelAndPointer() throws IOException {
       var byteArrayOutputStream = createByteStreamWithData();
       byteArrayOutputStream.write(new byte[] {0x03, 0x77, 0x77, 0x77});
       byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
@@ -164,9 +164,9 @@ class DomainParserTest {
       return byteArrayOutputStream;
     }
 
-    private static NetworkByte setByteStreamPositionAfterData(
+    private static NetworkByteBuffer setByteStreamPositionAfterData(
         ByteArrayOutputStream byteArrayOutputStream) {
-      var networkBytes = NetworkByte.of(byteArrayOutputStream.toByteArray());
+      var networkBytes = NetworkByteBuffer.of(byteArrayOutputStream.toByteArray());
       networkBytes.jumpToPosition(11);
       return networkBytes;
     }
@@ -177,7 +177,7 @@ class DomainParserTest {
 
     @Test
     void testRootToWire() {
-      var networkBytes = NetworkByte.of(
+      var networkBytes = NetworkByteBuffer.of(
           new byte[] {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
               0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
       DomainParser domainParser = new DomainParser();
@@ -187,12 +187,12 @@ class DomainParserTest {
       assertThat(bytes).isEqualTo(1);
       assertThat(networkBytes.createRestorePosition()).isEqualTo(1);
       networkBytes.jumpToPosition(0);
-      assertThat(networkBytes.readByte(1)).isEqualTo(new byte[] {0x00});
+      assertThat(networkBytes.readData(1)).isEqualTo(new byte[] {0x00});
     }
 
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetToWire() {
-      var networkBytes = NetworkByte.of(
+      var networkBytes = NetworkByteBuffer.of(
           new byte[] {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
               0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
       DomainParser domainParser = new DomainParser();
@@ -202,12 +202,12 @@ class DomainParserTest {
       assertThat(bytes).isEqualTo(11);
       assertThat(networkBytes.createRestorePosition()).isEqualTo(11);
       networkBytes.jumpToPosition(0);
-      assertThat(networkBytes.readByte(11)).isEqualTo(DOMAIN_BYTES);
+      assertThat(networkBytes.readData(11)).isEqualTo(DOMAIN_BYTES);
     }
 
     @Test
     void testAPointerToWire() {
-      var networkBytes = NetworkByte.of(
+      var networkBytes = NetworkByteBuffer.of(
           new byte[] {0x03, 0x77, 0x77, 0x77, 0x06, 0x64, 0x6e, 0x73, 0x6d, 0x61, 0x70, 0x02, 0x63,
               0x68, 0x00, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
       networkBytes.jumpToPosition(16);
@@ -221,7 +221,7 @@ class DomainParserTest {
       assertThat(bytes).isEqualTo(7);
       assertThat(networkBytes.createRestorePosition()).isEqualTo(23);
       networkBytes.jumpToPosition(16);
-      assertThat(networkBytes.readByte(7)).isEqualTo(
+      assertThat(networkBytes.readData(7)).isEqualTo(
           new byte[] {0x04, 0x61, 0x73, 0x64, 0x66, (byte) 0xC0, 0x05});
     }
   }

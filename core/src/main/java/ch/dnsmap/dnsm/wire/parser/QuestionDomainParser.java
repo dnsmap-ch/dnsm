@@ -5,8 +5,8 @@ import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Question;
-import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
-import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
 public final class QuestionDomainParser implements WireWritable<Question>, WireReadable<Question> {
 
@@ -17,7 +17,7 @@ public final class QuestionDomainParser implements WireWritable<Question>, WireR
   }
 
   @Override
-  public Question fromWire(ReadableByte wireData) {
+  public Question fromWire(ReadableByteBuffer wireData) {
     Domain qName = domainParser.fromWire(wireData);
     DnsQueryType qType = DnsQueryType.of(wireData.readUInt16());
     DnsQueryClass qClass = DnsQueryClass.of(wireData.readUInt16());
@@ -25,7 +25,7 @@ public final class QuestionDomainParser implements WireWritable<Question>, WireR
   }
 
   @Override
-  public int toWire(WriteableByte wireData, Question data) {
+  public int toWire(WriteableByteBuffer wireData, Question data) {
     int length = domainParser.toWire(wireData, data.questionName());
     length += wireData.writeUInt16(data.questionType().getValue());
     length += wireData.writeUInt16(data.questionClass().getValue());

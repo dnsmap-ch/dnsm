@@ -19,8 +19,8 @@ import ch.dnsmap.dnsm.header.HeaderBitFlags;
 import ch.dnsmap.dnsm.header.HeaderFlags;
 import ch.dnsmap.dnsm.header.HeaderOpcode;
 import ch.dnsmap.dnsm.header.HeaderRcode;
-import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
-import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +36,7 @@ public final class HeaderFlagsParser
   private static final int RA_FLAG_BIT_MASK = 0b0000_0000_1000_0000;
 
   @Override
-  public HeaderFlags fromWire(ReadableByte wireData, int length) {
+  public HeaderFlags fromWire(ReadableByteBuffer wireData, int length) {
     int rawFlags = wireData.readUInt16();
 
     HeaderOpcode opcode = opcodeFromInt(rawFlags);
@@ -47,7 +47,7 @@ public final class HeaderFlagsParser
   }
 
   @Override
-  public int toWire(WriteableByte wireData, HeaderFlags data) {
+  public int toWire(WriteableByteBuffer wireData, HeaderFlags data) {
     return wireData.writeUInt16(flagsToInt(data));
   }
 

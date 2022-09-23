@@ -5,8 +5,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.wire.DomainCompression;
-import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
-import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +25,7 @@ public final class DomainParser
   }
 
   @Override
-  public Domain fromWire(ReadableByte wireData) {
+  public Domain fromWire(ReadableByteBuffer wireData) {
     int restorePoint = wireData.createRestorePosition();
     int length = calculateDomainLength(wireData);
     wireData.restorePosition(restorePoint);
@@ -33,7 +33,7 @@ public final class DomainParser
   }
 
   @Override
-  public Domain fromWire(ReadableByte wireData, int length) {
+  public Domain fromWire(ReadableByteBuffer wireData, int length) {
     List<Label> labels = new ArrayList<>(length);
     int bytesRead = 0;
 
@@ -57,7 +57,7 @@ public final class DomainParser
       return Domain.of(labels);
     }
 
-    byte[] labelBytes = wireData.readByte(labelLength);
+    byte[] labelBytes = wireData.readData(labelLength);
     labels.add(Label.of(labelBytes));
 
     Domain subdomain = fromWire(wireData, length - bytesRead);
@@ -65,7 +65,7 @@ public final class DomainParser
     return Domain.of(labels);
   }
 
-  private static int calculateDomainLength(ReadableByte wireData) {
+  private static int calculateDomainLength(ReadableByteBuffer wireData) {
     int labelLength = wireData.peakUInt8();
     if (labelLength == END_OF_DOMAIN) {
       return 1;
@@ -90,7 +90,7 @@ public final class DomainParser
     return length;
   }
 
-  private Domain readPointer(ReadableByte wireData) {
+  private Domain readPointer(ReadableByteBuffer wireData) {
     int jumpToLabelPosition = resolvePointerPosition(wireData.readUInt16());
     int restorePosition = wireData.createRestorePosition();
     wireData.jumpToPosition(jumpToLabelPosition);
@@ -109,7 +109,7 @@ public final class DomainParser
   }
 
   @Override
-  public int toWire(WriteableByte wireData, Domain data) {
+  public int toWire(WriteableByteBuffer wireData, Domain data) {
 
     if (domainCompression == null) {
       return writeFullDomain(wireData, data);
@@ -125,7 +125,7 @@ public final class DomainParser
     return bytesWritten + toWire(wireData, data.getDomainWithoutFirstLabel());
   }
 
-  private static int writeFullDomain(WriteableByte wireData, Domain data) {
+  private static int writeFullDomain(WriteableByteBuffer wireData, Domain data) {
     int bytesWritten = data.getLabels().stream()
         .map(label -> writeLabel(wireData, label))
         .reduce(0, Integer::sum);
@@ -133,13 +133,13 @@ public final class DomainParser
     return bytesWritten;
   }
 
-  private static int writePointerToDomain(WriteableByte wireData, int pointer) {
+  private static int writePointerToDomain(WriteableByteBuffer wireData, int pointer) {
     return wireData.writeUInt16(pointer);
   }
 
-  private static int writeLabel(WriteableByte wireData, Label label) {
+  private static int writeLabel(WriteableByteBuffer wireData, Label label) {
     int bytesWritten = wireData.writeUInt8(label.length());
-    bytesWritten += wireData.writeByte(label.getLabel().getBytes(UTF_8));
+    bytesWritten += wireData.writeData(label.getLabel().getBytes(UTF_8));
     return bytesWritten;
   }
 

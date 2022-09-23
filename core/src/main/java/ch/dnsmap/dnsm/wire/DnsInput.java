@@ -8,8 +8,8 @@ import ch.dnsmap.dnsm.header.HeaderCount;
 import ch.dnsmap.dnsm.header.HeaderFlags;
 import ch.dnsmap.dnsm.header.HeaderId;
 import ch.dnsmap.dnsm.record.ResourceRecord;
-import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
-import ch.dnsmap.dnsm.wire.bytes.ReadableByte;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
 import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
 import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
@@ -18,7 +18,7 @@ import java.util.List;
 
 public final class DnsInput {
 
-  private final ReadableByte networkByte;
+  private final ReadableByteBuffer networkByte;
   private final HeaderFlagsParser headerFlagsParser;
   private final QuestionDomainParser questionDomainParser;
   private final ResourceRecordParser resourceRecordParser;
@@ -29,7 +29,7 @@ public final class DnsInput {
   private List<ResourceRecord> authority;
   private List<ResourceRecord> additional;
 
-  private DnsInput(ReadableByte networkByte) {
+  private DnsInput(ReadableByteBuffer networkByte) {
     this.networkByte = networkByte;
     this.headerFlagsParser = new HeaderFlagsParser();
     this.questionDomainParser = new QuestionDomainParser();
@@ -37,7 +37,7 @@ public final class DnsInput {
   }
 
   public static DnsInput fromWire(byte[] inputData) {
-    return new DnsInput(NetworkByte.of(inputData));
+    return new DnsInput(NetworkByteBuffer.of(inputData));
   }
 
   public Header getHeader() {

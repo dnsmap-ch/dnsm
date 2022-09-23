@@ -4,8 +4,8 @@ import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.header.Header;
 import ch.dnsmap.dnsm.record.ResourceRecord;
-import ch.dnsmap.dnsm.wire.bytes.NetworkByte;
-import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
 import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
 import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
@@ -26,7 +26,7 @@ public final class DnsOutput {
   private final HeaderFlagsParser headerFlagsParser;
   private final QuestionDomainParser questionDomainParser;
   private final ResourceRecordParser resourceRecordParser;
-  private final WriteableByte networkByte;
+  private final WriteableByteBuffer networkByte;
 
   private int headerTo;
   private int questionTo;
@@ -45,7 +45,7 @@ public final class DnsOutput {
     this.questionDomainParser = new QuestionDomainParser();
     this.resourceRecordParser = new ResourceRecordParser();
     int capacity = getCapacity(question, answers, authoritatives, additionals);
-    networkByte = NetworkByte.of(capacity);
+    networkByte = NetworkByteBuffer.of(capacity);
   }
 
   public static DnsOutput toWire(Header header, Question question, List<ResourceRecord> answers,

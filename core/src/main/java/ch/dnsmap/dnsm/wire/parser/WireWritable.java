@@ -1,6 +1,6 @@
 package ch.dnsmap.dnsm.wire.parser;
 
-import ch.dnsmap.dnsm.wire.bytes.WriteableByte;
+import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
 public interface WireWritable<T> {
 
@@ -11,7 +11,7 @@ public interface WireWritable<T> {
    * @param data     DNS object of type T
    * @return amount of bytes written
    */
-  int toWire(WriteableByte wireData, T data);
+  int toWire(WriteableByteBuffer wireData, T data);
 
   /**
    * Get the number of bytes of the {@code data} to write into wire format.
