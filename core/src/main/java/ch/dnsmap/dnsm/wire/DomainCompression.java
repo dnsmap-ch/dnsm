@@ -4,10 +4,11 @@ package ch.dnsmap.dnsm.wire;
 import ch.dnsmap.dnsm.Domain;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public final class DomainCompression {
 
-  private final Map<Domain, Pointer> domainPositionMap;
+  private final Map<Domain, AbsolutePosition> domainPositionMap;
 
   public DomainCompression() {
     this.domainPositionMap = new HashMap<>();
@@ -19,28 +20,19 @@ public final class DomainCompression {
     }
 
     if (!domainPositionMap.containsKey(domain)) {
-      Pointer pointer = new Pointer(startPosition);
+      AbsolutePosition absolutePosition = new AbsolutePosition(startPosition);
 
-      domainPositionMap.put(domain, pointer);
+      domainPositionMap.put(domain, absolutePosition);
     }
   }
 
-  public boolean contains(Domain domain) {
-    return domainPositionMap.containsKey(domain);
-  }
-
-  public int getPointer(Domain domain) {
-    if (contains(domain)) {
-      Pointer pointer = domainPositionMap.get(domain);
-      return createCompressionPointer(pointer.position());
+  public Optional<AbsolutePosition> getPointer(Domain domain) {
+    if (domainPositionMap.containsKey(domain)) {
+      return Optional.of(domainPositionMap.get(domain));
     }
-    return -1;
+    return Optional.empty();
   }
 
-  private static int createCompressionPointer(int pointerValue) {
-    return pointerValue | 0xC000;
-  }
-
-  private record Pointer(int position) {
+  public record AbsolutePosition(int position) {
   }
 }

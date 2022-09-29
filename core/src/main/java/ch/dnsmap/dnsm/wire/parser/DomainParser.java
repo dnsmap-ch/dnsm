@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.wire.DomainCompression;
+import ch.dnsmap.dnsm.wire.DomainCompression.AbsolutePosition;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 import java.util.ArrayList;
@@ -126,8 +127,8 @@ public final class DomainParser
       return writeFullDomain(wireData, data);
     }
 
-    if (domainCompression.contains(data)) {
-      return writePointerToDomain(wireData, domainCompression.getPointer(data));
+    if (domainCompression.getPointer(data).isPresent()) {
+      return writePointerToDomain(wireData, domainCompression.getPointer(data).get());
     }
 
     domainCompression.addDomain(data, wireData.getPosition());
@@ -144,8 +145,10 @@ public final class DomainParser
     return bytesWritten;
   }
 
-  private static int writePointerToDomain(WriteableByteBuffer wireData, int pointer) {
-    return wireData.writeUInt16(pointer);
+  private static int writePointerToDomain(WriteableByteBuffer wireData,
+                                          AbsolutePosition absolutePosition) {
+    int positionPointer = absolutePosition.position() | 0xC000;
+    return wireData.writeUInt16(positionPointer);
   }
 
   private static int writeLabel(WriteableByteBuffer wireData, Label label) {
@@ -173,7 +176,7 @@ public final class DomainParser
       return countDomainWithoutCompression(data);
     }
 
-    if (domainCompression.contains(data)) {
+    if (domainCompression.getPointer(data).isPresent()) {
       return DNS_POINTER_BYTES_LENGTH;
     }
 
