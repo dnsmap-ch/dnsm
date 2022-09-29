@@ -39,7 +39,7 @@ public final class ResourceRecordParser
   private final ResourceRecordOpaqueParser rrOpaqueParser;
   private final ResourceRecordTxtParser rrTxtParser;
 
-  public ResourceRecordParser() {
+  private ResourceRecordParser(DomainCompression domainCompression) {
     domainParser = new DomainParser();
     rrAParser = new ResourceRecordAParser();
     rrAaaaParser = new ResourceRecordAAAAParser();
@@ -48,10 +48,15 @@ public final class ResourceRecordParser
     rrNsParser = new ResourceRecordNsParser(domainParser);
     rrOpaqueParser = new ResourceRecordOpaqueParser();
     rrTxtParser = new ResourceRecordTxtParser();
+    domainParser.setDomainPositionMap(domainCompression);
   }
 
-  public void setDomainPositionMap(DomainCompression domainCompression) {
-    domainParser.setDomainPositionMap(domainCompression);
+  public static WireReadable<ResourceRecord> parseInput() {
+    return new ResourceRecordParser(null);
+  }
+
+  public static WireWritable<ResourceRecord> parseOutput(DomainCompression domainCompression) {
+    return new ResourceRecordParser(domainCompression);
   }
 
   @Override

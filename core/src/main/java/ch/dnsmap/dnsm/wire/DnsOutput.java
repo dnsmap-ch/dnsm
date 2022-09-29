@@ -9,6 +9,7 @@ import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
 import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
 import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
+import ch.dnsmap.dnsm.wire.parser.WireWritable;
 import java.util.List;
 
 public final class DnsOutput {
@@ -24,8 +25,9 @@ public final class DnsOutput {
   private final List<ResourceRecord> authoritatives;
   private final List<ResourceRecord> additionals;
   private final HeaderFlagsParser headerFlagsParser;
-  private final QuestionDomainParser questionDomainParser;
-  private final ResourceRecordParser resourceRecordParser;
+  private final DomainCompression domainCompression;
+  private final WireWritable<Question> questionDomainParser;
+  private final WireWritable<ResourceRecord> resourceRecordParser;
   private final WriteableByteBuffer networkByte;
 
   private int headerTo;
@@ -42,8 +44,9 @@ public final class DnsOutput {
     this.authoritatives = authoritatives;
     this.additionals = additionals;
     this.headerFlagsParser = new HeaderFlagsParser();
-    this.questionDomainParser = new QuestionDomainParser();
-    this.resourceRecordParser = new ResourceRecordParser();
+    this.domainCompression = new DomainCompression();
+    this.questionDomainParser = QuestionDomainParser.parseOutput(domainCompression);
+    this.resourceRecordParser = ResourceRecordParser.parseOutput(domainCompression);
     int capacity = getCapacity(question, answers, authoritatives, additionals);
     networkByte = NetworkByteBuffer.of(capacity);
   }
@@ -73,9 +76,7 @@ public final class DnsOutput {
       questionTo += questionByteLength;
 
       int startPositionOfDomainName = questionTo - questionByteLength;
-      DomainCompression domainCompression = new DomainCompression();
       domainCompression.addDomain(question.questionName(), startPositionOfDomainName);
-      resourceRecordParser.setDomainPositionMap(domainCompression);
     }
     return networkByte.range(headerTo, questionTo);
   }

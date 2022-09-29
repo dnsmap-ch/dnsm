@@ -5,6 +5,7 @@ import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.wire.DomainCompression;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
@@ -12,8 +13,16 @@ public final class QuestionDomainParser implements WireWritable<Question>, WireR
 
   private final DomainParser domainParser;
 
-  public QuestionDomainParser() {
-    domainParser = new DomainParser();
+  private QuestionDomainParser(DomainCompression domainCompression) {
+    domainParser = new DomainParser(domainCompression);
+  }
+
+  public static WireReadable<Question> parseInput() {
+    return new QuestionDomainParser(null);
+  }
+
+  public static WireWritable<Question> parseOutput(DomainCompression domainCompression) {
+    return new QuestionDomainParser(domainCompression);
   }
 
   @Override

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public final class DomainCompression {
 
-  private Map<Domain, Pointer> domainPositionMap;
+  private final Map<Domain, Pointer> domainPositionMap;
 
   public DomainCompression() {
     this.domainPositionMap = new HashMap<>();
@@ -22,13 +22,6 @@ public final class DomainCompression {
       Pointer pointer = new Pointer(startPosition);
 
       domainPositionMap.put(domain, pointer);
-
-      Domain parentDomain = domain.getDomainWithoutFirstLabel();
-      int newStartPosition = startPosition + domain.getLabels().get(0).length() + 1;
-
-      if (parentDomain.getLabelCount() > 0) {
-        addDomain(parentDomain, newStartPosition);
-      }
     }
   }
 

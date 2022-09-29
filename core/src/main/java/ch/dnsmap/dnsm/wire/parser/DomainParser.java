@@ -20,6 +20,13 @@ public final class DomainParser
 
   private DomainCompression domainCompression;
 
+  public DomainParser() {
+  }
+
+  public DomainParser(DomainCompression domainCompression) {
+    this.domainCompression = domainCompression;
+  }
+
   public void setDomainPositionMap(DomainCompression domainCompression) {
     this.domainCompression = domainCompression;
   }
@@ -111,6 +118,10 @@ public final class DomainParser
   @Override
   public int toWire(WriteableByteBuffer wireData, Domain data) {
 
+    if (data.getLabels().isEmpty()) {
+      return wireData.writeUInt8(END_OF_DOMAIN);
+    }
+
     if (domainCompression == null) {
       return writeFullDomain(wireData, data);
     }
@@ -153,6 +164,10 @@ public final class DomainParser
    */
   @Override
   public int bytesToWrite(Domain data) {
+
+    if (data.getLabels().isEmpty()) {
+      return DNS_DOMAIN_NAME_TERMINATION_BYTE_LENGTH;
+    }
 
     if (domainCompression == null) {
       return countDomainWithoutCompression(data);

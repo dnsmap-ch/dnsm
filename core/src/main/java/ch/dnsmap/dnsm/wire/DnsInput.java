@@ -13,6 +13,7 @@ import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
 import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
 import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
+import ch.dnsmap.dnsm.wire.parser.WireReadable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +21,8 @@ public final class DnsInput {
 
   private final ReadableByteBuffer networkByte;
   private final HeaderFlagsParser headerFlagsParser;
-  private final QuestionDomainParser questionDomainParser;
-  private final ResourceRecordParser resourceRecordParser;
+  private final WireReadable<Question> questionDomainParser;
+  private final WireReadable<ResourceRecord> resourceRecordParser;
 
   private Header header;
   private List<Question> question;
@@ -32,8 +33,8 @@ public final class DnsInput {
   private DnsInput(ReadableByteBuffer networkByte) {
     this.networkByte = networkByte;
     this.headerFlagsParser = new HeaderFlagsParser();
-    this.questionDomainParser = new QuestionDomainParser();
-    this.resourceRecordParser = new ResourceRecordParser();
+    this.questionDomainParser = QuestionDomainParser.parseInput();
+    this.resourceRecordParser = ResourceRecordParser.parseInput();
   }
 
   public static DnsInput fromWire(byte[] inputData) {
