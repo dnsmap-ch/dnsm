@@ -13,12 +13,16 @@ public final class QuestionDomainParser implements WireWritable<Question>, WireR
 
   private final DomainParser domainParser;
 
+  private QuestionDomainParser() {
+    domainParser = DomainParser.parseInput();
+  }
+
   private QuestionDomainParser(DomainCompression domainCompression) {
-    domainParser = new DomainParser(domainCompression);
+    domainParser = DomainParser.parseOutput(domainCompression);
   }
 
   public static WireReadable<Question> parseInput() {
-    return new QuestionDomainParser(null);
+    return new QuestionDomainParser();
   }
 
   public static WireWritable<Question> parseOutput(DomainCompression domainCompression) {

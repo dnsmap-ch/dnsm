@@ -28,7 +28,7 @@ class DomainParserTest {
     @Test
     void testRootFromWire() {
       var networkBytes = NetworkByteBuffer.of(new byte[] {0});
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes);
 
@@ -38,7 +38,7 @@ class DomainParserTest {
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWire() {
       var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes);
 
@@ -48,7 +48,7 @@ class DomainParserTest {
     @Test
     void testAPointerFromWire() throws IOException {
       var networkBytes = addEndingPointer();
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes);
 
@@ -58,7 +58,7 @@ class DomainParserTest {
     @Test
     void testASequenceOfLabelsEndingWithAPointer() throws IOException {
       var networkBytes = addEndingLabelAndPointer();
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes);
 
@@ -98,7 +98,7 @@ class DomainParserTest {
     @Test
     void testRootFromWire() {
       var networkBytes = NetworkByteBuffer.of(new byte[] {0});
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes, 1);
 
@@ -108,7 +108,7 @@ class DomainParserTest {
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWire() {
       var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes, DOMAIN_BYTES.length);
 
@@ -118,7 +118,7 @@ class DomainParserTest {
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWireReadOnlyFirstLabel() {
       var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes, 6);
 
@@ -128,7 +128,7 @@ class DomainParserTest {
     @Test
     void testAPointerFromWire() throws IOException {
       var networkBytes = addEndingPointer();
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes, 42);
 
@@ -138,7 +138,7 @@ class DomainParserTest {
     @Test
     void testASequenceOfLabelsEndingWithAPointer() throws IOException {
       var networkBytes = addEndingLabelAndPointer();
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var domain = domainParser.fromWire(networkBytes, 42);
 
@@ -180,7 +180,7 @@ class DomainParserTest {
       var networkBytes = NetworkByteBuffer.of(
           new byte[] {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
               0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var bytes = domainParser.toWire(networkBytes, root());
 
@@ -195,7 +195,7 @@ class DomainParserTest {
       var networkBytes = NetworkByteBuffer.of(
           new byte[] {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
               0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var bytes = domainParser.toWire(networkBytes, Domain.of("dnsmap.ch"));
 
@@ -211,10 +211,9 @@ class DomainParserTest {
           new byte[] {0x03, 0x77, 0x77, 0x77, 0x06, 0x64, 0x6e, 0x73, 0x6d, 0x61, 0x70, 0x02, 0x63,
               0x68, 0x00, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
       networkBytes.jumpToPosition(16);
-      DomainParser domainParser = new DomainParser();
       DomainCompression domainCompression = new DomainCompression();
+      DomainParser domainParser = DomainParser.parseOutput(domainCompression);
       domainCompression.addDomain(Domain.of("dnsmap.ch"), 5);
-      domainParser.setDomainPositionMap(domainCompression);
 
       var bytes = domainParser.toWire(networkBytes, Domain.of("asdf.dnsmap.ch"));
 
@@ -232,7 +231,7 @@ class DomainParserTest {
     @Test
     void testRootDomainWithoutCompression() {
       var domain = root();
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var nofBytes = domainParser.bytesToWrite(domain);
 
@@ -242,7 +241,7 @@ class DomainParserTest {
     @Test
     void testSimpleDomainWithoutCompression() {
       var domain = Domain.of("a.bc.def.");
-      DomainParser domainParser = new DomainParser();
+      DomainParser domainParser = DomainParser.parseInput();
 
       var nofBytes = domainParser.bytesToWrite(domain);
 
@@ -270,17 +269,11 @@ class DomainParserTest {
     }
 
     private static DomainParser domainParserWithCompression(String... domainCompressionEntries) {
-      DomainParser domainParser = new DomainParser();
-      setDomainCompression(domainParser, domainCompressionEntries);
-      return domainParser;
-    }
-
-    private static void setDomainCompression(DomainParser domainParser,
-                                             String... domainCompressionEntries) {
       DomainCompression domainCompression = new DomainCompression();
+      DomainParser domainParser = DomainParser.parseOutput(domainCompression);
       stream(domainCompressionEntries).map(Domain::of)
           .forEach(domain -> domainCompression.addDomain(domain, 23));
-      domainParser.setDomainPositionMap(domainCompression);
+      return domainParser;
     }
   }
 }

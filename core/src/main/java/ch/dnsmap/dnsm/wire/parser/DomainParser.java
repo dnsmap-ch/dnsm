@@ -19,17 +19,18 @@ public final class DomainParser
   private static final int DNS_POINTER_BYTES_LENGTH = 2;
   private static final int DNS_LABEL_FIELD_LENGTH = 1;
 
-  private DomainCompression domainCompression;
+  private final DomainCompression domainCompression;
 
-  public DomainParser() {
-  }
-
-  public DomainParser(DomainCompression domainCompression) {
+  private DomainParser(DomainCompression domainCompression) {
     this.domainCompression = domainCompression;
   }
 
-  public void setDomainPositionMap(DomainCompression domainCompression) {
-    this.domainCompression = domainCompression;
+  public static DomainParser parseInput() {
+    return new DomainParser(null);
+  }
+
+  public static DomainParser parseOutput(DomainCompression domainCompression) {
+    return new DomainParser(domainCompression);
   }
 
   @Override
