@@ -128,7 +128,8 @@ public final class DomainParser
       return writeFullDomain(wireData, data);
     }
 
-    if (domainCompression.getPointer(data).isPresent()) {
+    if (domainCompression.getPointer(data).isPresent() &&
+        domainCompression.getPointer(data).get().position() != -1) {
       return writePointerToDomain(wireData, domainCompression.getPointer(data).get());
     }
 
@@ -177,13 +178,15 @@ public final class DomainParser
       return countDomainWithoutCompression(data);
     }
 
-    if (domainCompression.getPointer(data).isPresent()) {
+    if (domainCompression.getPointer(data).isPresent() &&
+        domainCompression.getPointer(data).get().position() != -1) {
       return DNS_POINTER_BYTES_LENGTH;
     }
 
+    domainCompression.addDomain(data, -1);
     int bytesToWrite = DNS_LABEL_FIELD_LENGTH + data.getFirstLabel().length();
-    bytesToWrite += bytesToWrite(data.getDomainWithoutFirstLabel());
-    return bytesToWrite;
+
+    return bytesToWrite + bytesToWrite(data.getDomainWithoutFirstLabel());
   }
 
   private static int countDomainWithoutCompression(Domain data) {

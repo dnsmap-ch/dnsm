@@ -9,21 +9,32 @@ import java.util.Optional;
 public final class DomainCompression {
 
   private final Map<Domain, AbsolutePosition> domainPositionMap;
+  private final int offset;
 
   public DomainCompression() {
-    this.domainPositionMap = new HashMap<>();
+    this(0);
   }
 
-  public void addDomain(Domain domain, int startPosition) {
+  public DomainCompression(int offset) {
+    this.domainPositionMap = new HashMap<>();
+    this.offset = offset;
+  }
+
+  public void addDomain(Domain domain, int bytePosition) {
     if (domain.equals(Domain.root())) {
       return;
     }
 
-    if (!domainPositionMap.containsKey(domain)) {
-      AbsolutePosition absolutePosition = new AbsolutePosition(startPosition);
+    putDomain(domain, bytePosition + offset);
+  }
 
-      domainPositionMap.put(domain, absolutePosition);
+  private void putDomain(Domain domain, int bytePosition) {
+    if (domainPositionMap.containsKey(domain) &&
+        domainPositionMap.get(domain).position != -1) {
+      return;
     }
+
+    domainPositionMap.put(domain, new AbsolutePosition(bytePosition));
   }
 
   public Optional<AbsolutePosition> getPointer(Domain domain) {
