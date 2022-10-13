@@ -20,9 +20,4 @@ public final class ResourceRecordAParser implements WireWritable<Ip4>, WireTypeR
     bytesWritten += wireData.writeData(data.getIp().getAddress());
     return bytesWritten;
   }
-
-  @Override
-  public int bytesToWrite(Ip4 data) {
-    return data.getIp().getAddress().length;
-  }
 }

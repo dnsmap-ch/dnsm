@@ -19,16 +19,11 @@ import ch.dnsmap.dnsm.record.type.Mx;
 import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
 import ch.dnsmap.dnsm.record.type.Txt;
-import ch.dnsmap.dnsm.wire.DomainCompression;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
 public final class ResourceRecordParser
     implements WireWritable<ResourceRecord>, WireReadable<ResourceRecord> {
-
-  private static final int DNS_TYPE_FIELD_LENGTH = 2;
-  private static final int DNS_CLASS_FIELD_LENGTH = 2;
-  private static final int DNS_TTL_FIELD_LENGTH = 4;
 
   private final DomainParser domainParser;
   private final ResourceRecordAAAAParser rrAaaaParser;
@@ -39,8 +34,8 @@ public final class ResourceRecordParser
   private final ResourceRecordOpaqueParser rrOpaqueParser;
   private final ResourceRecordTxtParser rrTxtParser;
 
-  private ResourceRecordParser(DomainCompression domainCompression) {
-    domainParser = DomainParser.parseOutput(domainCompression);
+  public ResourceRecordParser(DomainParser domainParser) {
+    this.domainParser = domainParser;
     rrAParser = new ResourceRecordAParser();
     rrAaaaParser = new ResourceRecordAAAAParser();
     rrCnameParser = new ResourceRecordCnameParser(domainParser);
@@ -48,14 +43,6 @@ public final class ResourceRecordParser
     rrNsParser = new ResourceRecordNsParser(domainParser);
     rrOpaqueParser = new ResourceRecordOpaqueParser();
     rrTxtParser = new ResourceRecordTxtParser();
-  }
-
-  public static WireReadable<ResourceRecord> parseInput() {
-    return new ResourceRecordParser(null);
-  }
-
-  public static WireWritable<ResourceRecord> parseOutput(DomainCompression domainCompression) {
-    return new ResourceRecordParser(domainCompression);
   }
 
   @Override
@@ -106,9 +93,7 @@ public final class ResourceRecordParser
 
   @Override
   public int toWire(WriteableByteBuffer wireData, ResourceRecord data) {
-    int bytesWritten = 0;
-
-    bytesWritten += domainParser.toWire(wireData, data.getName());
+    int bytesWritten = domainParser.toWire(wireData, data.getName());
     bytesWritten += wireData.writeUInt16(data.getDnsType().getValue());
     bytesWritten += wireData.writeUInt16(data.getDnsClass().getValue());
     bytesWritten += wireData.writeUInt32((int) data.getTtl().getTtl());
@@ -148,54 +133,6 @@ public final class ResourceRecordParser
         ResourceRecordOpaque opaqueData = (ResourceRecordOpaque) data;
         bytesWritten += rrOpaqueParser.toWire(wireData, opaqueData.getOpaqueData());
         return bytesWritten;
-      }
-    }
-  }
-
-  @Override
-  public int bytesToWrite(ResourceRecord data) {
-    int bytesToWrite = 0;
-
-    bytesToWrite += domainParser.bytesToWrite(data.getName());
-    bytesToWrite += DNS_TYPE_FIELD_LENGTH;
-    bytesToWrite += DNS_CLASS_FIELD_LENGTH;
-    bytesToWrite += DNS_TTL_FIELD_LENGTH;
-
-    switch (data.getDnsType()) {
-      case A -> {
-        ResourceRecordA rrA = (ResourceRecordA) data;
-        bytesToWrite += rrAParser.bytesToWrite(rrA.getIp4());
-        return bytesToWrite;
-      }
-      case AAAA -> {
-        ResourceRecordAaaa rrAaaa = (ResourceRecordAaaa) data;
-        bytesToWrite += rrAaaaParser.bytesToWrite(rrAaaa.getIp6());
-        return bytesToWrite;
-      }
-      case CNAME -> {
-        ResourceRecordCname rrCname = (ResourceRecordCname) data;
-        bytesToWrite += rrCnameParser.bytesToWrite(rrCname.getCname());
-        return bytesToWrite;
-      }
-      case NS -> {
-        ResourceRecordNs rrNs = (ResourceRecordNs) data;
-        bytesToWrite += rrNsParser.bytesToWrite(rrNs.getNs());
-        return bytesToWrite;
-      }
-      case MX -> {
-        ResourceRecordMx rrMx = (ResourceRecordMx) data;
-        bytesToWrite += rrMxParser.bytesToWrite(rrMx.getMx());
-        return bytesToWrite;
-      }
-      case TXT -> {
-        ResourceRecordTxt rrTxt = (ResourceRecordTxt) data;
-        bytesToWrite += rrTxtParser.bytesToWrite(rrTxt.getTxt());
-        return bytesToWrite;
-      }
-      default -> {
-        ResourceRecordOpaque rrOpaque = (ResourceRecordOpaque) data;
-        bytesToWrite += rrOpaqueParser.bytesToWrite(rrOpaque.getOpaqueData());
-        return bytesToWrite;
       }
     }
   }

@@ -1,7 +1,10 @@
 package ch.dnsmap.dnsm.wire.parser;
 
+import static ch.dnsmap.dnsm.wire.bytes.ReadableWriteableByteBuffer.UINT_16;
+
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.record.type.Ns;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
@@ -21,17 +24,9 @@ public final class ResourceRecordNsParser implements WireWritable<Ns>, WireTypeR
 
   @Override
   public int toWire(WriteableByteBuffer wireData, Ns data) {
-    int bytesWritten = 0;
-    bytesWritten += wireData.writeUInt16(domainParser.bytesToWrite(data.ns()));
-    bytesWritten += domainParser.toWire(wireData, data.ns());
-    return bytesWritten;
-  }
-
-  @Override
-  public int bytesToWrite(Ns data) {
-    int bytesToWrite = 0;
-    bytesToWrite += data.ns().getLabelCount();
-    bytesToWrite += domainParser.bytesToWrite(data.ns());
-    return bytesToWrite;
+    int offset = wireData.getPosition() + UINT_16;
+    WriteableByteBuffer domainBuffer = NetworkByteBuffer.of(256, offset);
+    int nsSize = domainParser.toWire(domainBuffer, data.ns());
+    return wireData.writeBuffer16(domainBuffer, nsSize);
   }
 }

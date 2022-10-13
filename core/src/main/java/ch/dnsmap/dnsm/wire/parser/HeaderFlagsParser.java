@@ -51,11 +51,6 @@ public final class HeaderFlagsParser
     return wireData.writeUInt16(flagsToInt(data));
   }
 
-  @Override
-  public int bytesToWrite(HeaderFlags data) {
-    return 2;
-  }
-
   private static HeaderOpcode opcodeFromInt(int rawFlags) {
     int opcodeValue = readOpcodeValue(rawFlags);
     return switch (opcodeValue) {

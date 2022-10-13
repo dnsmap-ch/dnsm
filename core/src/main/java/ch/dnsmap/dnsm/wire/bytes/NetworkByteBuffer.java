@@ -10,9 +10,11 @@ import java.nio.ByteBuffer;
 public final class NetworkByteBuffer implements ReadableByteBuffer, WriteableByteBuffer {
 
   private final ByteBuffer byteBuffer;
+  private final int offset;
 
-  private NetworkByteBuffer(ByteBuffer byteBuffer) {
+  private NetworkByteBuffer(ByteBuffer byteBuffer, int offset) {
     this.byteBuffer = byteBuffer;
+    this.offset = offset;
   }
 
   /**
@@ -22,7 +24,7 @@ public final class NetworkByteBuffer implements ReadableByteBuffer, WriteableByt
    * @return buffer of passable network bytes
    */
   public static NetworkByteBuffer of(byte[] data) {
-    return new NetworkByteBuffer(wrap(data));
+    return new NetworkByteBuffer(wrap(data), 0);
   }
 
   /**
@@ -32,7 +34,11 @@ public final class NetworkByteBuffer implements ReadableByteBuffer, WriteableByt
    * @return empty buffer to write network bytes into
    */
   public static NetworkByteBuffer of(int capacity) {
-    return new NetworkByteBuffer(ByteBuffer.allocate(capacity));
+    return new NetworkByteBuffer(ByteBuffer.allocate(capacity), 0);
+  }
+
+  public static NetworkByteBuffer of(int capacity, int offset) {
+    return new NetworkByteBuffer(ByteBuffer.allocate(capacity), offset);
   }
 
   @Override
@@ -42,7 +48,12 @@ public final class NetworkByteBuffer implements ReadableByteBuffer, WriteableByt
 
   @Override
   public int getPosition() {
-    return byteBuffer.position();
+    return byteBuffer.position() + offset;
+  }
+
+  @Override
+  public int getOffset() {
+    return offset;
   }
 
   @Override
@@ -176,5 +187,24 @@ public final class NetworkByteBuffer implements ReadableByteBuffer, WriteableByt
     writeUInt16(length);
     byteBuffer.put(data);
     return 2 + length;
+  }
+
+  @Override
+  public int writeBuffer(WriteableByteBuffer buffer, int size) {
+    return appendBuffer((ReadableByteBuffer) buffer, size);
+  }
+
+  @Override
+  public int writeBuffer16(WriteableByteBuffer buffer, int size) {
+    int bytesWritten = writeUInt16(size);
+    bytesWritten += appendBuffer((ReadableByteBuffer) buffer, size);
+    return bytesWritten;
+  }
+
+  private int appendBuffer(ReadableByteBuffer buffer, int size) {
+    buffer.jumpToPosition(0);
+    byte[] bufferData = buffer.readData(size);
+    byteBuffer.put(bufferData);
+    return bufferData.length;
   }
 }

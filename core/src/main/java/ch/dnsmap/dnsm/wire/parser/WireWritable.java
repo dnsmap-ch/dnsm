@@ -12,12 +12,4 @@ public interface WireWritable<T> {
    * @return amount of bytes written
    */
   int toWire(WriteableByteBuffer wireData, T data);
-
-  /**
-   * Get the number of bytes of the {@code data} to write into wire format.
-   *
-   * @param data to be written into wire format
-   * @return number of bytes the write operation will need
-   */
-  int bytesToWrite(T data);
 }

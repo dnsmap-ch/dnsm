@@ -279,11 +279,4 @@ class HeaderFlagsParserTest {
       assertThat(networkBytesBuffer.readData(2)).isEqualTo(flagBytes);
     }
   }
-
-  @Test
-  void testBytesToWrite() {
-    var flags = new HeaderFlags(QUERY, NO_ERROR, QR);
-    var bytes = PARSER.bytesToWrite(flags);
-    assertThat(bytes).isEqualTo(2);
-  }
 }

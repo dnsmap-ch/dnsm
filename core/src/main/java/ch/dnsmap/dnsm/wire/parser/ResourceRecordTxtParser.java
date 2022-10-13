@@ -1,5 +1,6 @@
 package ch.dnsmap.dnsm.wire.parser;
 
+import static ch.dnsmap.dnsm.wire.bytes.ReadableWriteableByteBuffer.UINT_8;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import ch.dnsmap.dnsm.record.type.Txt;
@@ -18,14 +19,9 @@ public final class ResourceRecordTxtParser implements WireWritable<Txt>,
 
   @Override
   public int toWire(WriteableByteBuffer wireData, Txt data) {
-    int bytesWritten = wireData.writeUInt16(data.txt().length() + 1);
+    int bytesWritten = wireData.writeUInt16(data.txt().length() + UINT_8);
     bytesWritten += wireData.writeUInt8(data.txt().length());
     bytesWritten += wireData.writeData(data.txt().getBytes(UTF_8));
     return bytesWritten;
-  }
-
-  @Override
-  public int bytesToWrite(Txt data) {
-    return data.txt().length();
   }
 }

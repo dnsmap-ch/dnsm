@@ -52,6 +52,20 @@ class NetworkByteBufferTest {
       assertThat(networkByte.getPosition()).isEqualTo(4);
     }
 
+    @Test
+    void testOffsetBuffer() {
+      var networkByte = NetworkByteBuffer.of(12, 2);
+      assertThat(networkByte.getOffset()).isEqualTo(2);
+
+      var bytesWritten = networkByte.writeUInt8(0x23);
+      assertThat(networkByte.getPosition()).isEqualTo(3);
+
+      networkByte.jumpToPosition(0);
+      assertThat(bytesWritten).isEqualTo(1);
+      assertThat(networkByte.readUInt8()).isEqualTo(0x23);
+      assertThat(networkByte.getPosition()).isEqualTo(3);
+    }
+
     private static ReadableByteBuffer networkByteBuffer() {
       var data =
           new byte[] {
@@ -378,26 +392,20 @@ class NetworkByteBufferTest {
     @Test
     void testWriteData() {
       var networkByte = NetworkByteBuffer.of(16);
-      var data =
-          new byte[] {
-              (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
-              (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B,
-              (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F};
 
-      var bytesWritten = networkByte.writeData(data);
+      var bytesWritten = networkByte.writeData(someData());
 
       networkByte.jumpToPosition(0);
-      assertThat(bytesWritten).isEqualTo(16);
-      assertThat(networkByte.readData(16)).isEqualTo(data);
-      assertThat(networkByte.getPosition()).isEqualTo(16);
+      assertThat(bytesWritten).isEqualTo(someData().length);
+      assertThat(networkByte.readData(someData().length)).isEqualTo(someData());
+      assertThat(networkByte.getPosition()).isEqualTo(someData().length);
     }
 
     @Test
     void testWriteEmptyData() {
       var networkByte = NetworkByteBuffer.of(16);
-      var data = new byte[0];
 
-      var bytesWritten = networkByte.writeData(data);
+      var bytesWritten = networkByte.writeData(emptyData());
 
       networkByte.jumpToPosition(0);
       assertThat(bytesWritten).isEqualTo(0);
@@ -407,28 +415,22 @@ class NetworkByteBufferTest {
 
     @Test
     void testWriteData8() {
-      var networkByte = NetworkByteBuffer.of(17);
-      var data =
-          new byte[] {
-              (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
-              (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B,
-              (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F};
+      var networkByte = NetworkByteBuffer.of(someData().length + 1);
 
-      var bytesWritten = networkByte.writeData8(data);
+      var bytesWritten = networkByte.writeData8(someData());
 
       networkByte.jumpToPosition(0);
-      assertThat(bytesWritten).isEqualTo(17);
-      assertThat(networkByte.readUInt8()).isEqualTo(16);
-      assertThat(networkByte.readData(16)).isEqualTo(data);
-      assertThat(networkByte.getPosition()).isEqualTo(17);
+      assertThat(bytesWritten).isEqualTo(someData().length + 1);
+      assertThat(networkByte.readUInt8()).isEqualTo(someData().length);
+      assertThat(networkByte.readData(someData().length)).isEqualTo(someData());
+      assertThat(networkByte.getPosition()).isEqualTo(someData().length + 1);
     }
 
     @Test
     void testWriteEmptyData8() {
       var networkByte = NetworkByteBuffer.of(17);
-      var data = new byte[0];
 
-      var bytesWritten = networkByte.writeData8(data);
+      var bytesWritten = networkByte.writeData8(emptyData());
 
       networkByte.jumpToPosition(0);
       assertThat(bytesWritten).isEqualTo(1);
@@ -439,34 +441,85 @@ class NetworkByteBufferTest {
 
     @Test
     void testWriteData16() {
-      var networkByte = NetworkByteBuffer.of(18);
-      var data =
-          new byte[] {
-              (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
-              (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B,
-              (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F};
+      var networkByte = NetworkByteBuffer.of(someData().length + 2);
 
-      var bytesWritten = networkByte.writeData16(data);
+      var bytesWritten = networkByte.writeData16(someData());
 
       networkByte.jumpToPosition(0);
-      assertThat(bytesWritten).isEqualTo(18);
-      assertThat(networkByte.readUInt16()).isEqualTo(16);
-      assertThat(networkByte.readData(16)).isEqualTo(data);
-      assertThat(networkByte.getPosition()).isEqualTo(18);
+      assertThat(bytesWritten).isEqualTo(someData().length + 2);
+      assertThat(networkByte.readUInt16()).isEqualTo(someData().length);
+      assertThat(networkByte.readData(someData().length)).isEqualTo(someData());
+      assertThat(networkByte.getPosition()).isEqualTo(someData().length + 2);
     }
 
     @Test
     void testWriteEmptyData16() {
       var networkByte = NetworkByteBuffer.of(18);
-      var data = new byte[0];
 
-      var bytesWritten = networkByte.writeData16(data);
+      var bytesWritten = networkByte.writeData16(emptyData());
 
       networkByte.jumpToPosition(0);
       assertThat(bytesWritten).isEqualTo(2);
       assertThat(networkByte.readUInt16()).isEqualTo(0);
       assertThat(networkByte.readData(16)).isEqualTo(new byte[16]);
       assertThat(networkByte.getPosition()).isEqualTo(18);
+    }
+
+    @Test
+    void testWriteBuffer() {
+      assertWriteBuffer(someData());
+    }
+
+    @Test
+    void testWriteEmptyBuffer() {
+      assertWriteBuffer(emptyData());
+    }
+
+
+    @Test
+    void testWriteBuffer16() {
+      assertWriteBuffer16(someData());
+    }
+
+    @Test
+    void testWriteEmptyBuffer16() {
+      assertWriteBuffer16(emptyData());
+    }
+
+    private void assertWriteBuffer(byte[] data) {
+      var bufferSrc = NetworkByteBuffer.of(data);
+      var bufferDst = NetworkByteBuffer.of(data.length);
+
+      var bytesWritten = bufferDst.writeBuffer(bufferSrc, data.length);
+
+      bufferDst.jumpToPosition(0);
+      assertThat(bytesWritten).isEqualTo(data.length);
+      assertThat(bufferDst.readData(data.length)).isEqualTo(data);
+      assertThat(bufferDst.getPosition()).isEqualTo(data.length);
+    }
+
+    private static void assertWriteBuffer16(byte[] data) {
+      var bufferSrc = NetworkByteBuffer.of(data);
+      var bufferDst = NetworkByteBuffer.of(data.length + 2);
+
+      var bytesWritten = bufferDst.writeBuffer16(bufferSrc, data.length);
+
+      bufferDst.jumpToPosition(0);
+      assertThat(bytesWritten).isEqualTo(data.length + 2);
+      assertThat(bufferDst.readUInt16()).isEqualTo(data.length);
+      assertThat(bufferDst.readData(data.length)).isEqualTo(data);
+      assertThat(bufferDst.getPosition()).isEqualTo(data.length + 2);
+    }
+
+    private static byte[] someData() {
+      return new byte[] {
+          (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
+          (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B,
+          (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F};
+    }
+
+    private static byte[] emptyData() {
+      return new byte[0];
     }
   }
 }

@@ -22,17 +22,8 @@ public final class ResourceRecordCnameParser
 
   @Override
   public int toWire(WriteableByteBuffer wireData, Cname data) {
-    int bytesWritten = 0;
-    bytesWritten += wireData.writeUInt16(data.cname().getLabelCount());
+    int bytesWritten = wireData.writeUInt16(data.cname().getLabelCount());
     bytesWritten += domainParser.toWire(wireData, data.cname());
     return bytesWritten;
-  }
-
-  @Override
-  public int bytesToWrite(Cname data) {
-    int bytesToWrite = 0;
-    bytesToWrite += data.cname().getLabelCount();
-    bytesToWrite += domainParser.bytesToWrite(data.cname());
-    return bytesToWrite;
   }
 }

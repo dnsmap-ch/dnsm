@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.wire;
+package ch.dnsmap.dnsm.wire.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +32,7 @@ class DomainCompressionTest {
     domainCompression.addDomain(DOMAIN_A, -1);
 
     assertThat(domainCompression.getPointer(DOMAIN_A))
-        .contains(new DomainCompression.AbsolutePosition(-1));
+        .contains(new DomainCompression.Position(-1));
   }
 
   @Test
@@ -41,7 +41,7 @@ class DomainCompressionTest {
     domainCompression.addDomain(DOMAIN_A, -1);
 
     assertThat(domainCompression.getPointer(DOMAIN_A))
-        .contains(new DomainCompression.AbsolutePosition(23));
+        .contains(new DomainCompression.Position(23));
   }
 
   @Test
@@ -49,7 +49,7 @@ class DomainCompressionTest {
     domainCompression.addDomain(DOMAIN_A, 23);
 
     assertThat(domainCompression.getPointer(DOMAIN_A))
-        .contains(new DomainCompression.AbsolutePosition(23));
+        .contains(new DomainCompression.Position(23));
     assertThat(domainCompression.getPointer(DOMAIN_B)).isEmpty();
     assertThat(domainCompression.getPointer(DOMAIN_C)).isEmpty();
   }
@@ -60,9 +60,9 @@ class DomainCompressionTest {
     domainCompression.addDomain(DOMAIN_B, 42);
 
     assertThat(domainCompression.getPointer(DOMAIN_A))
-        .contains(new DomainCompression.AbsolutePosition(23));
+        .contains(new DomainCompression.Position(23));
     assertThat(domainCompression.getPointer(DOMAIN_B))
-        .contains(new DomainCompression.AbsolutePosition(42));
+        .contains(new DomainCompression.Position(42));
     assertThat(domainCompression.getPointer(DOMAIN_C)).isEmpty();
   }
 
@@ -74,9 +74,9 @@ class DomainCompressionTest {
     domainCompression.addDomain(DOMAIN_B, 42);
 
     assertThat(domainCompression.getPointer(DOMAIN_A))
-        .contains(new DomainCompression.AbsolutePosition(25));
+        .contains(new DomainCompression.Position(25));
     assertThat(domainCompression.getPointer(DOMAIN_B))
-        .contains(new DomainCompression.AbsolutePosition(44));
+        .contains(new DomainCompression.Position(44));
     assertThat(domainCompression.getPointer(DOMAIN_C)).isEmpty();
   }
 }

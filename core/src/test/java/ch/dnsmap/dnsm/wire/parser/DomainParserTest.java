@@ -1,12 +1,9 @@
 package ch.dnsmap.dnsm.wire.parser;
 
 import static ch.dnsmap.dnsm.Domain.root;
-import static java.util.Arrays.stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.dnsmap.dnsm.Domain;
-import ch.dnsmap.dnsm.Label;
-import ch.dnsmap.dnsm.wire.DomainCompression;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,12 +12,14 @@ import org.junit.jupiter.api.Test;
 
 class DomainParserTest {
 
-  // 6 characters: dnsmap 2 characters: ch ending zero
-  private static final byte[] DOMAIN_BYTES =
-      new byte[] {0x06, 0x64, 0x6e, 0x73, 0x6d, 0x61, 0x70, 0x02, 0x63, 0x68, 0x00};
-  private static final Domain DOMAIN = Domain.of(Label.of("dnsmap"), Label.of("ch"));
-  private static final Domain HOST =
-      Domain.of(Label.of("www"), Label.of("dnsmap"), Label.of("ch"));
+  private static final byte[] BYTES_DNSMAP_CH = new byte[] {
+      /* Value: 6dnsmap2ch0 */
+      0x06, 0x64, 0x6e, 0x73, 0x6d, 0x61, 0x70,
+      0x02, 0x63, 0x68,
+      0x00};
+  private static final Domain DOMAIN_ASDF_DNSMAP_CH = Domain.of("asdf.dnsmap.ch");
+  private static final Domain DOMAIN_DNSMAP_CH = Domain.of("dnsmap.ch");
+  private static final Domain DOMAIN_WWW_DNSMAP_CH = Domain.of("www.dnsmap.ch");
 
   @Nested
   class FromWire {
@@ -28,7 +27,7 @@ class DomainParserTest {
     @Test
     void testRootFromWire() {
       var networkBytes = NetworkByteBuffer.of(new byte[] {0});
-      DomainParser domainParser = DomainParser.parseInput();
+      DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes);
 
@@ -37,32 +36,32 @@ class DomainParserTest {
 
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWire() {
-      var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
-      DomainParser domainParser = DomainParser.parseInput();
+      var networkBytes = NetworkByteBuffer.of(BYTES_DNSMAP_CH);
+      DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes);
 
-      assertThat(domain).isEqualTo(DOMAIN);
+      assertThat(domain).isEqualTo(DOMAIN_DNSMAP_CH);
     }
 
     @Test
     void testAPointerFromWire() throws IOException {
       var networkBytes = addEndingPointer();
-      DomainParser domainParser = DomainParser.parseInput();
+      DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes);
 
-      assertThat(domain).isEqualTo(DOMAIN);
+      assertThat(domain).isEqualTo(DOMAIN_DNSMAP_CH);
     }
 
     @Test
     void testASequenceOfLabelsEndingWithAPointer() throws IOException {
       var networkBytes = addEndingLabelAndPointer();
-      DomainParser domainParser = DomainParser.parseInput();
+      DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes);
 
-      assertThat(domain).isEqualTo(HOST);
+      assertThat(domain).isEqualTo(DOMAIN_WWW_DNSMAP_CH);
     }
 
     private static NetworkByteBuffer addEndingPointer() throws IOException {
@@ -80,7 +79,7 @@ class DomainParserTest {
 
     private static ByteArrayOutputStream createByteStreamWithData() throws IOException {
       var byteArrayOutputStream = new ByteArrayOutputStream();
-      byteArrayOutputStream.write(DOMAIN_BYTES);
+      byteArrayOutputStream.write(BYTES_DNSMAP_CH);
       return byteArrayOutputStream;
     }
 
@@ -98,7 +97,7 @@ class DomainParserTest {
     @Test
     void testRootFromWire() {
       var networkBytes = NetworkByteBuffer.of(new byte[] {0});
-      DomainParser domainParser = DomainParser.parseInput();
+      DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes, 1);
 
@@ -107,18 +106,18 @@ class DomainParserTest {
 
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWire() {
-      var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
-      DomainParser domainParser = DomainParser.parseInput();
+      var networkBytes = NetworkByteBuffer.of(BYTES_DNSMAP_CH);
+      DomainParser domainParser = new DomainParser();
 
-      var domain = domainParser.fromWire(networkBytes, DOMAIN_BYTES.length);
+      var domain = domainParser.fromWire(networkBytes, BYTES_DNSMAP_CH.length);
 
-      assertThat(domain).isEqualTo(DOMAIN);
+      assertThat(domain).isEqualTo(DOMAIN_DNSMAP_CH);
     }
 
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetFromWireReadOnlyFirstLabel() {
-      var networkBytes = NetworkByteBuffer.of(DOMAIN_BYTES);
-      DomainParser domainParser = DomainParser.parseInput();
+      var networkBytes = NetworkByteBuffer.of(BYTES_DNSMAP_CH);
+      DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes, 6);
 
@@ -128,21 +127,21 @@ class DomainParserTest {
     @Test
     void testAPointerFromWire() throws IOException {
       var networkBytes = addEndingPointer();
-      DomainParser domainParser = DomainParser.parseInput();
+      DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes, 42);
 
-      assertThat(domain).isEqualTo(DOMAIN);
+      assertThat(domain).isEqualTo(DOMAIN_DNSMAP_CH);
     }
 
     @Test
     void testASequenceOfLabelsEndingWithAPointer() throws IOException {
       var networkBytes = addEndingLabelAndPointer();
-      DomainParser domainParser = DomainParser.parseInput();
+      DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes, 42);
 
-      assertThat(domain).isEqualTo(HOST);
+      assertThat(domain).isEqualTo(DOMAIN_WWW_DNSMAP_CH);
     }
 
     private static NetworkByteBuffer addEndingPointer() throws IOException {
@@ -160,7 +159,7 @@ class DomainParserTest {
 
     private static ByteArrayOutputStream createByteStreamWithData() throws IOException {
       var byteArrayOutputStream = new ByteArrayOutputStream();
-      byteArrayOutputStream.write(DOMAIN_BYTES);
+      byteArrayOutputStream.write(BYTES_DNSMAP_CH);
       return byteArrayOutputStream;
     }
 
@@ -177,10 +176,8 @@ class DomainParserTest {
 
     @Test
     void testRootToWire() {
-      var networkBytes = NetworkByteBuffer.of(
-          new byte[] {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
-              0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
-      DomainParser domainParser = DomainParser.parseInput();
+      var networkBytes = NetworkByteBuffer.of(23);
+      DomainParser domainParser = new DomainParser();
 
       var bytes = domainParser.toWire(networkBytes, root());
 
@@ -192,88 +189,35 @@ class DomainParserTest {
 
     @Test
     void testASequenceOfLabelsEndingInAZeroOctetToWire() {
-      var networkBytes = NetworkByteBuffer.of(
-          new byte[] {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42,
-              0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
-      DomainParser domainParser = DomainParser.parseInput();
+      var networkBytes = NetworkByteBuffer.of(23);
+      DomainParser domainParser = new DomainParser();
 
-      var bytes = domainParser.toWire(networkBytes, Domain.of("dnsmap.ch"));
+      var bytes = domainParser.toWire(networkBytes, DOMAIN_DNSMAP_CH);
 
       assertThat(bytes).isEqualTo(11);
       assertThat(networkBytes.createRestorePosition()).isEqualTo(11);
       networkBytes.jumpToPosition(0);
-      assertThat(networkBytes.readData(11)).isEqualTo(DOMAIN_BYTES);
+      assertThat(networkBytes.readData(11)).isEqualTo(BYTES_DNSMAP_CH);
     }
 
     @Test
     void testAPointerToWire() {
-      var networkBytes = NetworkByteBuffer.of(
-          new byte[] {0x03, 0x77, 0x77, 0x77, 0x06, 0x64, 0x6e, 0x73, 0x6d, 0x61, 0x70, 0x02, 0x63,
-              0x68, 0x00, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42});
-      networkBytes.jumpToPosition(16);
-      DomainCompression domainCompression = new DomainCompression();
-      DomainParser domainParser = DomainParser.parseOutput(domainCompression);
-      domainCompression.addDomain(Domain.of("dnsmap.ch"), 5);
+      var networkBytes = NetworkByteBuffer.of(35);
+      DomainParser domainParser = new DomainParser();
 
-      var bytes = domainParser.toWire(networkBytes, Domain.of("asdf.dnsmap.ch"));
+      var bytesFirstStep = domainParser.toWire(networkBytes, DOMAIN_DNSMAP_CH);
+      assertThat(bytesFirstStep).isEqualTo(11);
 
-      assertThat(bytes).isEqualTo(7);
-      assertThat(networkBytes.createRestorePosition()).isEqualTo(23);
-      networkBytes.jumpToPosition(16);
-      assertThat(networkBytes.readData(7)).isEqualTo(
-          new byte[] {0x04, 0x61, 0x73, 0x64, 0x66, (byte) 0xC0, 0x05});
-    }
-  }
+      var bytesSecondStep = domainParser.toWire(networkBytes, DOMAIN_ASDF_DNSMAP_CH);
 
-  @Nested
-  class BytesToWire {
-
-    @Test
-    void testRootDomainWithoutCompression() {
-      var domain = root();
-      DomainParser domainParser = DomainParser.parseInput();
-
-      var nofBytes = domainParser.bytesToWrite(domain);
-
-      assertThat(nofBytes).isEqualTo(1);
-    }
-
-    @Test
-    void testSimpleDomainWithoutCompression() {
-      var domain = Domain.of("a.bc.def.");
-      DomainParser domainParser = DomainParser.parseInput();
-
-      var nofBytes = domainParser.bytesToWrite(domain);
-
-      assertThat(nofBytes).isEqualTo(10);
-    }
-
-    @Test
-    void testSimpleDomainWithCompression() {
-      var domain = Domain.of("a.bc.def.");
-      var domainParser = domainParserWithCompression("def.");
-
-      var nofBytes = domainParser.bytesToWrite(domain);
-
-      assertThat(nofBytes).isEqualTo(7);
-    }
-
-    @Test
-    void testDomainWithCompression() {
-      var domain = Domain.of("a.bc.def.ghij.klmno.");
-      var domainParser = domainParserWithCompression("asf.", "ghij.klmno.", "foo.baz.");
-
-      var nofBytes = domainParser.bytesToWrite(domain);
-
-      assertThat(nofBytes).isEqualTo(11);
-    }
-
-    private static DomainParser domainParserWithCompression(String... domainCompressionEntries) {
-      DomainCompression domainCompression = new DomainCompression();
-      DomainParser domainParser = DomainParser.parseOutput(domainCompression);
-      stream(domainCompressionEntries).map(Domain::of)
-          .forEach(domain -> domainCompression.addDomain(domain, 23));
-      return domainParser;
+      assertThat(bytesSecondStep).isEqualTo(7);
+      assertThat(networkBytes.getPosition()).isEqualTo(18);
+      networkBytes.jumpToPosition(11);
+      assertThat(networkBytes.readData(7)).isEqualTo(new byte[] {
+          /* Value: 4asdfPointer0 */
+          (byte) 0x04, (byte) 0x61, (byte) 0x73, (byte) 0x64, (byte) 0x66,
+          (byte) 0xC0, (byte) 0x00}
+      );
     }
   }
 }

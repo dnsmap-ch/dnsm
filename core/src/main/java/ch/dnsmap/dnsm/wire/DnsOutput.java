@@ -1,11 +1,11 @@
 package ch.dnsmap.dnsm.wire;
 
-import ch.dnsmap.dnsm.Label;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.header.Header;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
+import ch.dnsmap.dnsm.wire.parser.DomainParser;
 import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
 import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
 import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
@@ -14,18 +14,12 @@ import java.util.List;
 
 public final class DnsOutput {
 
-  private static final int DNS_HEADER_LENGTH = 12;
-  private static final int DNS_TYPE_FIELD_LENGTH = 2;
-  private static final int DNS_CLASS_FIELD_LENGTH = 2;
-  private static final int DOMAIN_NULL_TERMINATION_LENGTH = 1;
-
   private final Header header;
   private final Question question;
   private final List<ResourceRecord> answers;
   private final List<ResourceRecord> authoritatives;
   private final List<ResourceRecord> additionals;
   private final HeaderFlagsParser headerFlagsParser;
-  private final DomainCompression domainCompression;
   private final WireWritable<Question> questionDomainParser;
   private final WireWritable<ResourceRecord> resourceRecordParser;
   private final WriteableByteBuffer networkByte;
@@ -44,11 +38,10 @@ public final class DnsOutput {
     this.authoritatives = authoritatives;
     this.additionals = additionals;
     this.headerFlagsParser = new HeaderFlagsParser();
-    this.domainCompression = new DomainCompression();
-    this.questionDomainParser = QuestionDomainParser.parseOutput(domainCompression);
-    this.resourceRecordParser = ResourceRecordParser.parseOutput(domainCompression);
-    int capacity = getCapacity(question, answers, authoritatives, additionals);
-    networkByte = NetworkByteBuffer.of(capacity);
+    DomainParser domainParser = new DomainParser();
+    this.questionDomainParser = new QuestionDomainParser(domainParser);
+    this.resourceRecordParser = new ResourceRecordParser(domainParser);
+    networkByte = NetworkByteBuffer.of(1024);
   }
 
   public static DnsOutput toWire(Header header, Question question, List<ResourceRecord> answers,
@@ -74,9 +67,6 @@ public final class DnsOutput {
       questionTo += headerTo;
       int questionByteLength = questionDomainParser.toWire(networkByte, question);
       questionTo += questionByteLength;
-
-      int startPositionOfDomainName = questionTo - questionByteLength;
-      domainCompression.addDomain(question.questionName(), startPositionOfDomainName);
     }
     return networkByte.range(headerTo, questionTo);
   }
@@ -110,38 +100,5 @@ public final class DnsOutput {
           .reduce(0, Integer::sum);
     }
     return networkByte.range(authoritativeTo, additionalTo);
-  }
-
-  private int getCapacity(Question question, List<ResourceRecord> answers,
-                          List<ResourceRecord> authoritatives,
-                          List<ResourceRecord> additionals) {
-    return getHeaderByteSize()
-        + getQuestionByteSize(question)
-        + getAnswerByteSize(answers)
-        + getResourceRecordByteSize(authoritatives)
-        + getResourceRecordByteSize(additionals);
-  }
-
-  private static int getHeaderByteSize() {
-    return DNS_HEADER_LENGTH;
-  }
-
-  private static int getQuestionByteSize(Question question) {
-    int domainLength = question.questionName().getLabelCount()
-        + question.questionName().getLabels().stream().map(Label::length).reduce(0, Integer::sum)
-        + DOMAIN_NULL_TERMINATION_LENGTH;
-    return domainLength + DNS_TYPE_FIELD_LENGTH + DNS_CLASS_FIELD_LENGTH;
-  }
-
-  private int getAnswerByteSize(List<ResourceRecord> resourceRecords) {
-    return resourceRecords.stream()
-        .map(resourceRecordParser::bytesToWrite)
-        .reduce(0, Integer::sum);
-  }
-
-  private int getResourceRecordByteSize(List<ResourceRecord> resourceRecords) {
-    return resourceRecords.stream()
-        .map(resourceRecordParser::bytesToWrite)
-        .reduce(0, Integer::sum);
   }
 }

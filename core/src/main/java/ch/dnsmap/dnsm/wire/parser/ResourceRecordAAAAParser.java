@@ -20,9 +20,4 @@ public final class ResourceRecordAAAAParser implements WireWritable<Ip6>, WireTy
     bytesWritten += wireData.writeData(data.getIp().getAddress());
     return bytesWritten;
   }
-
-  @Override
-  public int bytesToWrite(Ip6 data) {
-    return data.getIp().getAddress().length;
-  }
 }

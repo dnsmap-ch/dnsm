@@ -19,9 +19,4 @@ public final class ResourceRecordOpaqueParser
     wireData.writeUInt16(rdLength);
     return wireData.writeData(data.opaque());
   }
-
-  @Override
-  public int bytesToWrite(OpaqueData data) {
-    return data.opaque().length;
-  }
 }

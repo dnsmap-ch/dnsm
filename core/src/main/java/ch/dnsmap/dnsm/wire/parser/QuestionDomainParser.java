@@ -5,7 +5,6 @@ import ch.dnsmap.dnsm.DnsQueryClass;
 import ch.dnsmap.dnsm.DnsQueryType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Question;
-import ch.dnsmap.dnsm.wire.DomainCompression;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
@@ -13,20 +12,8 @@ public final class QuestionDomainParser implements WireWritable<Question>, WireR
 
   private final DomainParser domainParser;
 
-  private QuestionDomainParser() {
-    domainParser = DomainParser.parseInput();
-  }
-
-  private QuestionDomainParser(DomainCompression domainCompression) {
-    domainParser = DomainParser.parseOutput(domainCompression);
-  }
-
-  public static WireReadable<Question> parseInput() {
-    return new QuestionDomainParser();
-  }
-
-  public static WireWritable<Question> parseOutput(DomainCompression domainCompression) {
-    return new QuestionDomainParser(domainCompression);
+  public QuestionDomainParser(DomainParser domainParser) {
+    this.domainParser = domainParser;
   }
 
   @Override
@@ -39,17 +26,9 @@ public final class QuestionDomainParser implements WireWritable<Question>, WireR
 
   @Override
   public int toWire(WriteableByteBuffer wireData, Question data) {
-    int length = domainParser.toWire(wireData, data.questionName());
-    length += wireData.writeUInt16(data.questionType().getValue());
-    length += wireData.writeUInt16(data.questionClass().getValue());
-    return length;
-  }
-
-  @Override
-  public int bytesToWrite(Question data) {
-    int byteToWrite = domainParser.bytesToWrite(data.questionName());
-    byteToWrite += 2;
-    byteToWrite += 2;
-    return byteToWrite;
+    int bytesWritten = domainParser.toWire(wireData, data.questionName());
+    bytesWritten += wireData.writeUInt16(data.questionType().getValue());
+    bytesWritten += wireData.writeUInt16(data.questionClass().getValue());
+    return bytesWritten;
   }
 }

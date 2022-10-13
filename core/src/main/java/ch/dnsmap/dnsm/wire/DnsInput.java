@@ -10,6 +10,7 @@ import ch.dnsmap.dnsm.header.HeaderId;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
+import ch.dnsmap.dnsm.wire.parser.DomainParser;
 import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
 import ch.dnsmap.dnsm.wire.parser.QuestionDomainParser;
 import ch.dnsmap.dnsm.wire.parser.ResourceRecordParser;
@@ -33,8 +34,9 @@ public final class DnsInput {
   private DnsInput(ReadableByteBuffer networkByte) {
     this.networkByte = networkByte;
     this.headerFlagsParser = new HeaderFlagsParser();
-    this.questionDomainParser = QuestionDomainParser.parseInput();
-    this.resourceRecordParser = ResourceRecordParser.parseInput();
+    DomainParser domainParser = new DomainParser();
+    this.questionDomainParser = new QuestionDomainParser(domainParser);
+    this.resourceRecordParser = new ResourceRecordParser(domainParser);
   }
 
   public static DnsInput fromWire(byte[] inputData) {
