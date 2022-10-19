@@ -1,3 +1,6 @@
 rootProject.name = "dnsm"
 
-include("core")
+include(
+    "client",
+    "core"
+)
