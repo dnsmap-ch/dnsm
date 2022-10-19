@@ -40,7 +40,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-final class AdditionalParsingGoogleComTest {
+final class AdditionalParsingTest {
 
   private static final String GOOGLE_COM = "google.com.";
   private static final String NS_1_GOOGLE_COM = "ns1.google.com";
