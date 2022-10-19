@@ -15,8 +15,6 @@ public final class ResourceRecordOpaqueParser
 
   @Override
   public int toWire(WriteableByteBuffer wireData, OpaqueData data) {
-    int rdLength = data.opaque().length;
-    wireData.writeUInt16(rdLength);
     return wireData.writeData(data.opaque());
   }
 }

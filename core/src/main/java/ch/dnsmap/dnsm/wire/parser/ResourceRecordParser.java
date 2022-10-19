@@ -1,5 +1,7 @@
 package ch.dnsmap.dnsm.wire.parser;
 
+import static ch.dnsmap.dnsm.wire.bytes.ReadableWriteableByteBuffer.UINT_16;
+
 import ch.dnsmap.dnsm.DnsClass;
 import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
@@ -19,6 +21,7 @@ import ch.dnsmap.dnsm.record.type.Mx;
 import ch.dnsmap.dnsm.record.type.Ns;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
 import ch.dnsmap.dnsm.record.type.Txt;
+import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 
@@ -98,40 +101,50 @@ public final class ResourceRecordParser
     bytesWritten += wireData.writeUInt16(data.getDnsClass().getValue());
     bytesWritten += wireData.writeUInt32((int) data.getTtl().getTtl());
 
+    int offset = wireData.getPosition() + UINT_16;
+    WriteableByteBuffer rrBuffer = NetworkByteBuffer.of(256, offset);
+
     switch (data.getDnsType()) {
       case A -> {
         ResourceRecordA aData = (ResourceRecordA) data;
-        bytesWritten += rrAParser.toWire(wireData, aData.getIp4());
+        int aSize = rrAParser.toWire(rrBuffer, aData.getIp4());
+        bytesWritten += wireData.writeBuffer16(rrBuffer, aSize);
         return bytesWritten;
       }
       case AAAA -> {
         ResourceRecordAaaa aaaaData = (ResourceRecordAaaa) data;
-        bytesWritten += rrAaaaParser.toWire(wireData, aaaaData.getIp6());
+        int aaaaSize = rrAaaaParser.toWire(rrBuffer, aaaaData.getIp6());
+        bytesWritten += wireData.writeBuffer16(rrBuffer, aaaaSize);
         return bytesWritten;
       }
       case CNAME -> {
         ResourceRecordCname cnameData = (ResourceRecordCname) data;
-        bytesWritten += rrCnameParser.toWire(wireData, cnameData.getCname());
+        int cnameSize = rrCnameParser.toWire(rrBuffer, cnameData.getCname());
+        bytesWritten += wireData.writeBuffer16(rrBuffer, cnameSize);
         return bytesWritten;
       }
       case MX -> {
         ResourceRecordMx mxData = (ResourceRecordMx) data;
-        bytesWritten += rrMxParser.toWire(wireData, mxData.getMx());
+        int mxSize = rrMxParser.toWire(rrBuffer, mxData.getMx());
+        bytesWritten += wireData.writeBuffer16(rrBuffer, mxSize);
         return bytesWritten;
       }
       case NS -> {
         ResourceRecordNs nsData = (ResourceRecordNs) data;
-        bytesWritten += rrNsParser.toWire(wireData, nsData.getNs());
+        int nsSize = rrNsParser.toWire(rrBuffer, nsData.getNs());
+        bytesWritten += wireData.writeBuffer16(rrBuffer, nsSize);
         return bytesWritten;
       }
       case TXT -> {
         ResourceRecordTxt txtData = (ResourceRecordTxt) data;
-        bytesWritten += rrTxtParser.toWire(wireData, txtData.getTxt());
+        int txtSize = rrTxtParser.toWire(rrBuffer, txtData.getTxt());
+        bytesWritten += wireData.writeBuffer16(rrBuffer, txtSize);
         return bytesWritten;
       }
       default -> {
         ResourceRecordOpaque opaqueData = (ResourceRecordOpaque) data;
-        bytesWritten += rrOpaqueParser.toWire(wireData, opaqueData.getOpaqueData());
+        int opaqueSize = rrOpaqueParser.toWire(rrBuffer, opaqueData.getOpaqueData());
+        bytesWritten += wireData.writeBuffer16(rrBuffer, opaqueSize);
         return bytesWritten;
       }
     }

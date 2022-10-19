@@ -35,7 +35,7 @@ public final class Ttl {
    * @return TTL as long
    */
   public long getTtl() {
-    return ttl.getValue();
+    return ttl.value();
   }
 
   @Override
@@ -59,6 +59,6 @@ public final class Ttl {
 
   @Override
   public String toString() {
-    return "Ttl{ttl=" + ttl.getValue() + '}';
+    return "Ttl{ttl=" + ttl.value() + '}';
   }
 }

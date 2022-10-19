@@ -10,7 +10,7 @@ class Uint32Test {
   @Test
   void testValidTtl() {
     var uint = Uint32.of(0);
-    assertThat(uint.getValue()).isEqualTo(0);
+    assertThat(uint.value()).isEqualTo(0);
   }
 
   @Test
