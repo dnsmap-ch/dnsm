@@ -106,7 +106,6 @@ public final class HeaderFlagsParser
     rawFlags = insertOpcodeValue(rawFlags, flags.getOpcode().ordinal());
     rawFlags = insertRCodeValue(rawFlags, flags.getRcode().ordinal());
 
-    rawFlags = setResponseBit(rawFlags);
     for (HeaderBitFlags flag : flags.getFlags()) {
       switch (flag) {
         case QR -> rawFlags = setResponseBit(rawFlags);

@@ -165,7 +165,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testOpcodeQuery() {
-      var flags = new HeaderFlags(QUERY, NO_ERROR);
+      var flags = new HeaderFlags(QUERY, NO_ERROR, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -175,7 +175,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testOpcodeIquery() {
-      var flags = new HeaderFlags(IQUERY, NO_ERROR);
+      var flags = new HeaderFlags(IQUERY, NO_ERROR, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -185,7 +185,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testOpcodeStatus() {
-      var flags = new HeaderFlags(STATUS, NO_ERROR);
+      var flags = new HeaderFlags(STATUS, NO_ERROR, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -195,7 +195,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testRcodeNoError() {
-      var flags = new HeaderFlags(QUERY, NO_ERROR);
+      var flags = new HeaderFlags(QUERY, NO_ERROR, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -205,7 +205,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testRcodeFormatError() {
-      var flags = new HeaderFlags(QUERY, FORMAT_ERROR);
+      var flags = new HeaderFlags(QUERY, FORMAT_ERROR, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -215,7 +215,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testRcodeServerFailure() {
-      var flags = new HeaderFlags(QUERY, SERVER_FAILURE);
+      var flags = new HeaderFlags(QUERY, SERVER_FAILURE, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -225,7 +225,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testRcodeNameError() {
-      var flags = new HeaderFlags(QUERY, NAME_ERROR);
+      var flags = new HeaderFlags(QUERY, NAME_ERROR, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -235,7 +235,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testRcodeNotImplemented() {
-      var flags = new HeaderFlags(QUERY, NOT_IMPLEMENTED);
+      var flags = new HeaderFlags(QUERY, NOT_IMPLEMENTED, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -245,7 +245,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testRcodeRefused() {
-      var flags = new HeaderFlags(QUERY, REFUSED);
+      var flags = new HeaderFlags(QUERY, REFUSED, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
@@ -265,7 +265,7 @@ class HeaderFlagsParserTest {
 
     @Test
     void testAllFlagsSetInResponse() {
-      var flags = new HeaderFlags(QUERY, NO_ERROR, AA, TC, RD, RA);
+      var flags = new HeaderFlags(QUERY, NO_ERROR, AA, TC, RD, RA, QR);
       var networkBytes = NetworkByteBuffer.of(2);
 
       var bytes = PARSER.toWire(networkBytes, flags);
