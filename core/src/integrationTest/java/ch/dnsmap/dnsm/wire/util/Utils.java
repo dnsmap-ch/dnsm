@@ -1,11 +1,42 @@
 package ch.dnsmap.dnsm.wire.util;
 
 import ch.dnsmap.dnsm.Question;
+import ch.dnsmap.dnsm.header.Header;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.wire.DnsInput;
+import ch.dnsmap.dnsm.wire.DnsOutput;
+import ch.dnsmap.dnsm.wire.ParserOptions;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public final class Utils {
+
+  public static DnsInput udpDnsInput(ByteArrayOutputStream dnsBytes) {
+    ParserOptions options = new ParserOptions(false);
+    return dnsInput(options, dnsBytes);
+  }
+
+  private static DnsInput dnsInput(ParserOptions options, ByteArrayOutputStream dnsBytes) {
+    return DnsInput.fromWire(options, dnsBytes.toByteArray());
+  }
+
+  public static DnsOutput udpDnsOutput(Header header,
+                                       Question question,
+                                       List<ResourceRecord> answer,
+                                       List<ResourceRecord> authoritative,
+                                       List<ResourceRecord> additional) {
+    ParserOptions options = new ParserOptions(false);
+    return dnsOutput(options, header, question, answer, authoritative, additional);
+  }
+
+  private static DnsOutput dnsOutput(ParserOptions options,
+                                     Header header,
+                                     Question question,
+                                     List<ResourceRecord> answer,
+                                     List<ResourceRecord> authoritative,
+                                     List<ResourceRecord> additional) {
+    return DnsOutput.toWire(options, header, question, answer, authoritative, additional);
+  }
 
   public static List<Question> jumpToQuestionSection(DnsInput dnsInput) {
     dnsInput.getHeader();
@@ -14,7 +45,7 @@ public final class Utils {
 
   public static List<ResourceRecord> jumpToAnswerSection(DnsInput dnsInput) {
     jumpToQuestionSection(dnsInput);
-    return dnsInput.getAnswer();
+    return dnsInput.getAnswers();
   }
 
   public static List<ResourceRecord> jumpToAuthoritySection(DnsInput dnsInput) {

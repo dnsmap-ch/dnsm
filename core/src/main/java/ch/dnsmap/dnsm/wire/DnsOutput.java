@@ -4,6 +4,7 @@ import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.header.Header;
 import ch.dnsmap.dnsm.record.ResourceRecord;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
+import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 import ch.dnsmap.dnsm.wire.parser.DomainParser;
 import ch.dnsmap.dnsm.wire.parser.HeaderFlagsParser;
@@ -14,6 +15,7 @@ import java.util.List;
 
 public final class DnsOutput {
 
+  private final ParserOptions parserOptions;
   private final Header header;
   private final Question question;
   private final List<ResourceRecord> answers;
@@ -30,8 +32,13 @@ public final class DnsOutput {
   private int authoritativeTo;
   private int additionalTo;
 
-  private DnsOutput(Header header, Question question, List<ResourceRecord> answers,
-                    List<ResourceRecord> authoritatives, List<ResourceRecord> additionals) {
+  private DnsOutput(ParserOptions parserOptions,
+                    Header header,
+                    Question question,
+                    List<ResourceRecord> answers,
+                    List<ResourceRecord> authoritatives,
+                    List<ResourceRecord> additionals) {
+    this.parserOptions = parserOptions;
     this.header = header;
     this.question = question;
     this.answers = answers;
@@ -44,10 +51,36 @@ public final class DnsOutput {
     networkByte = NetworkByteBuffer.of(1024);
   }
 
-  public static DnsOutput toWire(Header header, Question question, List<ResourceRecord> answers,
+  public static DnsOutput toWire(ParserOptions parserOptions,
+                                 Header header,
+                                 Question question,
+                                 List<ResourceRecord> answers,
                                  List<ResourceRecord> authoritatives,
                                  List<ResourceRecord> additionals) {
-    return new DnsOutput(header, question, answers, authoritatives, additionals);
+    return new DnsOutput(parserOptions, header, question, answers, authoritatives, additionals);
+  }
+
+  public byte[] getMessage() {
+    WriteableByteBuffer messageBuffer = NetworkByteBuffer.of(1024);
+    int messageSize = messageBuffer.writeData(getHeader());
+    messageSize += messageBuffer.writeData(getQuestion());
+    messageSize += messageBuffer.writeData(getAnswers());
+    messageSize += messageBuffer.writeData(getAuthoritatives());
+    messageSize += messageBuffer.writeData(getAdditional());
+    messageBuffer.jumpToPosition(0);
+
+
+    if (parserOptions.isTcp()) {
+      WriteableByteBuffer tcpBuffer = NetworkByteBuffer.of(1024);
+      tcpBuffer.writeBuffer16(messageBuffer, messageSize);
+      tcpBuffer.jumpToPosition(0);
+      messageSize += 2;
+      ReadableByteBuffer r = (ReadableByteBuffer) tcpBuffer;
+      return r.readData(messageSize);
+    } else {
+      ReadableByteBuffer r = (ReadableByteBuffer) messageBuffer;
+      return r.readData(messageSize);
+    }
   }
 
   public byte[] getHeader() {

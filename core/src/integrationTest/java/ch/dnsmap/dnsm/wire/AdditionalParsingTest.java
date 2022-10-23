@@ -14,6 +14,8 @@ import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAdditionalSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAnswerSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAuthoritySection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToQuestionSection;
+import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsInput;
+import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.dnsmap.dnsm.DnsQueryClass;
@@ -34,8 +36,6 @@ import ch.dnsmap.dnsm.record.type.Ip6;
 import ch.dnsmap.dnsm.record.type.Ns;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,28 +79,28 @@ final class AdditionalParsingTest {
 
   @Test
   void testDnsHeaderInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var header = dnsInput.getHeader();
     assertDnsHeader(HEADER, header);
   }
 
   @Test
   void testDnsQuestionInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var questions = jumpToQuestionSection(dnsInput);
     assertDnsQuestion(questions, QUESTION_DOMAIN, DnsQueryType.NS, DnsQueryClass.IN);
   }
 
   @Test
   void testDnsAnswerInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var answers = jumpToAnswerSection(dnsInput);
     assertThat(answers.size()).isEqualTo(0);
   }
 
   @Test
   void testDnsAuthorityInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
 
     var authorities = jumpToAuthoritySection(dnsInput);
 
@@ -113,7 +113,7 @@ final class AdditionalParsingTest {
 
   @Test
   void testDnsAdditionalInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
 
     var additional = jumpToAdditionalSection(dnsInput);
 
@@ -134,12 +134,12 @@ final class AdditionalParsingTest {
 
   @Test
   void testOutputParsing() {
-    var question = composeQuestion();
-    var answer = new LinkedList<ResourceRecord>();
+    var question = new Question(QUESTION_DOMAIN, DnsQueryType.NS, DnsQueryClass.IN);
+    List<ResourceRecord> answer = List.of();
     var authoritative = composeAuthoritative();
     var additional = composeAdditional();
 
-    var dnsOutput = DnsOutput.toWire(HEADER, question, answer, authoritative, additional);
+    var dnsOutput = udpDnsOutput(HEADER, question, answer, authoritative, additional);
 
     assertThat(dnsOutput).satisfies(output -> {
       assertThat(output.getHeader()).isEqualTo(DNS_BYTES_HEADER);
@@ -150,30 +150,24 @@ final class AdditionalParsingTest {
     });
   }
 
-  private static Question composeQuestion() {
-    return new Question(QUESTION_DOMAIN, DnsQueryType.NS, DnsQueryClass.IN);
-  }
-
   private static List<ResourceRecord> composeAuthoritative() {
-    List<ResourceRecord> authorities = new ArrayList<>(4);
-    authorities.add(new ResourceRecordNs(AUTHORITY_DOMAIN, IN, TTL, NS2));
-    authorities.add(new ResourceRecordNs(AUTHORITY_DOMAIN, IN, TTL, NS1));
-    authorities.add(new ResourceRecordNs(AUTHORITY_DOMAIN, IN, TTL, NS3));
-    authorities.add(new ResourceRecordNs(AUTHORITY_DOMAIN, IN, TTL, NS4));
-    return authorities;
+    return List.of(
+        new ResourceRecordNs(AUTHORITY_DOMAIN, IN, TTL, NS2),
+        new ResourceRecordNs(AUTHORITY_DOMAIN, IN, TTL, NS1),
+        new ResourceRecordNs(AUTHORITY_DOMAIN, IN, TTL, NS3),
+        new ResourceRecordNs(AUTHORITY_DOMAIN, IN, TTL, NS4));
   }
 
   private static List<ResourceRecord> composeAdditional() {
-    List<ResourceRecord> authorities = new ArrayList<>(8);
-    authorities.add(new ResourceRecordAaaa(NS2.ns(), IN, TTL, Ip6.of("2001:4860:4802:34::a")));
-    authorities.add(new ResourceRecordA(NS2.ns(), IN, TTL, Ip4.of("216.239.34.10")));
-    authorities.add(new ResourceRecordAaaa(NS1.ns(), IN, TTL, Ip6.of("2001:4860:4802:32::a")));
-    authorities.add(new ResourceRecordA(NS1.ns(), IN, TTL, Ip4.of("216.239.32.10")));
-    authorities.add(new ResourceRecordAaaa(NS3.ns(), IN, TTL, Ip6.of("2001:4860:4802:36::a")));
-    authorities.add(new ResourceRecordA(NS3.ns(), IN, TTL, Ip4.of("216.239.36.10")));
-    authorities.add(new ResourceRecordAaaa(NS4.ns(), IN, TTL, Ip6.of("2001:4860:4802:38::a")));
-    authorities.add(new ResourceRecordA(NS4.ns(), IN, TTL, Ip4.of("216.239.38.10")));
-    return authorities;
+    return List.of(
+        new ResourceRecordAaaa(NS2.ns(), IN, TTL, Ip6.of("2001:4860:4802:34::a")),
+        new ResourceRecordA(NS2.ns(), IN, TTL, Ip4.of("216.239.34.10")),
+        new ResourceRecordAaaa(NS1.ns(), IN, TTL, Ip6.of("2001:4860:4802:32::a")),
+        new ResourceRecordA(NS1.ns(), IN, TTL, Ip4.of("216.239.32.10")),
+        new ResourceRecordAaaa(NS3.ns(), IN, TTL, Ip6.of("2001:4860:4802:36::a")),
+        new ResourceRecordA(NS3.ns(), IN, TTL, Ip4.of("216.239.36.10")),
+        new ResourceRecordAaaa(NS4.ns(), IN, TTL, Ip6.of("2001:4860:4802:38::a")),
+        new ResourceRecordA(NS4.ns(), IN, TTL, Ip4.of("216.239.38.10")));
   }
 
   private static final byte[] DNS_BYTES_HEADER = new byte[] {

@@ -15,6 +15,8 @@ import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAdditionalSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAnswerSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAuthoritySection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToQuestionSection;
+import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsInput;
+import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.dnsmap.dnsm.DnsClass;
@@ -36,8 +38,6 @@ import ch.dnsmap.dnsm.record.type.Cname;
 import ch.dnsmap.dnsm.record.type.Ip4;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,21 +76,21 @@ final class CnameParsingTest {
 
   @Test
   void testDnsHeaderInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var header = dnsInput.getHeader();
     assertDnsHeader(HEADER, header);
   }
 
   @Test
   void testDnsQuestionInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var questions = jumpToQuestionSection(dnsInput);
     assertDnsQuestion(questions, QUESTION_DOMAIN, DnsQueryType.A, DnsQueryClass.IN);
   }
 
   @Test
   void testDnsAnswerInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
 
     var answers = jumpToAnswerSection(dnsInput);
 
@@ -105,14 +105,14 @@ final class CnameParsingTest {
 
   @Test
   void testDnsAuthorityInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var authorities = jumpToAuthoritySection(dnsInput);
     assertThat(authorities.size()).isEqualTo(0);
   }
 
   @Test
   void testDnsAdditionalInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
 
     var additional = jumpToAdditionalSection(dnsInput);
 
@@ -128,36 +128,27 @@ final class CnameParsingTest {
 
   @Test
   void testCnameOutputParsing() {
-    var header = composeHeader();
-    var question = composeQuestion();
+    var header = new Header(MESSAGE_ID, FLAGS, COUNT);
+    var question = new Question(QUESTION_DOMAIN, DnsQueryType.A, DnsQueryClass.IN);
     var answer = composeAnswer();
-    var authoritative = new LinkedList<ResourceRecord>();
-    var additional = new LinkedList<ResourceRecord>();
+    List<ResourceRecord> authoritative = List.of();
+    List<ResourceRecord> additional = List.of();
 
-    var dnsOutput = DnsOutput.toWire(header, question, answer, authoritative, additional);
+    var dnsOutput = udpDnsOutput(header, question, answer, authoritative, additional);
 
     assertThat(dnsOutput.getHeader()).isEqualTo(DNS_BYTES_HEADER);
     assertThat(dnsOutput.getQuestion()).isEqualTo(DNS_BYTES_QUESTION);
     assertThat(dnsOutput.getAnswers()).isEqualTo(DNS_BYTES_ANSWER);
   }
 
-  private static Header composeHeader() {
-    return new Header(MESSAGE_ID, FLAGS, COUNT);
-  }
-
-  private static Question composeQuestion() {
-    return new Question(QUESTION_DOMAIN, DnsQueryType.A, DnsQueryClass.IN);
-  }
-
   private static List<ResourceRecord> composeAnswer() {
-    List<ResourceRecord> answers = new ArrayList<>(6);
-    answers.add(new ResourceRecordCname(QUESTION_DOMAIN, IN, TTL, new Cname(ANSWER_DOMAIN)));
-    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_1));
-    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_2));
-    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_3));
-    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_4));
-    answers.add(new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_5));
-    return answers;
+    return List.of(
+        new ResourceRecordCname(QUESTION_DOMAIN, IN, TTL, new Cname(ANSWER_DOMAIN)),
+        new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_1),
+        new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_2),
+        new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_3),
+        new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_4),
+        new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_5));
   }
 
   private static final byte[] DNS_BYTES_HEADER = new byte[] {

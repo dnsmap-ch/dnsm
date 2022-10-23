@@ -2,6 +2,7 @@ package ch.dnsmap.dnsm.wire;
 
 import static java.util.stream.IntStream.range;
 
+import ch.dnsmap.dnsm.Message;
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.header.Header;
 import ch.dnsmap.dnsm.header.HeaderCount;
@@ -25,13 +26,15 @@ public final class DnsInput {
   private final WireReadable<Question> questionDomainParser;
   private final WireReadable<ResourceRecord> resourceRecordParser;
 
+  private ParserOptions parserOptions;
   private Header header;
   private List<Question> question;
   private List<ResourceRecord> answer;
   private List<ResourceRecord> authority;
   private List<ResourceRecord> additional;
 
-  private DnsInput(ReadableByteBuffer networkByte) {
+  private DnsInput(ParserOptions parserOptions, ReadableByteBuffer networkByte) {
+    this.parserOptions = parserOptions;
     this.networkByte = networkByte;
     this.headerFlagsParser = new HeaderFlagsParser();
     DomainParser domainParser = new DomainParser();
@@ -39,13 +42,21 @@ public final class DnsInput {
     this.resourceRecordParser = new ResourceRecordParser(domainParser);
   }
 
-  public static DnsInput fromWire(byte[] inputData) {
-    return new DnsInput(NetworkByteBuffer.of(inputData));
+  public static DnsInput fromWire(ParserOptions parserOptions, byte[] inputData) {
+    return new DnsInput(parserOptions, NetworkByteBuffer.of(inputData));
+  }
+
+  public Message getMessage() {
+    return new Message(getHeader(), getQuestion().get(0), getAnswers(), getAuthority(),
+        getAdditional());
   }
 
   public Header getHeader() {
     if (header != null) {
       return header;
+    }
+    if (parserOptions.isTcp()) {
+      networkByte.readUInt16();
     }
     HeaderId id = HeaderId.of(networkByte.readUInt16());
     HeaderFlags flags = headerFlagsParser.fromWire(networkByte, 2);
@@ -72,7 +83,7 @@ public final class DnsInput {
     return question;
   }
 
-  public List<ResourceRecord> getAnswer() {
+  public List<ResourceRecord> getAnswers() {
     if (answer.isEmpty()) {
       range(0, getHeader().count().getAnCount()).forEach(
           element -> answer.add(resourceRecordParser.fromWire(networkByte)));

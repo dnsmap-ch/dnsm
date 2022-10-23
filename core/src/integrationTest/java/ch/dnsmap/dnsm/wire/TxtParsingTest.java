@@ -13,6 +13,8 @@ import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAdditionalSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAnswerSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAuthoritySection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToQuestionSection;
+import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsInput;
+import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.dnsmap.dnsm.DnsQueryClass;
@@ -30,7 +32,6 @@ import ch.dnsmap.dnsm.record.type.Txt;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,21 +80,21 @@ final class TxtParsingTest {
 
   @Test
   void testDnsHeaderInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var header = dnsInput.getHeader();
     assertDnsHeader(HEADER, header);
   }
 
   @Test
   void testDnsQuestionInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var questions = jumpToQuestionSection(dnsInput);
     assertDnsQuestion(questions, QUESTION_DOMAIN, DnsQueryType.TXT, DnsQueryClass.IN);
   }
 
   @Test
   void testDnsAnswerInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
 
     var answers = jumpToAnswerSection(dnsInput);
 
@@ -113,14 +114,14 @@ final class TxtParsingTest {
 
   @Test
   void testDnsAuthorityInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var authorities = jumpToAuthoritySection(dnsInput);
     assertThat(authorities.size()).isEqualTo(0);
   }
 
   @Test
   void testDnsAdditionalInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var additional = jumpToAdditionalSection(dnsInput);
     assertThat(additional.size()).isEqualTo(0);
   }
@@ -129,10 +130,10 @@ final class TxtParsingTest {
   void testOutputParsing() {
     var question = composeQuestion();
     var answer = composeAnswer();
-    var authoritative = new LinkedList<ResourceRecord>();
-    var additional = new LinkedList<ResourceRecord>();
+    List<ResourceRecord> authoritative = List.of();
+    List<ResourceRecord> additional = List.of();
 
-    var dnsOutput = DnsOutput.toWire(HEADER, question, answer, authoritative, additional);
+    var dnsOutput = udpDnsOutput(HEADER, question, answer, authoritative, additional);
 
     assertThat(dnsOutput.getHeader()).isEqualTo(DNS_BYTES_HEADER);
     assertThat(dnsOutput.getQuestion()).isEqualTo(DNS_BYTES_QUESTION);

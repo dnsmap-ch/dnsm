@@ -11,6 +11,8 @@ import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
 import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordSoa;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAnswerSection;
 import static ch.dnsmap.dnsm.wire.util.Utils.jumpToQuestionSection;
+import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsInput;
+import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.dnsmap.dnsm.DnsQueryClass;
@@ -28,8 +30,6 @@ import ch.dnsmap.dnsm.record.ResourceRecordSoa;
 import ch.dnsmap.dnsm.record.type.Soa;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,21 +67,21 @@ final class SoaParsingTest {
 
   @Test
   void testDnsHeaderInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var header = dnsInput.getHeader();
     assertDnsHeader(HEADER, header);
   }
 
   @Test
   void testDnsQuestionInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
     var questions = jumpToQuestionSection(dnsInput);
     assertDnsQuestion(questions, QUESTION_DOMAIN, DnsQueryType.SOA, DnsQueryClass.IN);
   }
 
   @Test
   void testDnsAnswerInputParsing() {
-    var dnsInput = DnsInput.fromWire(dnsBytes.toByteArray());
+    var dnsInput = udpDnsInput(dnsBytes);
 
     var answers = jumpToAnswerSection(dnsInput);
 
@@ -91,33 +91,19 @@ final class SoaParsingTest {
 
   @Test
   void testOutputParsing() {
-    var header = composeHeader();
-    var question = composeQuestion();
-    var answer = composeAnswer();
-    var authoritative = new LinkedList<ResourceRecord>();
-    var additional = new LinkedList<ResourceRecord>();
+    var header = new Header(MESSAGE_ID, FLAGS, COUNT);
+    var question = new Question(QUESTION_DOMAIN, DnsQueryType.SOA, DnsQueryClass.IN);
+    var answer = List.<ResourceRecord>of(new ResourceRecordSoa(QUESTION_DOMAIN, IN, TTL, SOA));
+    List<ResourceRecord> authoritative = List.of();
+    List<ResourceRecord> additional = List.of();
 
-    var dnsOutput = DnsOutput.toWire(header, question, answer, authoritative, additional);
+    var dnsOutput = udpDnsOutput(header, question, answer, authoritative, additional);
 
     assertThat(dnsOutput).satisfies(output -> {
       assertThat(output.getHeader()).isEqualTo(DNS_BYTES_HEADER);
       assertThat(output.getQuestion()).isEqualTo(DNS_BYTES_QUESTION);
       assertThat(output.getAnswers()).isEqualTo(DNS_BYTES_ANSWER);
     });
-  }
-
-  private static Header composeHeader() {
-    return new Header(MESSAGE_ID, FLAGS, COUNT);
-  }
-
-  private static Question composeQuestion() {
-    return new Question(QUESTION_DOMAIN, DnsQueryType.SOA, DnsQueryClass.IN);
-  }
-
-  private static List<ResourceRecord> composeAnswer() {
-    List<ResourceRecord> answers = new ArrayList<>(1);
-    answers.add(new ResourceRecordSoa(QUESTION_DOMAIN, IN, TTL, SOA));
-    return answers;
   }
 
   private static final byte[] DNS_BYTES_HEADER = new byte[] {
