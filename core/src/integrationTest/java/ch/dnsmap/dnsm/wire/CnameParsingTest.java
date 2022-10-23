@@ -118,11 +118,11 @@ final class CnameParsingTest {
 
     assertThat(additional.size()).isEqualTo(1);
     assertThat(additional.get(0)).satisfies(answer -> {
-      assertThat(answer.getName()).isEqualTo(root());
+      assertThat(answer.name()).isEqualTo(root());
       assertThat(answer.getDnsType()).isEqualTo(DnsType.UNKNOWN);
-      assertThat(answer.getDnsClass()).isEqualTo(DnsClass.UNKNOWN);
-      assertThat(answer.getTtl()).isEqualTo(Ttl.of(0));
-      assertThat(((ResourceRecordOpaque) answer).getOpaqueData().opaque()).isEqualTo(new byte[0]);
+      assertThat(answer.dnsClass()).isEqualTo(DnsClass.UNKNOWN);
+      assertThat(answer.ttl()).isEqualTo(Ttl.of(0));
+      assertThat(((ResourceRecordOpaque) answer).opaqueData().opaque()).isEqualTo(new byte[0]);
     });
   }
 

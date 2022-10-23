@@ -57,50 +57,50 @@ public final class DnsAssert {
   public static void assertDnsRecordCname(ResourceRecord resourceRecord, Domain domainName,
                                           DnsClass dnsClass, Ttl ttl, Cname cname) {
     assertDnsRecord(resourceRecord, domainName, CNAME, dnsClass, ttl);
-    assertThat(((ResourceRecordCname) resourceRecord).getCname()).isEqualTo(cname);
+    assertThat(((ResourceRecordCname) resourceRecord).cname()).isEqualTo(cname);
   }
 
   public static void assertDnsRecordIp4(ResourceRecord resourceRecord, Domain domainName,
                                         DnsClass dnsClass, Ttl ttl, Ip4 ip4) {
     assertDnsRecord(resourceRecord, domainName, A, dnsClass, ttl);
-    assertThat(((ResourceRecordA) resourceRecord).getIp4()).isEqualTo(ip4);
+    assertThat(((ResourceRecordA) resourceRecord).ip4()).isEqualTo(ip4);
   }
 
   public static void assertDnsRecordIp6(ResourceRecord resourceRecord, Domain domainName,
                                         DnsClass dnsClass, Ttl ttl, Ip6 ip6) {
     assertDnsRecord(resourceRecord, domainName, AAAA, dnsClass, ttl);
-    assertThat(((ResourceRecordAaaa) resourceRecord).getIp6()).isEqualTo(ip6);
+    assertThat(((ResourceRecordAaaa) resourceRecord).ip6()).isEqualTo(ip6);
   }
 
   public static void assertDnsRecordNs(ResourceRecord resourceRecord, Domain domainName,
                                        DnsClass dnsClass, Ttl ttl, Ns ns) {
     assertDnsRecord(resourceRecord, domainName, NS, dnsClass, ttl);
-    assertThat(((ResourceRecordNs) resourceRecord).getNs()).isEqualTo(ns);
+    assertThat(((ResourceRecordNs) resourceRecord).ns()).isEqualTo(ns);
   }
 
   public static void assertDnsRecordMx(ResourceRecord resourceRecord, Domain domainName,
                                        DnsClass dnsClass, Ttl ttl, Mx mx) {
     assertDnsRecord(resourceRecord, domainName, MX, dnsClass, ttl);
-    assertThat(((ResourceRecordMx) resourceRecord).getMx()).isEqualTo(mx);
+    assertThat(((ResourceRecordMx) resourceRecord).mx()).isEqualTo(mx);
   }
 
   public static void assertDnsRecordSoa(ResourceRecord resourceRecord, Domain domainName,
                                         DnsClass dnsClass, Ttl ttl, Soa soa) {
     assertDnsRecord(resourceRecord, domainName, SOA, dnsClass, ttl);
-    assertThat(((ResourceRecordSoa) resourceRecord).getSoa()).isEqualTo(soa);
+    assertThat(((ResourceRecordSoa) resourceRecord).soa()).isEqualTo(soa);
   }
 
   public static void assertDnsRecordTxt(ResourceRecord resourceRecord, Domain domainName,
                                         DnsClass dnsClass, Ttl ttl, Txt txt) {
     assertDnsRecord(resourceRecord, domainName, TXT, dnsClass, ttl);
-    assertThat(((ResourceRecordTxt) resourceRecord).getTxt()).isEqualTo(txt);
+    assertThat(((ResourceRecordTxt) resourceRecord).txt()).isEqualTo(txt);
   }
 
   private static void assertDnsRecord(ResourceRecord resourceRecord, Domain domainName,
                                       DnsType dnsType, DnsClass dnsClass, Ttl ttl) {
-    assertThat(resourceRecord.getName()).isEqualTo(domainName);
+    assertThat(resourceRecord.name()).isEqualTo(domainName);
     assertThat(resourceRecord.getDnsType()).isEqualTo(dnsType);
-    assertThat(resourceRecord.getDnsClass()).isEqualTo(dnsClass);
-    assertThat(resourceRecord.getTtl()).isEqualTo(ttl);
+    assertThat(resourceRecord.dnsClass()).isEqualTo(dnsClass);
+    assertThat(resourceRecord.ttl()).isEqualTo(ttl);
   }
 }

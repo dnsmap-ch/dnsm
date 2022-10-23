@@ -5,33 +5,36 @@ import ch.dnsmap.dnsm.DnsType;
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Ttl;
 
-public abstract class ResourceRecord {
+/**
+ * Common interface for all resource records.
+ */
+public interface ResourceRecord {
 
-  private Domain name;
-  private DnsType dnsType;
-  private DnsClass dnsClass;
-  private Ttl ttl;
+  /**
+   * Domain name of this resource record.
+   *
+   * @return domain name of record
+   */
+  Domain name();
 
-  protected ResourceRecord(Domain name, DnsType dnsType, DnsClass dnsClass, Ttl ttl) {
-    this.name = name;
-    this.dnsType = dnsType;
-    this.dnsClass = dnsClass;
-    this.ttl = ttl;
-  }
+  /**
+   * DNS type of this resource record.
+   *
+   * @return DNS type of record
+   */
+  DnsType getDnsType();
 
-  public Domain getName() {
-    return name;
-  }
+  /**
+   * DNS class of this resource record.
+   *
+   * @return DNS class of record
+   */
+  DnsClass dnsClass();
 
-  public DnsType getDnsType() {
-    return dnsType;
-  }
-
-  public DnsClass getDnsClass() {
-    return dnsClass;
-  }
-
-  public Ttl getTtl() {
-    return ttl;
-  }
+  /**
+   * DNS time to live of this resource record.
+   *
+   * @return TTL of record
+   */
+  Ttl ttl();
 }

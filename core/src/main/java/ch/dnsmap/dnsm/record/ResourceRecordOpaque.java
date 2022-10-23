@@ -6,17 +6,12 @@ import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Ttl;
 import ch.dnsmap.dnsm.record.type.OpaqueData;
 
-public final class ResourceRecordOpaque extends ResourceRecord {
+public record ResourceRecordOpaque(Domain name, DnsType dnsType, DnsClass dnsClass, Ttl ttl,
+                                   OpaqueData opaqueData)
+    implements ResourceRecord {
 
-  private final OpaqueData opaqueData;
-
-  public ResourceRecordOpaque(Domain name, DnsType dnsType, DnsClass dnsClass, Ttl ttl,
-                              OpaqueData opaqueData) {
-    super(name, dnsType, dnsClass, ttl);
-    this.opaqueData = opaqueData;
-  }
-
-  public OpaqueData getOpaqueData() {
-    return opaqueData;
+  @Override
+  public DnsType getDnsType() {
+    return dnsType;
   }
 }
