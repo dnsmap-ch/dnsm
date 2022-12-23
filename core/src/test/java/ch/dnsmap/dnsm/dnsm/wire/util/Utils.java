@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.wire.util;
+package ch.dnsmap.dnsm.dnsm.wire.util;
 
 import ch.dnsmap.dnsm.Question;
 import ch.dnsmap.dnsm.header.Header;

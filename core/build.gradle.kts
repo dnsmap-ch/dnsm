@@ -40,29 +40,10 @@ testing {
         val test by getting(JvmTestSuite::class) {
             useJUnitJupiter()
         }
-
-        val integrationTest by registering(JvmTestSuite::class) {
-            dependencies {
-                implementation(project)
-                // add testImplementation dependencies
-                configurations.testImplementation {
-                    dependencies.forEach(::implementation)
-                }
-            }
-
-            targets {
-                all {
-                    testTask.configure {
-                        shouldRunAfter(test)
-                    }
-                }
-            }
-        }
     }
 }
 
 tasks.named("check") {
-    dependsOn(testing.suites.named("integrationTest"))
     dependsOn("jacocoTestCoverageVerification")
 }
 
@@ -74,7 +55,7 @@ tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = "0.64".toBigDecimal()
+                minimum = "0.9".toBigDecimal()
             }
         }
     }

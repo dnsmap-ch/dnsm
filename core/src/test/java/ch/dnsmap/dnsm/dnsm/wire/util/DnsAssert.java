@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.wire.util;
+package ch.dnsmap.dnsm.dnsm.wire.util;
 
 import static ch.dnsmap.dnsm.DnsType.A;
 import static ch.dnsmap.dnsm.DnsType.AAAA;

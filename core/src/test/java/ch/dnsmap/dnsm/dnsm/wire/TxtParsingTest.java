@@ -1,20 +1,20 @@
-package ch.dnsmap.dnsm.wire;
+package ch.dnsmap.dnsm.dnsm.wire;
 
 import static ch.dnsmap.dnsm.DnsClass.IN;
+import static ch.dnsmap.dnsm.dnsm.wire.util.DnsAssert.assertDnsHeader;
+import static ch.dnsmap.dnsm.dnsm.wire.util.DnsAssert.assertDnsQuestion;
+import static ch.dnsmap.dnsm.dnsm.wire.util.DnsAssert.assertDnsRecordTxt;
+import static ch.dnsmap.dnsm.dnsm.wire.util.Utils.jumpToAdditionalSection;
+import static ch.dnsmap.dnsm.dnsm.wire.util.Utils.jumpToAnswerSection;
+import static ch.dnsmap.dnsm.dnsm.wire.util.Utils.jumpToAuthoritySection;
+import static ch.dnsmap.dnsm.dnsm.wire.util.Utils.jumpToQuestionSection;
+import static ch.dnsmap.dnsm.dnsm.wire.util.Utils.udpDnsInput;
+import static ch.dnsmap.dnsm.dnsm.wire.util.Utils.udpDnsOutput;
 import static ch.dnsmap.dnsm.header.HeaderBitFlags.QR;
 import static ch.dnsmap.dnsm.header.HeaderBitFlags.RA;
 import static ch.dnsmap.dnsm.header.HeaderBitFlags.RD;
 import static ch.dnsmap.dnsm.header.HeaderOpcode.QUERY;
 import static ch.dnsmap.dnsm.header.HeaderRcode.NO_ERROR;
-import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsHeader;
-import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsQuestion;
-import static ch.dnsmap.dnsm.wire.util.DnsAssert.assertDnsRecordTxt;
-import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAdditionalSection;
-import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAnswerSection;
-import static ch.dnsmap.dnsm.wire.util.Utils.jumpToAuthoritySection;
-import static ch.dnsmap.dnsm.wire.util.Utils.jumpToQuestionSection;
-import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsInput;
-import static ch.dnsmap.dnsm.wire.util.Utils.udpDnsOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.dnsmap.dnsm.DnsQueryClass;
