@@ -1,7 +1,6 @@
 name: CI
 on:
   push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
@@ -21,10 +20,12 @@ jobs:
       - name: Archive test report
         uses: actions/upload-artifact@v3
         with:
-          name: Test report
+          name: Report
           path: core/build/reports/
       - name: Archive artefacts
         uses: actions/upload-artifact@v3
         with:
           name: Package
-          path: core/build/libs/
+          path: |
+            client/build/libs/
+            core/build/libs/
