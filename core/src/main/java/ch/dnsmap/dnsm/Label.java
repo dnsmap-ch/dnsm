@@ -1,12 +1,15 @@
 package ch.dnsmap.dnsm;
 
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
+
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * Smallest valid part of a domain name.
  */
-public class Label {
+public final class Label {
 
   private static final int MIN_LENGTH = 1;
 
@@ -18,8 +21,8 @@ public class Label {
 
   private final String label;
 
-  private Label(String label) {
-    Objects.requireNonNull(label, "label must not be null");
+  private Label(String label) throws IllegalArgumentException {
+    requireNonNull(label, "label must not be null");
 
     if (label.length() < MIN_LENGTH) {
       throw new IllegalArgumentException("label fail to meet min length of " + MIN_LENGTH);
@@ -29,12 +32,14 @@ public class Label {
       throw new IllegalArgumentException("label exceeds max length of " + MAX_LENGTH);
     }
 
-    if (!isAlphaCharacter(label.charAt(0))) {
+    if (!isAlpha(label.charAt(0))) {
       throw new IllegalArgumentException("label must start with alpha character");
     }
 
-    if (!label.chars().allMatch(c -> isValidCharacter((char) c))) {
-      throw new IllegalArgumentException("label contains invalid character");
+    String invalidCharacters = findInvalidCharacters(label);
+    if (!invalidCharacters.isEmpty()) {
+      throw new IllegalArgumentException(
+          format("label '%s' contains invalid characters: %s", label, invalidCharacters));
     }
 
     this.label = label;
@@ -106,20 +111,30 @@ public class Label {
     return "Label{label='" + label + '\'' + '}';
   }
 
-  private static boolean isAlphaCharacter(char character) {
-    if (character >= 'A' && character <= 'Z') {
-      return true;
-    }
-    return character >= 'a' && character <= 'z';
+  private static String findInvalidCharacters(String label) {
+    return label.chars().filter(c -> !isValidCharacter((char) c))
+        .mapToObj(i -> (char) i)
+        .map(String::valueOf)
+        .collect(joining(", "));
   }
 
   private static boolean isValidCharacter(char character) {
-    if (character == DASH) {
-      return true;
-    }
-    if (character >= '0' && character <= '9') {
-      return true;
-    }
-    return isAlphaCharacter(character);
+    return character == DASH || isAlpha(character) || isNumeric(character);
+  }
+
+  private static boolean isAlpha(char character) {
+    return isAlphaLowercase(character) || isAlphaUppercase(character);
+  }
+
+  private static boolean isAlphaLowercase(char character) {
+    return character >= 'a' && character <= 'z';
+  }
+
+  private static boolean isAlphaUppercase(char character) {
+    return character >= 'A' && character <= 'Z';
+  }
+
+  private static boolean isNumeric(char character) {
+    return character >= '0' && character <= '9';
   }
 }
