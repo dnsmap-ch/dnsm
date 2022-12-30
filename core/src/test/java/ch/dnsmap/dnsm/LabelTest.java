@@ -103,15 +103,15 @@ class LabelTest {
     var invalidLabel = "asdf.foo";
     assertThatThrownBy(() -> Label.of(invalidLabel.getBytes()))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("label contains invalid character");
+        .hasMessage("label 'asdf.foo' contains invalid characters: .");
   }
 
   @Test
   void testInvalidSpecialCharacterInLabel() {
-    var invalidLabel = "as*df";
+    var invalidLabel = "as*df/fdsa";
     assertThatThrownBy(() -> Label.of(invalidLabel.getBytes()))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("label contains invalid character");
+        .hasMessage("label 'as*df/fdsa' contains invalid characters: *, /");
   }
 
   @Test
