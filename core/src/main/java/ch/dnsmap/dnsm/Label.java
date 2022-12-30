@@ -22,26 +22,6 @@ public final class Label {
   private final String label;
 
   private Label(String label) throws IllegalArgumentException {
-    requireNonNull(label, "label must not be null");
-
-    if (label.length() < MIN_LENGTH) {
-      throw new IllegalArgumentException("label fail to meet min length of " + MIN_LENGTH);
-    }
-
-    if (label.length() > MAX_LENGTH) {
-      throw new IllegalArgumentException("label exceeds max length of " + MAX_LENGTH);
-    }
-
-    if (!isAlpha(label.charAt(0))) {
-      throw new IllegalArgumentException("label must start with alpha character");
-    }
-
-    String invalidCharacters = findInvalidCharacters(label);
-    if (!invalidCharacters.isEmpty()) {
-      throw new IllegalArgumentException(
-          format("label '%s' contains invalid characters: %s", label, invalidCharacters));
-    }
-
     this.label = label;
   }
 
@@ -54,6 +34,7 @@ public final class Label {
    * @throws NullPointerException     if {@code label} is null
    */
   public static Label of(String label) {
+    validate(label);
     return new Label(label);
   }
 
@@ -67,6 +48,28 @@ public final class Label {
    */
   public static Label of(byte[] label) {
     return of(new String(label));
+  }
+
+  /**
+   * Create a {@link Label} from a string without RFC 1035 input validation.
+   *
+   * @param label byte array to make a label of
+   * @return new {@link Label} of {@code label}
+   */
+  public static Label tolerantOf(String label) {
+    return new Label(label);
+  }
+
+  /**
+   * Create a {@link Label} from a byte array without RFC 1035 input validation.
+   *
+   * @param label byte array to make a label of
+   * @return new {@link Label} of {@code label}
+   * @throws IllegalArgumentException if {@code label} does not fulfill RFC 1035 requirements
+   * @throws NullPointerException     if {@code label} is null
+   */
+  public static Label tolerantOf(byte[] label) {
+    return tolerantOf(new String(label));
   }
 
   /**
@@ -116,6 +119,28 @@ public final class Label {
         .mapToObj(i -> (char) i)
         .map(String::valueOf)
         .collect(joining(", "));
+  }
+
+  private static void validate(String labelToValidate) {
+    requireNonNull(labelToValidate, "label must not be null");
+
+    if (labelToValidate.length() < MIN_LENGTH) {
+      throw new IllegalArgumentException("label fail to meet min length of " + MIN_LENGTH);
+    }
+
+    if (labelToValidate.length() > MAX_LENGTH) {
+      throw new IllegalArgumentException("label exceeds max length of " + MAX_LENGTH);
+    }
+
+    if (!isAlpha(labelToValidate.charAt(0))) {
+      throw new IllegalArgumentException("label must start with alpha character");
+    }
+
+    String invalidCharacters = findInvalidCharacters(labelToValidate);
+    if (!invalidCharacters.isEmpty()) {
+      throw new IllegalArgumentException(
+          format("label '%s' contains invalid characters: %s", labelToValidate, invalidCharacters));
+    }
   }
 
   private static boolean isValidCharacter(char character) {

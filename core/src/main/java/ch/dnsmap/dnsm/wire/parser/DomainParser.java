@@ -16,9 +16,15 @@ public final class DomainParser
   private static final int END_OF_DOMAIN = 0;
 
   private final DomainCompression domainCompression;
+  private final boolean isTolerant;
 
   public DomainParser() {
+    this(false);
+  }
+
+  public DomainParser(boolean isTolerant) {
     this.domainCompression = new DomainCompression();
+    this.isTolerant = isTolerant;
   }
 
   @Override
@@ -55,11 +61,25 @@ public final class DomainParser
     }
 
     byte[] labelBytes = wireData.readData(labelLength);
-    labels.add(Label.of(labelBytes));
+    labels.add(labelFromBytes(labelBytes));
 
     Domain subdomain = fromWire(wireData, length - bytesRead);
     labels.addAll(subdomain.getLabels());
     return Domain.of(labels);
+  }
+
+  private Label labelFromBytes(byte[] labelBytes) {
+    Label label;
+    if (isTolerant) {
+      try {
+        label = Label.of(labelBytes);
+      } catch (IllegalArgumentException e) {
+        label = Label.tolerantOf(labelBytes);
+      }
+    } else {
+      label = Label.of(labelBytes);
+    }
+    return label;
   }
 
   private static int calculateDomainLength(ReadableByteBuffer wireData) {

@@ -2,6 +2,7 @@ package ch.dnsmap.dnsm.wire.parser;
 
 import static ch.dnsmap.dnsm.Domain.root;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
@@ -12,13 +13,20 @@ import org.junit.jupiter.api.Test;
 
 class DomainParserTest {
 
-  private static final byte[] BYTES_DNSMAP_CH = new byte[] {
+  private static final byte[] BYTES_DNSMAP_CH = new byte[]{
       /* Value: 6dnsmap2ch0 */
       0x06, 0x64, 0x6e, 0x73, 0x6d, 0x61, 0x70,
       0x02, 0x63, 0x68,
       0x00};
+  private static final byte[] BYTES_DNSMAP_CH_WITH_INVALID_CHARACTER = new byte[]{
+      /* Value: 7dnsmap\2ch0 */
+      0x07, 0x64, 0x6e, 0x73, 0x6d, 0x61, 0x70, 0x5c,
+      0x02, 0x63, 0x68,
+      0x00};
   private static final Domain DOMAIN_ASDF_DNSMAP_CH = Domain.of("asdf.dnsmap.ch");
   private static final Domain DOMAIN_DNSMAP_CH = Domain.of("dnsmap.ch");
+  private static final Domain DOMAIN_DNSMAP_CH_WITH_INVALID_CHARACTER = Domain.tolerantOf(
+      "dnsmap\\.ch");
   private static final Domain DOMAIN_WWW_DNSMAP_CH = Domain.of("www.dnsmap.ch");
 
   @Nested
@@ -26,7 +34,7 @@ class DomainParserTest {
 
     @Test
     void testRootFromWire() {
-      var networkBytes = NetworkByteBuffer.of(new byte[] {0});
+      var networkBytes = NetworkByteBuffer.of(new byte[]{0});
       DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes);
@@ -64,16 +72,37 @@ class DomainParserTest {
       assertThat(domain).isEqualTo(DOMAIN_WWW_DNSMAP_CH);
     }
 
+    @Test
+    void testNonToleranceOnInvalidCharacterFromWire() {
+      var networkBytes = NetworkByteBuffer.of(BYTES_DNSMAP_CH_WITH_INVALID_CHARACTER);
+      DomainParser domainParser = new DomainParser();
+
+      assertThatThrownBy(() -> domainParser.fromWire(networkBytes))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("label 'dnsmap\\' contains invalid characters: \\");
+
+    }
+
+    @Test
+    void testToleranceOnInvalidCharacterFromWire() {
+      var networkBytes = NetworkByteBuffer.of(BYTES_DNSMAP_CH_WITH_INVALID_CHARACTER);
+      DomainParser domainParser = new DomainParser(true);
+
+      var domain = domainParser.fromWire(networkBytes);
+
+      assertThat(domain).isEqualTo(DOMAIN_DNSMAP_CH_WITH_INVALID_CHARACTER);
+    }
+
     private static NetworkByteBuffer addEndingPointer() throws IOException {
       var byteArrayOutputStream = createByteStreamWithData();
-      byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
+      byteArrayOutputStream.write(new byte[]{(byte) 0xC0, 0x00});
       return setByteStreamPositionAfterData(byteArrayOutputStream);
     }
 
     private static NetworkByteBuffer addEndingLabelAndPointer() throws IOException {
       var byteArrayOutputStream = createByteStreamWithData();
-      byteArrayOutputStream.write(new byte[] {0x03, 0x77, 0x77, 0x77});
-      byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
+      byteArrayOutputStream.write(new byte[]{0x03, 0x77, 0x77, 0x77});
+      byteArrayOutputStream.write(new byte[]{(byte) 0xC0, 0x00});
       return setByteStreamPositionAfterData(byteArrayOutputStream);
     }
 
@@ -96,7 +125,7 @@ class DomainParserTest {
 
     @Test
     void testRootFromWire() {
-      var networkBytes = NetworkByteBuffer.of(new byte[] {0});
+      var networkBytes = NetworkByteBuffer.of(new byte[]{0});
       DomainParser domainParser = new DomainParser();
 
       var domain = domainParser.fromWire(networkBytes, 1);
@@ -146,14 +175,14 @@ class DomainParserTest {
 
     private static NetworkByteBuffer addEndingPointer() throws IOException {
       var byteArrayOutputStream = createByteStreamWithData();
-      byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
+      byteArrayOutputStream.write(new byte[]{(byte) 0xC0, 0x00});
       return setByteStreamPositionAfterData(byteArrayOutputStream);
     }
 
     private static NetworkByteBuffer addEndingLabelAndPointer() throws IOException {
       var byteArrayOutputStream = createByteStreamWithData();
-      byteArrayOutputStream.write(new byte[] {0x03, 0x77, 0x77, 0x77});
-      byteArrayOutputStream.write(new byte[] {(byte) 0xC0, 0x00});
+      byteArrayOutputStream.write(new byte[]{0x03, 0x77, 0x77, 0x77});
+      byteArrayOutputStream.write(new byte[]{(byte) 0xC0, 0x00});
       return setByteStreamPositionAfterData(byteArrayOutputStream);
     }
 
@@ -184,7 +213,7 @@ class DomainParserTest {
       assertThat(bytes).isEqualTo(1);
       assertThat(networkBytes.createRestorePosition()).isEqualTo(1);
       networkBytes.jumpToPosition(0);
-      assertThat(networkBytes.readData(1)).isEqualTo(new byte[] {0x00});
+      assertThat(networkBytes.readData(1)).isEqualTo(new byte[]{0x00});
     }
 
     @Test
@@ -213,7 +242,7 @@ class DomainParserTest {
       assertThat(bytesSecondStep).isEqualTo(7);
       assertThat(networkBytes.getPosition()).isEqualTo(18);
       networkBytes.jumpToPosition(11);
-      assertThat(networkBytes.readData(7)).isEqualTo(new byte[] {
+      assertThat(networkBytes.readData(7)).isEqualTo(new byte[]{
           /* Value: 4asdfPointer0 */
           (byte) 0x04, (byte) 0x61, (byte) 0x73, (byte) 0x64, (byte) 0x66,
           (byte) 0xC0, (byte) 0x00}

@@ -26,16 +26,17 @@ class DnsInputTest {
       new Question(DOMAIN_EXAMPLE, DnsQueryType.A, DnsQueryClass.IN);
   private static final Message MESSAGE =
       new Message(HEADER, QUESTION, List.of(), List.of(), List.of());
-  private static final byte[] UDP_HEADER_QUESTION_BYTES = new byte[] {
+  private static final byte[] UDP_HEADER_QUESTION_BYTES = new byte[]{
       0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 119, 119, 119, 7, 101, 120, 97, 109, 112, 108, 101, 3,
       99, 111, 109, 0, 0, 1, 0, 1};
-  private static final byte[] TCP_HEADER_QUESTION_BYTES = new byte[] {
+  private static final byte[] TCP_HEADER_QUESTION_BYTES = new byte[]{
       0, 33, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 119, 119, 119, 7, 101, 120, 97, 109, 112, 108,
       101, 3, 99, 111, 109, 0, 0, 1, 0, 1};
 
   @Test
   void testExampleUdpQuery() {
-    var dnsInput = DnsInput.fromWire(new ParserOptions(false), UDP_HEADER_QUESTION_BYTES);
+    ParserOptions parserOptions = ParserOptions.Builder.builder().unsetTcp().build();
+    var dnsInput = DnsInput.fromWire(parserOptions, UDP_HEADER_QUESTION_BYTES);
 
     assertThat(dnsInput.getHeader()).isEqualTo(HEADER);
     assertThat(dnsInput.getQuestion()).isEqualTo(List.of(QUESTION));
@@ -48,7 +49,8 @@ class DnsInputTest {
 
   @Test
   void testExampleTcpQuery() {
-    var dnsInput = DnsInput.fromWire(new ParserOptions(true), TCP_HEADER_QUESTION_BYTES);
+    ParserOptions parserOptions = ParserOptions.Builder.builder().setTcp().build();
+    var dnsInput = DnsInput.fromWire(parserOptions, TCP_HEADER_QUESTION_BYTES);
 
     assertThat(dnsInput.getHeader()).isEqualTo(HEADER);
     assertThat(dnsInput.getQuestion()).isEqualTo(List.of(QUESTION));

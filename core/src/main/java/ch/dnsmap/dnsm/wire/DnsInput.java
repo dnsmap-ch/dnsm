@@ -25,8 +25,8 @@ public final class DnsInput {
   private final HeaderFlagsParser headerFlagsParser;
   private final WireReadable<Question> questionDomainParser;
   private final WireReadable<ResourceRecord> resourceRecordParser;
+  private final ParserOptions parserOptions;
 
-  private ParserOptions parserOptions;
   private Header header;
   private List<Question> question;
   private List<ResourceRecord> answer;
@@ -37,7 +37,7 @@ public final class DnsInput {
     this.parserOptions = parserOptions;
     this.networkByte = networkByte;
     this.headerFlagsParser = new HeaderFlagsParser();
-    DomainParser domainParser = new DomainParser();
+    DomainParser domainParser = new DomainParser(parserOptions.isDomainLabelTolerant());
     this.questionDomainParser = new QuestionDomainParser(domainParser);
     this.resourceRecordParser = new ResourceRecordParser(domainParser);
   }
