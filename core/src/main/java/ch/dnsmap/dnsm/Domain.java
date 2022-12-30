@@ -1,6 +1,7 @@
 package ch.dnsmap.dnsm;
 
 import static java.util.Arrays.stream;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.IntStream.range;
 
@@ -21,7 +22,7 @@ public final class Domain {
   private final List<Label> labels;
 
   private Domain(Label... labels) {
-    Objects.requireNonNull(labels, "labels must not be null");
+    requireNonNull(labels, "labels must not be null");
 
     int totalLength = stream(labels).map(label -> label.length() + 1).reduce(0, Integer::sum);
     if (totalLength > MAX_LENGTH) {
@@ -73,7 +74,7 @@ public final class Domain {
    * @throws NullPointerException     if {@code labels} is null
    */
   public static Domain of(List<Label> labels) {
-    Objects.requireNonNull(labels, "labels must not be null");
+    requireNonNull(labels, "labels must not be null");
     return of(labels.toArray(new Label[0]));
   }
 
@@ -88,8 +89,8 @@ public final class Domain {
    * @throws NullPointerException     if {@code label} or {@code domain} is null
    */
   public static Domain of(Domain domain, Label label) {
-    Objects.requireNonNull(label, "label must not be null");
-    Objects.requireNonNull(domain, "domain name must not be null");
+    requireNonNull(label, "label must not be null");
+    requireNonNull(domain, "domain name must not be null");
 
     List<Label> labels = new ArrayList<>(domain.getLabels());
     labels.add(label);
@@ -107,8 +108,8 @@ public final class Domain {
    * @throws NullPointerException     if {@code label} or {@code domain} is null
    */
   public static Domain of(Label label, Domain domain) {
-    Objects.requireNonNull(label, "label must not be null");
-    Objects.requireNonNull(domain, "domain name must not be null");
+    requireNonNull(label, "label must not be null");
+    requireNonNull(domain, "domain name must not be null");
 
     List<Label> labels = new ArrayList<>(1 + domain.getLabelCount());
     labels.add(label);
@@ -126,9 +127,16 @@ public final class Domain {
    * @throws NullPointerException     if {@code domainString} is null
    */
   public static Domain of(String domainString) {
-    Objects.requireNonNull(domainString, "domain string must not be null");
+    requireNonNull(domainString, "domain string must not be null");
 
     List<Label> labels = stream(domainString.split("\\.")).map(Label::of).toList();
+    return of(labels);
+  }
+
+  public static Domain tolerantOf(String domainString) {
+    requireNonNull(domainString, "domain string must not be null");
+
+    List<Label> labels = stream(domainString.split("\\.")).map(Label::tolerantOf).toList();
     return of(labels);
   }
 

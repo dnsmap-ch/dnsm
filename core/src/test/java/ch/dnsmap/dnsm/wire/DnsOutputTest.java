@@ -23,14 +23,14 @@ class DnsOutputTest {
   public static final Domain DOMAIN_EXAMPLE = Domain.of("www.example.com");
   private static final Question QUESTION =
       new Question(DOMAIN_EXAMPLE, DnsQueryType.A, DnsQueryClass.IN);
-  private static final byte[] HEADER_BYTES = new byte[] {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0};
+  private static final byte[] HEADER_BYTES = new byte[]{0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0};
   private static final byte[] QUESTION_BYTES =
-      new byte[] {3, 119, 119, 119, 7, 101, 120, 97, 109, 112, 108, 101, 3, 99, 111, 109, 0, 0, 1,
+      new byte[]{3, 119, 119, 119, 7, 101, 120, 97, 109, 112, 108, 101, 3, 99, 111, 109, 0, 0, 1,
           0, 1};
-  private static final byte[] UDP_HEADER_QUESTION_BYTES = new byte[] {
+  private static final byte[] UDP_HEADER_QUESTION_BYTES = new byte[]{
       0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 119, 119, 119, 7, 101, 120, 97, 109, 112, 108, 101, 3,
       99, 111, 109, 0, 0, 1, 0, 1};
-  private static final byte[] TCP_HEADER_QUESTION_BYTES = new byte[] {
+  private static final byte[] TCP_HEADER_QUESTION_BYTES = new byte[]{
       0, 33, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 119, 119, 119, 7, 101, 120, 97, 109, 112, 108,
       101, 3, 99, 111, 109, 0, 0, 1, 0, 1};
   private static final byte[] EMPTY_BYTES = new byte[0];
@@ -38,7 +38,7 @@ class DnsOutputTest {
   @Test
   void testExampleUdpQuery() {
     var dnsOutput = DnsOutput.toWire(
-        new ParserOptions(false),
+        ParserOptions.Builder.builder().unsetTcp().build(),
         HEADER,
         QUESTION,
         List.of(),
@@ -57,7 +57,7 @@ class DnsOutputTest {
   @Test
   void testExampleTcpQuery() {
     var dnsOutput = DnsOutput.toWire(
-        new ParserOptions(true),
+        ParserOptions.Builder.builder().setTcp().build(),
         HEADER,
         QUESTION,
         List.of(),

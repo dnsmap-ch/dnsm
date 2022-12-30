@@ -12,7 +12,7 @@ import java.util.List;
 public final class Utils {
 
   public static DnsInput udpDnsInput(ByteArrayOutputStream dnsBytes) {
-    ParserOptions options = new ParserOptions(false);
+    ParserOptions options = ParserOptions.Builder.builder().build();
     return dnsInput(options, dnsBytes);
   }
 
@@ -25,7 +25,7 @@ public final class Utils {
                                        List<ResourceRecord> answer,
                                        List<ResourceRecord> authoritative,
                                        List<ResourceRecord> additional) {
-    ParserOptions options = new ParserOptions(false);
+    ParserOptions options = ParserOptions.Builder.builder().unsetTcp().build();
     return dnsOutput(options, header, question, answer, authoritative, additional);
   }
 
