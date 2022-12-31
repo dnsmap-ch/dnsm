@@ -37,7 +37,7 @@ public final class DnsInput {
     this.parserOptions = parserOptions;
     this.networkByte = networkByte;
     this.headerFlagsParser = new HeaderFlagsParser();
-    DomainParser domainParser = new DomainParser(parserOptions.isDomainLabelTolerant());
+    DomainParser domainParser = new DomainParser(parserOptions);
     this.questionDomainParser = new QuestionDomainParser(domainParser);
     this.resourceRecordParser = new ResourceRecordParser(domainParser);
   }
