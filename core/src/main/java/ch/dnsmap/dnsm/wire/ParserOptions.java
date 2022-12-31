@@ -1,6 +1,13 @@
 package ch.dnsmap.dnsm.wire;
 
-public record ParserOptions(boolean isTcp, boolean isDomainLabelTolerant) {
+import java.util.ArrayList;
+import java.util.List;
+
+public record ParserOptions(boolean isTcp, boolean isDomainLabelTolerant, List<ParsingLog> log) {
+
+  public void log(ParsingLog log) {
+    this.log.add(log);
+  }
 
   public static class Builder {
 
@@ -32,7 +39,7 @@ public record ParserOptions(boolean isTcp, boolean isDomainLabelTolerant) {
     }
 
     public ParserOptions build() {
-      return new ParserOptions(isTcp, isDomainLabelTolerant);
+      return new ParserOptions(isTcp, isDomainLabelTolerant, new ArrayList<>());
     }
   }
 }

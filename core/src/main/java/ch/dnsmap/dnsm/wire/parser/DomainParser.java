@@ -1,9 +1,13 @@
 package ch.dnsmap.dnsm.wire.parser;
 
+import static ch.dnsmap.dnsm.wire.ParsingLog.error;
+import static ch.dnsmap.dnsm.wire.ParsingLog.warn;
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import ch.dnsmap.dnsm.Domain;
 import ch.dnsmap.dnsm.Label;
+import ch.dnsmap.dnsm.wire.ParserOptions;
 import ch.dnsmap.dnsm.wire.bytes.ReadableByteBuffer;
 import ch.dnsmap.dnsm.wire.bytes.WriteableByteBuffer;
 import ch.dnsmap.dnsm.wire.parser.DomainCompression.Position;
@@ -16,15 +20,15 @@ public final class DomainParser
   private static final int END_OF_DOMAIN = 0;
 
   private final DomainCompression domainCompression;
-  private final boolean isTolerant;
+  private final ParserOptions options;
 
   public DomainParser() {
-    this(false);
+    this(ParserOptions.Builder.builder().build());
   }
 
-  public DomainParser(boolean isTolerant) {
+  public DomainParser(ParserOptions options) {
     this.domainCompression = new DomainCompression();
-    this.isTolerant = isTolerant;
+    this.options = options;
   }
 
   @Override
@@ -55,9 +59,9 @@ public final class DomainParser
     int labelLength = wireData.readUInt8();
     bytesRead += labelLength;
     if (bytesRead > length) {
-      // TODO add logging this is a special case where the domain is potential longer than bytes to
-      //  read
-      return Domain.of(labels);
+      Domain domain = Domain.of(labels);
+      options.log(error(format("domain '%s' longer than message length", domain)));
+      return domain;
     }
 
     byte[] labelBytes = wireData.readData(labelLength);
@@ -70,10 +74,11 @@ public final class DomainParser
 
   private Label labelFromBytes(byte[] labelBytes) {
     Label label;
-    if (isTolerant) {
+    if (options.isDomainLabelTolerant()) {
       try {
         label = Label.of(labelBytes);
       } catch (IllegalArgumentException e) {
+        options.log(warn(e.getMessage()));
         label = Label.tolerantOf(labelBytes);
       }
     } else {

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import ch.dnsmap.dnsm.Domain;
+import ch.dnsmap.dnsm.wire.ParserOptions;
 import ch.dnsmap.dnsm.wire.bytes.NetworkByteBuffer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -86,7 +87,8 @@ class DomainParserTest {
     @Test
     void testToleranceOnInvalidCharacterFromWire() {
       var networkBytes = NetworkByteBuffer.of(BYTES_DNSMAP_CH_WITH_INVALID_CHARACTER);
-      DomainParser domainParser = new DomainParser(true);
+      DomainParser domainParser = new DomainParser(
+          ParserOptions.Builder.builder().setDomainLabelTolerant().build());
 
       var domain = domainParser.fromWire(networkBytes);
 

@@ -21,6 +21,7 @@
         <exclude name="JUnitTestContainsTooManyAsserts"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="AvoidUsingHardCodedIP"/>
+        <exclude name="GuardLogStatement"/>
     </rule>
 
 </ruleset>
