@@ -20,7 +20,7 @@ class Dnsm : CliktCommand(
         val subcommand = currentContext.invokedSubcommand
         if (subcommand == null) {
             if (isVersion) {
-                echo("dnsm 0.1.0-SNAPSHOT")
+                echo("dnsm 0.1.0")
             } else {
                 echo("dnsm: try 'dnsm --help' for more information")
             }
