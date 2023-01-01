@@ -28,7 +28,7 @@ jobs:
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           native-image-job-reports: 'true'
-      - name: Compile to native
+      - name: Compile to native binary
         run: native-image --no-fallback -cp client/build/libs/client-*.jar -H:Class=ch.dnsmap.dnsm.infrastructure.ClientKt -H:Name=dnsm
       - name: Upload binary
         uses: actions/upload-artifact@v3
