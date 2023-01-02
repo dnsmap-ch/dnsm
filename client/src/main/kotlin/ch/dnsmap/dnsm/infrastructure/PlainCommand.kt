@@ -57,7 +57,8 @@ class PlainCommand : CliktCommand(
     }
 
     private fun echoAnswer(answer: Answer) {
-        answer.logs.forEach { log -> echo(log) }
+        answer.logs.forEach { log -> echo(log, err = true) }
+        echo("H: ${answer.status}")
         echo("Q: $name $type -> ${resolverHost.hostAddress}:$resolverPort/udp")
         echo("A: " + answer.ips.joinToString(separator = ", "))
     }
