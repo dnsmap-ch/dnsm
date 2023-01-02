@@ -15,6 +15,7 @@ repositories {
 
 dependencies {
     implementation("com.github.ajalt.clikt:clikt:3.5.0")
+    implementation("io.reactivex.rxjava3:rxjava:3.1.5")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation(project(":core"))

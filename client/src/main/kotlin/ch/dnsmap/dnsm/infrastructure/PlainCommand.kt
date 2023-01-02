@@ -1,16 +1,16 @@
 package ch.dnsmap.dnsm.infrastructure
 
-import ch.dnsmap.dnsm.domain.model.Answer
-import ch.dnsmap.dnsm.domain.service.UdpService
+import ch.dnsmap.dnsm.domain.model.QueryResponse
+import ch.dnsmap.dnsm.domain.model.QueryTask
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
 import java.net.InetAddress
 import kotlin.math.pow
+import kotlin.system.measureTimeMillis
 
 enum class QueryType { A, AAAA }
 
@@ -42,24 +42,29 @@ class PlainCommand : CliktCommand(
             "-n", "--name",
             help = "DNS name to resolve"
     ).required()
-    private val type: QueryType by option(
+    private val types by option(
             "-t", "--type",
             help = "DNS type to resolve the name"
-    ).enum<QueryType>().default(QueryType.A)
+    ).split(",").default(listOf("A", "AAAA"))
 
     override fun run() {
-        val udpService = UdpService(resolverHost, resolverPort)
-        try {
-            echoAnswer(udpService.query(name, type))
-        } catch (e: IllegalArgumentException) {
-            echo(e.message)
+        val connector = UdpConnector(resolverHost, resolverPort)
+
+        types.map { it.uppercase() }
+                .map { each -> QueryType.valueOf(each) }
+                .forEach { type -> connector.addTask(QueryTask(name, type)) }
+
+        val elapsed = measureTimeMillis {
+            val result = connector.start()
+            result.forEach { echoAnswer(it) }
         }
+        echo("completed in ${elapsed}ms")
     }
 
-    private fun echoAnswer(answer: Answer) {
-        answer.logs.forEach { log -> echo(log, err = true) }
-        echo("H: ${answer.status}")
-        echo("Q: $name $type -> ${resolverHost.hostAddress}:$resolverPort/udp")
-        echo("A: " + answer.ips.joinToString(separator = ", "))
+    private fun echoAnswer(queryResponse: QueryResponse) {
+        queryResponse.logs.forEach { log -> echo(log, err = true) }
+        echo("H: ${queryResponse.status}")
+        echo("Q: $name ${queryResponse.queryType} -> ${resolverHost.hostAddress}:$resolverPort/udp")
+        echo("A: " + queryResponse.ips.joinToString(separator = ", "))
     }
 }

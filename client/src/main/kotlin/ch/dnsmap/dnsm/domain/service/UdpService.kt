@@ -1,6 +1,6 @@
 package ch.dnsmap.dnsm.domain.service
 
-import ch.dnsmap.dnsm.domain.model.Answer
+import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.Status.*
 import ch.dnsmap.dnsm.infrastructure.QueryType
 import ch.dnsmap.dnsm.record.ResourceRecordA
@@ -15,9 +15,8 @@ import java.net.InetAddress
 
 class UdpService(private val resolverHost: InetAddress, private val resolverPort: Int) {
 
-    private val datagramSocket = DatagramSocket()
-
-    fun query(name: String, type: QueryType): Answer {
+    fun query(name: String, type: QueryType): QueryResponse {
+        val datagramSocket = DatagramSocket()
 
         val msg = createQuery(name, type)
         val parserOptionsOut = ParserOptions.Builder.builder().build()
@@ -33,7 +32,7 @@ class UdpService(private val resolverHost: InetAddress, private val resolverPort
         val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()
         val response = DnsInput.fromWire(parserOptionsIn, packetIn.data)
         val resMsg = response.message
-        val r = when (resMsg.header.flags.rcode.ordinal) {
+        val status = when (resMsg.header.flags.rcode.ordinal) {
             0 -> NO_ERROR
             1 -> FORMAT_ERROR
             2 -> SERVER_FAILURE
@@ -57,6 +56,6 @@ class UdpService(private val resolverHost: InetAddress, private val resolverPort
             ips.add(ip)
         }
         val logs = parserOptionsIn.log.map { it.formatted() }
-        return Answer(ips, r, logs)
+        return QueryResponse(ips, logs, type.name, status)
     }
 }
