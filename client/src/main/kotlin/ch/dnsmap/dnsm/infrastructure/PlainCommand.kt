@@ -2,6 +2,9 @@ package ch.dnsmap.dnsm.infrastructure
 
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
+import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.model.networking.max
+import ch.dnsmap.dnsm.domain.model.networking.min
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
@@ -18,8 +21,6 @@ class PlainCommand : CliktCommand(
         name = "plain",
         help = "Query DNS over UDP"
 ) {
-    private val portMin = 1
-    private val portMax = (2.0.pow(16.0) - 1).toInt()
 
     init {
         context {
@@ -37,7 +38,7 @@ class PlainCommand : CliktCommand(
     private val resolverPort by option(
             "-p", "--port",
             help = " Port to query on resolver side"
-    ).int().restrictTo(portMin, portMax).default(53)
+    ).convert { Port(Integer.parseInt(it)) }.default(Port(53))
     private val name by option(
             "-n", "--name",
             help = "DNS name to resolve"

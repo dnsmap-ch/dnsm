@@ -2,6 +2,7 @@ package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.Status.*
+import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.infrastructure.QueryType
 import ch.dnsmap.dnsm.record.ResourceRecordA
 import ch.dnsmap.dnsm.record.ResourceRecordAaaa
@@ -13,7 +14,7 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 
-class UdpService(private val resolverHost: InetAddress, private val resolverPort: Int) {
+class UdpService(private val resolverHost: InetAddress, private val resolverPort: Port) {
 
     fun query(name: String, type: QueryType): QueryResponse {
         val datagramSocket = DatagramSocket()
@@ -23,7 +24,7 @@ class UdpService(private val resolverHost: InetAddress, private val resolverPort
         val dnsOutput =
                 DnsOutput.toWire(parserOptionsOut, msg.header, msg.question, emptyList(), emptyList(), emptyList())
         val msg2 = dnsOutput.message
-        val packetOut = DatagramPacket(msg2, msg2.size, resolverHost, resolverPort)
+        val packetOut = DatagramPacket(msg2, msg2.size, resolverHost, resolverPort.value)
         datagramSocket.send(packetOut)
 
         val buf = ByteArray(4096)
