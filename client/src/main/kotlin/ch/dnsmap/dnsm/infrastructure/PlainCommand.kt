@@ -3,16 +3,12 @@ package ch.dnsmap.dnsm.infrastructure
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
 import ch.dnsmap.dnsm.domain.model.networking.Port
-import ch.dnsmap.dnsm.domain.model.networking.max
-import ch.dnsmap.dnsm.domain.model.networking.min
+import ch.dnsmap.dnsm.domain.service.UdpService
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.int
-import com.github.ajalt.clikt.parameters.types.restrictTo
 import java.net.InetAddress
-import kotlin.math.pow
 import kotlin.system.measureTimeMillis
 
 enum class QueryType { A, AAAA }
@@ -49,14 +45,16 @@ class PlainCommand : CliktCommand(
     ).split(",").default(listOf("A", "AAAA"))
 
     override fun run() {
-        val connector = UdpConnector(resolverHost, resolverPort)
+        val udpService = UdpService(resolverHost, resolverPort)
+        val taskScheduler = ReactiveTaskScheduler(udpService)
 
         types.map { it.uppercase() }
                 .map { each -> QueryType.valueOf(each) }
-                .forEach { type -> connector.addTask(QueryTask(name, type)) }
+                .forEach { type -> taskScheduler.addTask(QueryTask(name, type)) }
 
         val elapsed = measureTimeMillis {
-            val result = connector.start()
+
+            val result = taskScheduler.start()
             result.forEach { echoAnswer(it) }
         }
         echo("completed in ${elapsed}ms")

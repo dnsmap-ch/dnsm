@@ -14,8 +14,9 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 
-class UdpService(private val resolverHost: InetAddress, private val resolverPort: Port) {
+class UdpService(private val resolverHost: InetAddress, private val resolverPort: Port) : SimpleService {
 
+    override
     fun query(name: String, type: QueryType): QueryResponse {
         val datagramSocket = DatagramSocket()
 
