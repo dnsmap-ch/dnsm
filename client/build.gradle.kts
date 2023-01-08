@@ -14,14 +14,15 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.ajalt.clikt:clikt:3.5.0")
-    implementation("io.reactivex.rxjava3:rxjava:3.1.5")
+    implementation("com.github.ajalt.clikt:clikt:3.5.1")
+    implementation("io.reactivex.rxjava3:rxjava:3.1.6")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation(project(":core"))
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation(kotlin("test"))
+    testImplementation(libs.assertj.core)
 }
 
 java {
@@ -29,6 +30,10 @@ java {
         languageVersion.set(JavaLanguageVersion.of(17))
         vendor.set(JvmVendorSpec.ADOPTIUM)
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 application {
