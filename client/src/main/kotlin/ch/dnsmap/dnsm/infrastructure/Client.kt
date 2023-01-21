@@ -2,8 +2,7 @@ package ch.dnsmap.dnsm.infrastructure
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.versionOption
 
 class Dnsm : CliktCommand(
     invokeWithoutSubcommand = true,
@@ -11,23 +10,16 @@ class Dnsm : CliktCommand(
         DNS client utility tool to resolve domain names into ip addresses. 
         """.trimIndent()
 ) {
-    private val isVersion by option(
-        "-V", "--version",
-        help = "Show version number and exit"
-    ).flag()
-
     override fun run() {
         val subcommand = currentContext.invokedSubcommand
         if (subcommand == null) {
-            if (isVersion) {
-                echo("dnsm 0.2.0-SNAPSHOT")
-            } else {
-                echo("dnsm: try 'dnsm --help' for more information")
-            }
+            echo("dnsm: try 'dnsm --help' for more information")
         }
     }
 }
 
-fun main(args: Array<String>) = Dnsm().subcommands(
-    PlainCommand(),
-).main(args)
+fun main(args: Array<String>) = Dnsm()
+    .versionOption(version = "0.2.0-SNAPSHOT", names = setOf("-V", "--version"))
+    .subcommands(
+        PlainCommand(),
+    ).main(args)
