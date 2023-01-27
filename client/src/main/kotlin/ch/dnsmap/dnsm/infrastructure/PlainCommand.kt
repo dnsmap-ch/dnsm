@@ -9,12 +9,15 @@ import ch.dnsmap.dnsm.domain.model.networking.Protocol.TCP
 import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
 import ch.dnsmap.dnsm.domain.service.TcpService
 import ch.dnsmap.dnsm.domain.service.UdpService
+import ch.dnsmap.dnsm.infrastructure.ErrorCode.NETWORK_CONNECTION_ERROR
+import ch.dnsmap.dnsm.infrastructure.ErrorCode.SUCCESSFUL
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.parameters.options.*
+import java.io.IOException
 import java.net.InetAddress
-import kotlin.time.DurationUnit
+import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
@@ -69,15 +72,21 @@ class PlainCommand : CliktCommand(
             .toList()
 
         val result = measureTimedValue {
-            if (resolverPort.protocol == UDP) {
-                runUdp(tasks)
-            } else {
-                runTcp(tasks)
+            try {
+                if (resolverPort.protocol == UDP) {
+                    runUdp(tasks)
+                } else {
+                    runTcp(tasks)
+                }
+            } catch (e: IOException) {
+                echoError("While connecting to ${resolverHost.hostName}:${resolverPort.asString()}: ${e.message}")
+                exitProcess(NETWORK_CONNECTION_ERROR.ordinal)
             }
         }
         result.value.forEach { echoAnswer(it) }
         val summary = Summary(result.duration, tasks, result.value)
         echoAppSummary(summary)
+        exitProcess(SUCCESSFUL.ordinal)
     }
 
 
@@ -91,6 +100,10 @@ class PlainCommand : CliktCommand(
         echoAppHeader(TCP)
         val tcpService = TcpService(resolverHost, resolverPort)
         return tcpService.query(tasks)
+    }
+
+    private fun echoError(msg: String) {
+        echo("error: $msg", err = true)
     }
 
     private fun echoAppHeader(protocol: Protocol) {
