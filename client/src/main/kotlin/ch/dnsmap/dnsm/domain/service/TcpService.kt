@@ -3,7 +3,6 @@ package ch.dnsmap.dnsm.domain.service
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
 import ch.dnsmap.dnsm.domain.model.networking.Port
-import ch.dnsmap.dnsm.wire.DnsInput
 import ch.dnsmap.dnsm.wire.ParserOptions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -51,7 +50,7 @@ class TcpService(private val resolverHost: InetAddress, private val resolverPort
             while (input.available() != -1) {
                 val length = ByteBuffer.wrap(input.readNBytes(2)).short
                 val dataBuffer = ByteArray(length.toInt())
-                val bytesRead = input.readNBytes(dataBuffer, 0, length.toInt())
+                input.readNBytes(dataBuffer, 0, length.toInt())
                 emitter.onNext(dataBuffer)
                 counter++
                 if (counter == queries.size) {
@@ -60,14 +59,7 @@ class TcpService(private val resolverHost: InetAddress, private val resolverPort
                 }
             }
         }
-            .map { rawDns ->
-                val response = DnsInput.fromWire(parserOptionsIn, rawDns)
-                val resMsg = response.message
-                val ips = ipResults(resMsg)
-                val logs = parserOptionsIn.log.map { it.formatted() }
-                val status = status(resMsg)
-                QueryResponse(ips, logs, resMsg.answer[0].dnsType.name, status)
-            }
+            .map { rawDns -> queryResponse(parserOptionsIn, rawDns) }
             .subscribeOn(Schedulers.io())
             .subscribe { msg ->
                 resultList.add(msg)
@@ -81,8 +73,6 @@ class TcpService(private val resolverHost: InetAddress, private val resolverPort
         val parserOptionsOut = ParserOptions.Builder.builder().setTcp().build()
         return Observable.fromIterable(queries)
             .map { messageBytes(it, parserOptionsOut) }
-            .subscribe { msg ->
-                output.write(msg)
-            }
+            .subscribe { msg -> output.write(msg) }
     }
 }

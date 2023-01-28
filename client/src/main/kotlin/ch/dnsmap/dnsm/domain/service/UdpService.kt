@@ -51,14 +51,9 @@ class UdpService(private val resolverHost: InetAddress, private val resolverPort
                     break
                 }
             }
-        }.map { rawDns ->
-            val response = DnsInput.fromWire(parserOptionsIn, rawDns)
-            val resMsg = response.message
-            val ips = ipResults(resMsg)
-            val logs = parserOptionsIn.log.map { it.formatted() }
-            val status = status(resMsg)
-            QueryResponse(ips, logs, resMsg.answer[0].dnsType.name, status)
-        }.subscribeOn(Schedulers.io())
+        }
+            .map { rawDns -> queryResponse(parserOptionsIn, rawDns) }
+            .subscribeOn(Schedulers.io())
             .subscribe { msg ->
                 resultList.add(msg)
                 if (resultList.size == queries.size) {
@@ -72,16 +67,17 @@ class UdpService(private val resolverHost: InetAddress, private val resolverPort
         val parserOptionsOut = ParserOptions.Builder.builder().build()
         return Observable.fromIterable(queries)
             .map { messageBytes(it, parserOptionsOut) }
-            .map { rawBytes ->
-                DatagramPacket(
-                    rawBytes,
-                    rawBytes.size,
-                    resolverHost,
-                    resolverPort.value
-                )
+            .map { rawBytes -> DatagramPacket(rawBytes, rawBytes.size, resolverHost, resolverPort.value)
             }
-            .subscribe { msg ->
-                socket.send(msg)
-            }
+            .subscribe { msg -> socket.send(msg) }
     }
+}
+
+fun queryResponse(parserOptionsIn: ParserOptions, rawDns: ByteArray?): QueryResponse {
+    val response = DnsInput.fromWire(parserOptionsIn, rawDns)
+    val resMsg = response.message
+    val ips = ipResults(resMsg)
+    val logs = parserOptionsIn.log.map { it.formatted() }
+    val status = status(resMsg)
+    return QueryResponse(ips, logs, resMsg.answer[0].dnsType.name, status)
 }

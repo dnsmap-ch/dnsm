@@ -7,8 +7,6 @@ import ch.dnsmap.dnsm.header.*
 import ch.dnsmap.dnsm.header.HeaderBitFlags.RD
 import ch.dnsmap.dnsm.header.HeaderOpcode.QUERY
 import ch.dnsmap.dnsm.header.HeaderRcode.NO_ERROR
-import ch.dnsmap.dnsm.infrastructure.PlainCommand
-import ch.dnsmap.dnsm.infrastructure.QueryType
 
 fun createQuery(name: String, type: QueryType): Message {
     return when (type) {
