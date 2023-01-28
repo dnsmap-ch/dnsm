@@ -7,7 +7,7 @@ plugins {
 
 description = "DNS core components and wire format generation and parsing."
 group = "ch.dnsmap.dnsm"
-version = "1.0-SNAPSHOT"
+version = project.properties["dnsm.core.version"]!!
 
 repositories {
     mavenCentral()

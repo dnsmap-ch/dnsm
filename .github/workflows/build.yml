@@ -30,5 +30,6 @@ jobs:
         with:
           name: package
           path: |
+            client-app/build/libs/
             client/build/libs/
             core/build/libs/

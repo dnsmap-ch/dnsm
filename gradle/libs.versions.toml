@@ -1,5 +1,16 @@
 [versions]
 assertj = "3.23.1"
+clikt = "3.5.1"
+jupiter = "5.8.1"
+rxjava = "3.1.6"
 
 [libraries]
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
+jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jupiter"}
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom" }
+kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
+rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
+
+[plugins]
+kotlinjvm = { id = "org.jetbrains.kotlin.jvm", version = "1.8.0" }
