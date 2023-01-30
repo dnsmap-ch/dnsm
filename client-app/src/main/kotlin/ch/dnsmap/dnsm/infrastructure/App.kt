@@ -19,7 +19,7 @@ class Dnsm : CliktCommand(
 }
 
 fun main(args: Array<String>) = Dnsm()
-    .versionOption(version = "0.2.0-SNAPSHOT", names = setOf("-V", "--version"))
+    .versionOption(version = "0.2.0", names = setOf("-V", "--version"))
     .subcommands(
         PlainCommand(),
     ).main(args)
