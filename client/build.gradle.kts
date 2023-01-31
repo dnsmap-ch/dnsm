@@ -16,7 +16,7 @@ dependencies {
     implementation(libs.kotlin.stdlib.jdk8)
     implementation(libs.rxjava)
     implementation(platform(libs.kotlin.bom))
-    implementation(project(":core"))
+    api(project(":core"))
 
     detektPlugins(libs.klint)
 

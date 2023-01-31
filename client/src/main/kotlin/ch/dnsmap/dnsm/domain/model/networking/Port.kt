@@ -6,7 +6,6 @@ const val PORT_MAX = 65535
 enum class Protocol(val printName: String) {
     UDP("udp"),
     TCP("tcp"),
-    UDP_TCP("udp/tcp")
 }
 
 class Port(val value: Int, val protocol: Protocol) {

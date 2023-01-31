@@ -14,19 +14,19 @@ import ch.dnsmap.dnsm.header.HeaderId
 import ch.dnsmap.dnsm.header.HeaderOpcode.QUERY
 import ch.dnsmap.dnsm.header.HeaderRcode.NO_ERROR
 
-fun createQuery(name: String, type: QueryType): Message {
+fun createQuery(name: Domain, type: QueryType): Message {
     return when (type) {
         QueryType.A -> createAQuery(name)
         QueryType.AAAA -> createAaaaQuery(name)
     }
 }
 
-private fun createAQuery(name: String): Message {
-    return createMessage(Question(Domain.of(name), A, IN))
+private fun createAQuery(name: Domain): Message {
+    return createMessage(Question(name, A, IN))
 }
 
-private fun createAaaaQuery(name: String): Message {
-    return createMessage(Question(Domain.of(name), AAAA, IN))
+private fun createAaaaQuery(name: Domain): Message {
+    return createMessage(Question(name, AAAA, IN))
 }
 
 private fun createMessage(question: Question): Message {
