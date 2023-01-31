@@ -6,7 +6,6 @@ import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
 import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP_TCP
 import java.lang.Integer.parseInt
 
-
 fun parsePort(portString: String): Port {
     require(portString.isNotBlank()) { "must not be blank or empty" }
     return parseSanitizedInput(portString.trim().lowercase())

@@ -44,16 +44,18 @@ class PlainCommand : CliktCommand(
     }
 
     private val resolverHost by option(
-        "-r", "--resolver",
+        "-r",
+        "--resolver",
         help = "UDP DNS resolver to query"
     )
         .convert { InetAddress.getByName(it) }
         .required()
 
     private val resolverPort by option(
-        "-p", "--port",
+        "-p",
+        "--port",
         help = " Port and protocol to query on resolver side. Possible values are '53', '53/udp' " +
-                "'53/tcp' or '53/udp/tcp/'",
+            "'53/tcp' or '53/udp/tcp/'",
     )
         .convert { parsePort(it) }
         .default(
@@ -62,13 +64,15 @@ class PlainCommand : CliktCommand(
         )
 
     private val name by option(
-        "-n", "--name",
+        "-n",
+        "--name",
         help = "DNS name to resolve"
     )
         .required()
 
     private val types by option(
-        "-t", "--type",
+        "-t",
+        "--type",
         help = "DNS type to resolve the name"
     )
         .split(",")
@@ -98,10 +102,11 @@ class PlainCommand : CliktCommand(
                 }
             } catch (e: IOException) {
                 echo(
-                    "error: ${
-                        "While connecting to ${settings.resolverHost.hostName}:" +
+                    "error: " +
+                        (
+                            "While connecting to ${settings.resolverHost.hostName}:" +
                                 "${settings.resolverPort.asString()}: ${e.message}"
-                    }",
+                            ),
                     err = true
                 )
                 throw ProgramResult(ErrorCode.NETWORK_CONNECTION_ERROR.ordinal)

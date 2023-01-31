@@ -18,7 +18,6 @@ private const val BUFFER_SIZE = 4096
 class UdpService(private val resolverHost: InetAddress, private val resolverPort: Port) :
     SimpleService {
 
-
     override
     fun query(queries: List<QueryTask>): List<QueryResponse> {
         val socket = DatagramSocket()
