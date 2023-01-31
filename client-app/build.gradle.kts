@@ -18,6 +18,8 @@ dependencies {
     implementation(platform(libs.kotlin.bom))
     implementation(project(":client"))
 
+    detektPlugins(libs.klint)
+
     testImplementation(kotlin("test"))
     testImplementation(libs.assertj.core)
     testImplementation(libs.jupiter)

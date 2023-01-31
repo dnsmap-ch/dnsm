@@ -7,8 +7,8 @@ import com.github.ajalt.clikt.parameters.options.versionOption
 class App : CliktCommand(
     invokeWithoutSubcommand = true,
     help = """
-        DNS client utility tool to resolve domain names into ip addresses. 
-        """.trimIndent()
+        DNS client utility tool to resolve domain names into ip addresses."""
+        .trimIndent()
 ) {
     override fun run() {
         val subcommand = currentContext.invokedSubcommand

@@ -31,7 +31,8 @@ private fun createAaaaQuery(name: String): Message {
 
 private fun createMessage(question: Question): Message {
     val header = Header(
-        HeaderId.ofRandom(), HeaderFlags(QUERY, NO_ERROR, RD),
+        HeaderId.ofRandom(),
+        HeaderFlags(QUERY, NO_ERROR, RD),
         HeaderCount.of(1, 0, 0, 0)
     )
     return Message(header, question, null, null, null)

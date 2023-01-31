@@ -3,7 +3,6 @@ package ch.dnsmap.dnsm.header;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import ch.dnsmap.dnsm.header.HeaderId;
 import org.junit.jupiter.api.Test;
 
 class HeaderIdTest {

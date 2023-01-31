@@ -10,7 +10,7 @@ class PrintableAnswer(
             listOf(
                 "H: ${queryResponse.status}",
                 "Q: ${settings.name} ${queryResponse.queryType} -> " +
-                        "${settings.resolverHost.hostAddress}:${settings.resolverPort.asString()}",
+                    "${settings.resolverHost.hostAddress}:${settings.resolverPort.asString()}",
                 "A: " + queryResponse.ips.joinToString(separator = ", ")
             )
         }.toList()
