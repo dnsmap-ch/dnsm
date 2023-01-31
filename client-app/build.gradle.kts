@@ -1,4 +1,5 @@
 plugins {
+    alias(libs.plugins.detekt)
     alias(libs.plugins.kotlinjvm)
     application
 }

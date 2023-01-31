@@ -2,18 +2,15 @@ package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.Message
 import ch.dnsmap.dnsm.domain.model.Status
+import ch.dnsmap.dnsm.header.HeaderRcode
 
 fun status(resMsg: Message): Status {
-    val status = when (resMsg.header.flags.rcode.ordinal) {
-        0 -> Status.NO_ERROR
-        1 -> Status.FORMAT_ERROR
-        2 -> Status.SERVER_FAILURE
-        3 -> Status.NAME_ERROR
-        4 -> Status.NOT_IMPLEMENTED
-        5 -> Status.REFUSED
-        else -> {
-            throw IllegalStateException("Invalid return code")
-        }
+    return when (resMsg.header.flags.rcode!!) {
+        HeaderRcode.NO_ERROR -> Status.NO_ERROR
+        HeaderRcode.FORMAT_ERROR -> Status.FORMAT_ERROR
+        HeaderRcode.SERVER_FAILURE -> Status.SERVER_FAILURE
+        HeaderRcode.NAME_ERROR -> Status.NAME_ERROR
+        HeaderRcode.NOT_IMPLEMENTED -> Status.NOT_IMPLEMENTED
+        HeaderRcode.REFUSED -> Status.REFUSED
     }
-    return status
 }

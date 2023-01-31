@@ -8,9 +8,7 @@ import java.lang.Integer.parseInt
 
 
 fun parsePort(portString: String): Port {
-    if (portString.isBlank()) {
-        throw IllegalArgumentException("must not be blank or empty")
-    }
+    require(portString.isNotBlank()) { "must not be blank or empty" }
     return parseSanitizedInput(portString.trim().lowercase())
 }
 

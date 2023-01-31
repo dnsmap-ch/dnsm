@@ -4,7 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.versionOption
 
-class Dnsm : CliktCommand(
+class App : CliktCommand(
     invokeWithoutSubcommand = true,
     help = """
         DNS client utility tool to resolve domain names into ip addresses. 
@@ -18,7 +18,7 @@ class Dnsm : CliktCommand(
     }
 }
 
-fun main(args: Array<String>) = Dnsm()
+fun main(args: Array<String>) = App()
     .versionOption(version = "0.3.0-SNAPSHOT", names = setOf("-V", "--version"))
     .subcommands(
         PlainCommand(),

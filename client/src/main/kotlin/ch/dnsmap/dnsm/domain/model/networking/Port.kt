@@ -1,7 +1,7 @@
 package ch.dnsmap.dnsm.domain.model.networking
 
-const val min = 1
-const val max = 65535
+const val PORT_MIN = 1
+const val PORT_MAX = 65535
 
 enum class Protocol(val printName: String) {
     UDP("udp"),
@@ -12,9 +12,7 @@ enum class Protocol(val printName: String) {
 class Port(val value: Int, val protocol: Protocol) {
 
     init {
-        if (value < min || value > max) {
-            throw IllegalArgumentException("Invalid port $value")
-        }
+        require(value in PORT_MIN until PORT_MAX) { "Invalid port $value" }
     }
 
     override fun equals(other: Any?): Boolean {

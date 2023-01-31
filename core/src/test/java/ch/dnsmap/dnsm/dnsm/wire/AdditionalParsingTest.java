@@ -170,18 +170,18 @@ final class AdditionalParsingTest {
         new ResourceRecordA(NS4.ns(), IN, TTL, Ip4.of("216.239.38.10")));
   }
 
-  private static final byte[] DNS_BYTES_HEADER = new byte[] {
+  private static final byte[] DNS_BYTES_HEADER = new byte[]{
       (byte) 0x9f, (byte) 0x81, (byte) 0x81, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x08
   };
 
-  private static final byte[] DNS_BYTES_QUESTION = new byte[] {
+  private static final byte[] DNS_BYTES_QUESTION = new byte[]{
       (byte) 0x06, (byte) 0x67, (byte) 0x6f, (byte) 0x6f, (byte) 0x67, (byte) 0x6c, (byte) 0x65,
       (byte) 0x03, (byte) 0x63, (byte) 0x6f, (byte) 0x6d, (byte) 0x00, (byte) 0x00, (byte) 0x02,
       (byte) 0x00, (byte) 0x01
   };
 
-  private static final byte[] DNS_BYTES_AUTHORITATIVE_NAMESERVERS = new byte[] {
+  private static final byte[] DNS_BYTES_AUTHORITATIVE_NAMESERVERS = new byte[]{
       (byte) 0xc0, (byte) 0x0c, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x02, (byte) 0xa3, (byte) 0x00, (byte) 0x00, (byte) 0x06, (byte) 0x03, (byte) 0x6e,
       (byte) 0x73, (byte) 0x32, (byte) 0xc0, (byte) 0x0c, (byte) 0xc0, (byte) 0x0c, (byte) 0x00,
@@ -195,7 +195,7 @@ final class AdditionalParsingTest {
       (byte) 0xc0, (byte) 0x0c
   };
 
-  private static final byte[] DNS_BYTES_ADDITIONAL = new byte[] {
+  private static final byte[] DNS_BYTES_ADDITIONAL = new byte[]{
       (byte) 0xc0, (byte) 0x28, (byte) 0x00, (byte) 0x1c, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x02, (byte) 0xa3, (byte) 0x00, (byte) 0x00, (byte) 0x10, (byte) 0x20, (byte) 0x01,
       (byte) 0x48, (byte) 0x60, (byte) 0x48, (byte) 0x02, (byte) 0x00, (byte) 0x34, (byte) 0x00,

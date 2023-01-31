@@ -33,11 +33,11 @@ public final class DnsOutput {
   private int additionalTo;
 
   private DnsOutput(ParserOptions parserOptions,
-                    Header header,
-                    Question question,
-                    List<ResourceRecord> answers,
-                    List<ResourceRecord> authoritatives,
-                    List<ResourceRecord> additionals) {
+      Header header,
+      Question question,
+      List<ResourceRecord> answers,
+      List<ResourceRecord> authoritatives,
+      List<ResourceRecord> additionals) {
     this.parserOptions = parserOptions;
     this.header = header;
     this.question = question;
@@ -52,11 +52,11 @@ public final class DnsOutput {
   }
 
   public static DnsOutput toWire(ParserOptions parserOptions,
-                                 Header header,
-                                 Question question,
-                                 List<ResourceRecord> answers,
-                                 List<ResourceRecord> authoritatives,
-                                 List<ResourceRecord> additionals) {
+      Header header,
+      Question question,
+      List<ResourceRecord> answers,
+      List<ResourceRecord> authoritatives,
+      List<ResourceRecord> additionals) {
     return new DnsOutput(parserOptions, header, question, answers, authoritatives, additionals);
   }
 
@@ -68,7 +68,6 @@ public final class DnsOutput {
     messageSize += messageBuffer.writeData(getAuthoritatives());
     messageSize += messageBuffer.writeData(getAdditional());
     messageBuffer.jumpToPosition(0);
-
 
     if (parserOptions.isTcp()) {
       WriteableByteBuffer tcpBuffer = NetworkByteBuffer.of(1024);

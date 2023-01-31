@@ -44,5 +44,6 @@ public final class DomainCompression {
   }
 
   public record Position(int value) {
+
   }
 }

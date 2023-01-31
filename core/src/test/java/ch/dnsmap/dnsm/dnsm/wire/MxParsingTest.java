@@ -102,18 +102,18 @@ final class MxParsingTest {
     });
   }
 
-  private static final byte[] DNS_BYTES_HEADER = new byte[] {
+  private static final byte[] DNS_BYTES_HEADER = new byte[]{
       (byte) 0xc5, (byte) 0xb6, (byte) 0x81, (byte) 0x80, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
   };
 
-  private static final byte[] DNS_BYTES_QUESTION = new byte[] {
+  private static final byte[] DNS_BYTES_QUESTION = new byte[]{
       (byte) 0x06, (byte) 0x61, (byte) 0x64, (byte) 0x64, (byte) 0x65, (byte) 0x72, (byte) 0x65,
       (byte) 0x02, (byte) 0x63, (byte) 0x68, (byte) 0x00, (byte) 0x00, (byte) 0x0f, (byte) 0x00,
       (byte) 0x01,
   };
 
-  private static final byte[] DNS_BYTES_ANSWER = new byte[] {
+  private static final byte[] DNS_BYTES_ANSWER = new byte[]{
       (byte) 0xc0, (byte) 0x0c, (byte) 0x00, (byte) 0x0f, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x00, (byte) 0x2a, (byte) 0x30, (byte) 0x00, (byte) 0x08, (byte) 0x00, (byte) 0x05,
       (byte) 0x03, (byte) 0x6d, (byte) 0x78, (byte) 0x31, (byte) 0xc0, (byte) 0x0c,

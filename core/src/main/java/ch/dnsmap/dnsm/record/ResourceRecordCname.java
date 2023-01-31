@@ -10,6 +10,7 @@ import ch.dnsmap.dnsm.record.type.Cname;
 
 public record ResourceRecordCname(Domain name, DnsClass dnsClass, Ttl ttl, Cname cname)
     implements ResourceRecord {
+
   @Override
   public DnsType getDnsType() {
     return CNAME;

@@ -151,19 +151,19 @@ final class CnameParsingTest {
         new ResourceRecordA(ANSWER_DOMAIN, IN, TTL, IP_V4_5));
   }
 
-  private static final byte[] DNS_BYTES_HEADER = new byte[] {
+  private static final byte[] DNS_BYTES_HEADER = new byte[]{
       (byte) 0x9a, (byte) 0xb0, (byte) 0x81, (byte) 0x80, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x06, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01
   };
 
-  private static final byte[] DNS_BYTES_QUESTION = new byte[] {
+  private static final byte[] DNS_BYTES_QUESTION = new byte[]{
       (byte) 0x03, (byte) 0x77, (byte) 0x77, (byte) 0x77, (byte) 0x09, (byte) 0x6d, (byte) 0x69,
       (byte) 0x63, (byte) 0x72, (byte) 0x6f, (byte) 0x73, (byte) 0x6f, (byte) 0x66, (byte) 0x74,
       (byte) 0x02, (byte) 0x63, (byte) 0x68, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x01
   };
 
-  private static final byte[] DNS_BYTES_ANSWER = new byte[] {
+  private static final byte[] DNS_BYTES_ANSWER = new byte[]{
       (byte) 0xc0, (byte) 0x0c, (byte) 0x00, (byte) 0x05, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x02, (byte) 0xc0, (byte) 0x10,
       (byte) 0xc0, (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0x01, (byte) 0x00,
@@ -180,7 +180,7 @@ final class CnameParsingTest {
       (byte) 0x54, (byte) 0xb5, (byte) 0x3e
   };
 
-  private static final byte[] DNS_BYTES_ADDITIONAL = new byte[] {
+  private static final byte[] DNS_BYTES_ADDITIONAL = new byte[]{
       (byte) 0x00, (byte) 0x00, (byte) 0x29, (byte) 0x04, (byte) 0xd0, (byte) 0x00, (byte) 0x00,
       (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
   };
