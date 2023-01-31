@@ -15,16 +15,19 @@ import java.util.concurrent.CountDownLatch
 
 private const val BUFFER_SIZE = 4096
 
-class UdpService(private val resolverHost: InetAddress, private val resolverPort: Port) :
-    SimpleService {
+class UdpService : QueryService {
 
     override
-    fun query(queries: List<QueryTask>): List<QueryResponse> {
+    fun query(
+        resolverHost: InetAddress,
+        resolverPort: Port,
+        queries: List<QueryTask>
+    ): List<QueryResponse> {
         val socket = DatagramSocket()
         val resultList = mutableListOf<QueryResponse>()
         val latch = CountDownLatch(1)
         val receiver = startListener(socket, queries, resultList, latch)
-        val sender = startSender(socket, queries)
+        val sender = startSender(resolverHost, resolverPort, socket, queries)
 
         latch.await()
         receiver.dispose()
@@ -65,7 +68,12 @@ class UdpService(private val resolverHost: InetAddress, private val resolverPort
         return disposable
     }
 
-    private fun startSender(socket: DatagramSocket, queries: List<QueryTask>): Disposable {
+    private fun startSender(
+        resolverHost: InetAddress,
+        resolverPort: Port,
+        socket: DatagramSocket,
+        queries: List<QueryTask>
+    ): Disposable {
         val parserOptionsOut = ParserOptions.Builder.builder().build()
         return Observable.fromIterable(queries)
             .map { messageBytes(it, parserOptionsOut) }

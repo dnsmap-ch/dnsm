@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.kotlinjvm)
     application
+    jacoco
 }
 
 description = "CLI client application."
@@ -14,19 +15,31 @@ repositories {
 
 dependencies {
     implementation(libs.clikt)
+    implementation(libs.koin)
     implementation(libs.kotlin.stdlib.jdk8)
     implementation(platform(libs.kotlin.bom))
     implementation(project(":client"))
 
     detektPlugins(libs.klint)
 
-    testImplementation(kotlin("test"))
     testImplementation(libs.assertj.core)
     testImplementation(libs.jupiter)
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit5)
 }
 
 application {
     mainClass.set("ch.dnsmap.dnsm.infrastructure.AppKt")
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(18))
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.withType<Jar> {
@@ -44,4 +57,22 @@ tasks.withType<Jar> {
     from({
         configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
     })
+}
+
+tasks.named("check") {
+    dependsOn("jacocoTestCoverageVerification")
+}
+
+tasks.named("jacocoTestReport") {
+    dependsOn(testing.suites.named("test"))
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.9".toBigDecimal()
+            }
+        }
+    }
 }

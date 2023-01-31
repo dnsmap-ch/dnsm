@@ -14,11 +14,14 @@ import java.net.Socket
 import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 
-class TcpService(private val resolverHost: InetAddress, private val resolverPort: Port) :
-    SimpleService {
+class TcpService : QueryService {
 
     override
-    fun query(queries: List<QueryTask>): List<QueryResponse> {
+    fun query(
+        resolverHost: InetAddress,
+        resolverPort: Port,
+        queries: List<QueryTask>
+    ): List<QueryResponse> {
         val socket = Socket(resolverHost, resolverPort.value)
         val input = DataInputStream(socket.getInputStream())
         val output = DataOutputStream(socket.getOutputStream())

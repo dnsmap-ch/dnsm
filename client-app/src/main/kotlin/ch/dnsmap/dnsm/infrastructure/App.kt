@@ -1,25 +1,30 @@
 package ch.dnsmap.dnsm.infrastructure
 
+import ch.dnsmap.dnsm.domain.service.Printer
+import ch.dnsmap.dnsm.infrastructure.modules.plainModule
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.versionOption
+import org.koin.core.context.GlobalContext.startKoin
 
 class App : CliktCommand(
     invokeWithoutSubcommand = true,
+    printHelpOnEmptyArgs = true,
     help = """
-        DNS client utility tool to resolve domain names into ip addresses."""
+        DNS client utility tool to resolve domain names into IP addresses."""
         .trimIndent()
 ) {
     override fun run() {
-        val subcommand = currentContext.invokedSubcommand
-        if (subcommand == null) {
-            echo("dnsm: try 'dnsm --help' for more information")
-        }
+        currentContext.invokedSubcommand
     }
 }
 
-fun main(args: Array<String>) = App()
-    .versionOption(version = "0.3.0-SNAPSHOT", names = setOf("-V", "--version"))
-    .subcommands(
-        PlainCommand(),
-    ).main(args)
+fun main(args: Array<String>) {
+    startKoin { modules(plainModule) }
+
+    App()
+        .versionOption(version = "0.3.0-SNAPSHOT", names = setOf("-V", "--version"))
+        .subcommands(
+            PlainCommand(Printer()),
+        ).main(args)
+}

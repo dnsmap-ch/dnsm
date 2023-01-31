@@ -1,17 +1,15 @@
-package ch.dnsmap.dnsm.infrastructure
+package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import kotlin.IllegalArgumentException
 
-internal class PortFactoryTest {
+class InputParserServiceKtTest {
 
     private val port53Udp = Port(53, Protocol.UDP)
     private val port53Tcp = Port(53, Protocol.TCP)
-    private val port53UdpTcp = Port(53, Protocol.UDP_TCP)
 
     @Test
     fun testPortNumberOnly() {
@@ -35,23 +33,9 @@ internal class PortFactoryTest {
     }
 
     @Test
-    fun testPortNumberUdpTcp() {
-        val input = "53/udp/tcp"
-        val result = parsePort(input)
-        assertThat(result).isEqualTo(port53UdpTcp)
-    }
-
-    @Test
-    fun testPortNumberUdpTcpFunkyCapitalisation() {
-        val input = "53/tCp/UdP/"
-        val result = parsePort(input)
-        assertThat(result).isEqualTo(port53UdpTcp)
-    }
-
-    @Test
     fun testThrowOnEmpty() {
         val input = ""
-        assertThatThrownBy { parsePort(input) }
+        Assertions.assertThatThrownBy { parsePort(input) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("must not be blank or empty")
     }
@@ -59,7 +43,7 @@ internal class PortFactoryTest {
     @Test
     fun testThrowOnBlank() {
         val input = "       "
-        assertThatThrownBy { parsePort(input) }
+        Assertions.assertThatThrownBy { parsePort(input) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("must not be blank or empty")
     }
@@ -67,7 +51,7 @@ internal class PortFactoryTest {
     @Test
     fun testThrowIfNonsense() {
         val input = "nonsense"
-        assertThatThrownBy { parsePort(input) }
+        Assertions.assertThatThrownBy { parsePort(input) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("invalid or no port specified")
     }
@@ -75,7 +59,7 @@ internal class PortFactoryTest {
     @Test
     fun testThrowIfNoPort() {
         val input = "/tcp"
-        assertThatThrownBy { parsePort(input) }
+        Assertions.assertThatThrownBy { parsePort(input) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("invalid or no port specified")
     }
@@ -83,7 +67,7 @@ internal class PortFactoryTest {
     @Test
     fun testThrowIfUnknownProtocol() {
         val input = "53/unknown"
-        assertThatThrownBy { parsePort(input) }
+        Assertions.assertThatThrownBy { parsePort(input) }
             .isInstanceOf(IllegalArgumentException::class.java)
             .hasMessage("invalid input 53/unknown")
     }
