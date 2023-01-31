@@ -9,43 +9,43 @@ import kotlin.IllegalArgumentException
 
 internal class PortFactoryTest {
 
-    private val PORT_53_UDP = Port(53, Protocol.UDP)
-    private val PORT_53_TCP = Port(53, Protocol.TCP)
-    private val PORT_53_UDP_TCP = Port(53, Protocol.UDP_TCP)
+    private val port53Udp = Port(53, Protocol.UDP)
+    private val port53Tcp = Port(53, Protocol.TCP)
+    private val port53UdpTcp = Port(53, Protocol.UDP_TCP)
 
     @Test
     fun testPortNumberOnly() {
         val input = "53"
         val result = parsePort(input)
-        assertThat(result).isEqualTo(PORT_53_UDP)
+        assertThat(result).isEqualTo(port53Udp)
     }
 
     @Test
     fun testPortNumberUdp() {
         val input = "53/udp"
         val result = parsePort(input)
-        assertThat(result).isEqualTo(PORT_53_UDP)
+        assertThat(result).isEqualTo(port53Udp)
     }
 
     @Test
     fun testPortNumberTcp() {
         val input = "53/tcp"
         val result = parsePort(input)
-        assertThat(result).isEqualTo(PORT_53_TCP)
+        assertThat(result).isEqualTo(port53Tcp)
     }
 
     @Test
     fun testPortNumberUdpTcp() {
         val input = "53/udp/tcp"
         val result = parsePort(input)
-        assertThat(result).isEqualTo(PORT_53_UDP_TCP)
+        assertThat(result).isEqualTo(port53UdpTcp)
     }
 
     @Test
     fun testPortNumberUdpTcpFunkyCapitalisation() {
         val input = "53/tCp/UdP/"
         val result = parsePort(input)
-        assertThat(result).isEqualTo(PORT_53_UDP_TCP)
+        assertThat(result).isEqualTo(port53UdpTcp)
     }
 
     @Test

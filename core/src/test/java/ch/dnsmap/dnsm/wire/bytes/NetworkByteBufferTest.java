@@ -16,7 +16,7 @@ class NetworkByteBufferTest {
       var networkByte = networkByteBuffer();
       var data = networkByte.range(0, 5);
       assertThat(data).isEqualTo(
-          new byte[] {(byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04});
+          new byte[]{(byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04});
       assertThat(networkByte.getRemaining()).isEqualTo(16);
     }
 
@@ -68,7 +68,7 @@ class NetworkByteBufferTest {
 
     private static ReadableByteBuffer networkByteBuffer() {
       var data =
-          new byte[] {
+          new byte[]{
               (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
               (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B,
               (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F};
@@ -132,7 +132,7 @@ class NetworkByteBufferTest {
     void testReadNineByteData() {
       var networkByte = networkByteBuffer();
       var data = networkByte.readData(9);
-      assertThat(data).isEqualTo(new byte[] {
+      assertThat(data).isEqualTo(new byte[]{
           (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
           (byte) 0x06,
           (byte) 0x07, (byte) 0x08});
@@ -142,7 +142,7 @@ class NetworkByteBufferTest {
     void testReadMaximalByteData() {
       var networkByte = networkByteBuffer();
       var data = networkByte.readData(16);
-      assertThat(data).isEqualTo(new byte[] {
+      assertThat(data).isEqualTo(new byte[]{
           (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
           (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B,
           (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F});
@@ -168,7 +168,7 @@ class NetworkByteBufferTest {
       var networkByte = networkByteBuffer();
       networkByte.jumpToPosition(4);
       var data = networkByte.readData8();
-      assertThat(data).isEqualTo(new byte[] {(byte) 0x05, (byte) 0x06, (byte) 0x07, (byte) 0x08});
+      assertThat(data).isEqualTo(new byte[]{(byte) 0x05, (byte) 0x06, (byte) 0x07, (byte) 0x08});
     }
 
     @Test
@@ -182,7 +182,7 @@ class NetworkByteBufferTest {
     void testReadDataWithHeaderUInt16() {
       var networkByte = networkByteBuffer();
       var data = networkByte.readData16();
-      assertThat(data).isEqualTo(new byte[] {(byte) 0x02});
+      assertThat(data).isEqualTo(new byte[]{(byte) 0x02});
     }
 
     @Test
@@ -194,7 +194,7 @@ class NetworkByteBufferTest {
 
     private static ReadableByteBuffer networkByteBuffer() {
       var data =
-          new byte[] {
+          new byte[]{
               (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
               (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B,
               (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F};
@@ -202,7 +202,7 @@ class NetworkByteBufferTest {
     }
 
     private static ReadableByteBuffer emptyNetworkByteBuffer() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0x00, (byte) 0x00});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0x00, (byte) 0x00});
     }
   }
 
@@ -512,7 +512,7 @@ class NetworkByteBufferTest {
     }
 
     private static byte[] someData() {
-      return new byte[] {
+      return new byte[]{
           (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x03, (byte) 0x04, (byte) 0x05,
           (byte) 0x06, (byte) 0x07, (byte) 0x08, (byte) 0x09, (byte) 0x0A, (byte) 0x0B,
           (byte) 0x0C, (byte) 0x0D, (byte) 0x0E, (byte) 0x0F};

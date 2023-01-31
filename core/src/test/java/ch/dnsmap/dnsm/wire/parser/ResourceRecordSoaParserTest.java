@@ -52,7 +52,7 @@ class ResourceRecordSoaParserTest {
   }
 
   private static byte[] soaBytes() {
-    return new byte[] {
+    return new byte[]{
         (byte) 0x03, (byte) 0x6e, (byte) 0x73, (byte) 0x31, (byte) 0x05, (byte) 0x67, (byte) 0x61,
         (byte) 0x6e, (byte) 0x64, (byte) 0x69, (byte) 0x03, (byte) 0x6e, (byte) 0x65, (byte) 0x74,
         (byte) 0x00, (byte) 0x0a, (byte) 0x68, (byte) 0x6f, (byte) 0x73, (byte) 0x74, (byte) 0x6d,

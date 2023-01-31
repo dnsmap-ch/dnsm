@@ -1,10 +1,16 @@
 package ch.dnsmap.dnsm.domain.service
 
-import ch.dnsmap.dnsm.*
 import ch.dnsmap.dnsm.DnsQueryClass.IN
-import ch.dnsmap.dnsm.DnsQueryType.*
-import ch.dnsmap.dnsm.header.*
+import ch.dnsmap.dnsm.DnsQueryType.A
+import ch.dnsmap.dnsm.DnsQueryType.AAAA
+import ch.dnsmap.dnsm.Domain
+import ch.dnsmap.dnsm.Message
+import ch.dnsmap.dnsm.Question
+import ch.dnsmap.dnsm.header.Header
 import ch.dnsmap.dnsm.header.HeaderBitFlags.RD
+import ch.dnsmap.dnsm.header.HeaderCount
+import ch.dnsmap.dnsm.header.HeaderFlags
+import ch.dnsmap.dnsm.header.HeaderId
 import ch.dnsmap.dnsm.header.HeaderOpcode.QUERY
 import ch.dnsmap.dnsm.header.HeaderRcode.NO_ERROR
 

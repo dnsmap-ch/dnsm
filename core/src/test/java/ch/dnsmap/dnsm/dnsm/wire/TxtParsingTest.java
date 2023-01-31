@@ -160,18 +160,18 @@ final class TxtParsingTest {
     return answers;
   }
 
-  private static final byte[] DNS_BYTES_HEADER = new byte[] {
+  private static final byte[] DNS_BYTES_HEADER = new byte[]{
       (byte) 0xe0, (byte) 0xca, (byte) 0x81, (byte) 0x80, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x0b, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00
   };
 
-  private static final byte[] DNS_BYTES_QUESTION = new byte[] {
+  private static final byte[] DNS_BYTES_QUESTION = new byte[]{
       (byte) 0x06, (byte) 0x67, (byte) 0x6f, (byte) 0x6f, (byte) 0x67, (byte) 0x6c, (byte) 0x65,
       (byte) 0x03, (byte) 0x63, (byte) 0x6f, (byte) 0x6d, (byte) 0x00, (byte) 0x00, (byte) 0x10,
       (byte) 0x00, (byte) 0x01
   };
 
-  private static final byte[] DNS_BYTES_ANSWER = new byte[] {
+  private static final byte[] DNS_BYTES_ANSWER = new byte[]{
       (byte) 0xc0, (byte) 0x0c, (byte) 0x00, (byte) 0x10, (byte) 0x00, (byte) 0x01, (byte) 0x00,
       (byte) 0x00, (byte) 0x0e, (byte) 0x10, (byte) 0x00, (byte) 0x24, (byte) 0x23, (byte) 0x76,
       (byte) 0x3d, (byte) 0x73, (byte) 0x70, (byte) 0x66, (byte) 0x31, (byte) 0x20, (byte) 0x69,

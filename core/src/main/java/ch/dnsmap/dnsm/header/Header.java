@@ -8,4 +8,5 @@ package ch.dnsmap.dnsm.header;
  * @param count Number of query, anser, name server and additional data in this DNS message
  */
 public record Header(HeaderId id, HeaderFlags flags, HeaderCount count) {
+
 }

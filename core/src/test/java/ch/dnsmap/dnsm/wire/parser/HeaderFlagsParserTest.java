@@ -116,47 +116,47 @@ class HeaderFlagsParserTest {
     }
 
     private static NetworkByteBuffer minimalNetworkBytes() {
-      return NetworkByteBuffer.of(new byte[] {0, 0});
+      return NetworkByteBuffer.of(new byte[]{0, 0});
     }
 
     private static NetworkByteBuffer maximalNetworkBytes() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b1001_0111, (byte) 0b1000_0101});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b1001_0111, (byte) 0b1000_0101});
     }
 
     private static NetworkByteBuffer opcodeQuery() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0000});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b000_0000, (byte) 0b0000_0000});
     }
 
     private static NetworkByteBuffer opcodeIquery() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_1000, (byte) 0b0000_0000});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b000_1000, (byte) 0b0000_0000});
     }
 
     private static NetworkByteBuffer opcodeStatus() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b001_0000, (byte) 0b0000_0000});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b001_0000, (byte) 0b0000_0000});
     }
 
     private static NetworkByteBuffer rcodeNoError() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0000});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b000_0000, (byte) 0b0000_0000});
     }
 
     private static NetworkByteBuffer rcodeFormatError() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0001});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b000_0000, (byte) 0b0000_0001});
     }
 
     private static NetworkByteBuffer rcodeServerFailure() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0010});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b000_0000, (byte) 0b0000_0010});
     }
 
     private static NetworkByteBuffer rcodeNameError() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0011});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b000_0000, (byte) 0b0000_0011});
     }
 
     private static NetworkByteBuffer rcodeNotImplemented() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0100});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b000_0000, (byte) 0b0000_0100});
     }
 
     private static NetworkByteBuffer rcodeRefused() {
-      return NetworkByteBuffer.of(new byte[] {(byte) 0b000_0000, (byte) 0b0000_0101});
+      return NetworkByteBuffer.of(new byte[]{(byte) 0b000_0000, (byte) 0b0000_0101});
     }
   }
 
@@ -170,7 +170,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x80, (byte) 0x0});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x80, (byte) 0x0});
     }
 
     @Test
@@ -180,7 +180,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x88, (byte) 0x0});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x88, (byte) 0x0});
     }
 
     @Test
@@ -190,7 +190,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x90, (byte) 0x0});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x90, (byte) 0x0});
     }
 
     @Test
@@ -200,7 +200,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x80, (byte) 0x0});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x80, (byte) 0x0});
     }
 
     @Test
@@ -210,7 +210,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x80, (byte) 0x01});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x80, (byte) 0x01});
     }
 
     @Test
@@ -220,7 +220,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x80, (byte) 0x02});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x80, (byte) 0x02});
     }
 
     @Test
@@ -230,7 +230,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x80, (byte) 0x03});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x80, (byte) 0x03});
     }
 
     @Test
@@ -240,7 +240,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x80, (byte) 0x04});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x80, (byte) 0x04});
     }
 
     @Test
@@ -250,7 +250,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x80, (byte) 0x05});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x80, (byte) 0x05});
     }
 
     @Test
@@ -260,7 +260,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x87, (byte) (byte) 0x80});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x87, (byte) (byte) 0x80});
     }
 
     @Test
@@ -270,7 +270,7 @@ class HeaderFlagsParserTest {
 
       var bytes = PARSER.toWire(networkBytes, flags);
 
-      assertFlags(networkBytes, bytes, new byte[] {(byte) 0x87, (byte) (byte) 0x80});
+      assertFlags(networkBytes, bytes, new byte[]{(byte) 0x87, (byte) (byte) 0x80});
     }
 
     private void assertFlags(NetworkByteBuffer networkBytesBuffer, int bytes, byte[] flagBytes) {

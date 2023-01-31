@@ -21,20 +21,20 @@ public final class Utils {
   }
 
   public static DnsOutput udpDnsOutput(Header header,
-                                       Question question,
-                                       List<ResourceRecord> answer,
-                                       List<ResourceRecord> authoritative,
-                                       List<ResourceRecord> additional) {
+      Question question,
+      List<ResourceRecord> answer,
+      List<ResourceRecord> authoritative,
+      List<ResourceRecord> additional) {
     ParserOptions options = ParserOptions.Builder.builder().unsetTcp().build();
     return dnsOutput(options, header, question, answer, authoritative, additional);
   }
 
   private static DnsOutput dnsOutput(ParserOptions options,
-                                     Header header,
-                                     Question question,
-                                     List<ResourceRecord> answer,
-                                     List<ResourceRecord> authoritative,
-                                     List<ResourceRecord> additional) {
+      Header header,
+      Question question,
+      List<ResourceRecord> answer,
+      List<ResourceRecord> authoritative,
+      List<ResourceRecord> additional) {
     return DnsOutput.toWire(options, header, question, answer, authoritative, additional);
   }
 

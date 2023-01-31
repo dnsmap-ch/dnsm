@@ -12,4 +12,5 @@ public record Soa(
     Uint32 expire,
     Uint32 minimum
 ) {
+
 }

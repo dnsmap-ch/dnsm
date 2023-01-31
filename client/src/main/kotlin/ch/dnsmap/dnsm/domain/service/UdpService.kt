@@ -13,8 +13,11 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import java.util.concurrent.CountDownLatch
 
+private const val BUFFER_SIZE = 4096
+
 class UdpService(private val resolverHost: InetAddress, private val resolverPort: Port) :
     SimpleService {
+
 
     override
     fun query(queries: List<QueryTask>): List<QueryResponse> {
@@ -41,7 +44,7 @@ class UdpService(private val resolverHost: InetAddress, private val resolverPort
         var counter = 0
         val disposable = Observable.create { emitter ->
             while (true) {
-                val buf = ByteArray(4096)
+                val buf = ByteArray(BUFFER_SIZE)
                 val packetIn = DatagramPacket(buf, buf.size)
                 socket.receive(packetIn)
                 emitter.onNext(packetIn.data)
@@ -67,7 +70,8 @@ class UdpService(private val resolverHost: InetAddress, private val resolverPort
         val parserOptionsOut = ParserOptions.Builder.builder().build()
         return Observable.fromIterable(queries)
             .map { messageBytes(it, parserOptionsOut) }
-            .map { rawBytes -> DatagramPacket(rawBytes, rawBytes.size, resolverHost, resolverPort.value)
+            .map { rawBytes ->
+                DatagramPacket(rawBytes, rawBytes.size, resolverHost, resolverPort.value)
             }
             .subscribe { msg -> socket.send(msg) }
     }

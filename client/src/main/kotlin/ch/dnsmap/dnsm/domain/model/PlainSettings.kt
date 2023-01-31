@@ -8,5 +8,4 @@ class PlainSettings(
     val resolverPort: Port,
     val name: String,
     val types: List<String>
-) {
-}
+)

@@ -11,4 +11,5 @@ public record Message(
     List<ResourceRecord> authority,
     List<ResourceRecord> additional
 ) {
+
 }
