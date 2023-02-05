@@ -13,12 +13,20 @@ class Printer {
 
     fun answer(settings: PlainSettings, answers: List<QueryResponse>): List<String> {
         return answers.flatMap { queryResponse ->
-            listOf(
-                "H: ${queryResponse.status}",
-                "Q: ${settings.name.canonical} ${queryResponse.queryType} -> " +
-                    "${settings.resolverHost.hostAddress}:${settings.resolverPort.asString()}",
-                "A: " + queryResponse.ips.joinToString(separator = ", ")
-            )
+            if (queryResponse.ips.isNotEmpty()) {
+                listOf(
+                    "H: ${queryResponse.status}",
+                    "Q: ${settings.name.canonical} ${queryResponse.queryType} -> " +
+                        "${settings.resolverHost.hostAddress}:${settings.resolverPort.asString()}",
+                    "A: " + queryResponse.ips.joinToString(separator = ", ")
+                )
+            } else {
+                listOf(
+                    "H: ${queryResponse.status}",
+                    "Q: ${settings.name.canonical} ${queryResponse.queryType} -> " +
+                        "${settings.resolverHost.hostAddress}:${settings.resolverPort.asString()}"
+                )
+            }
         }.toList()
     }
 
