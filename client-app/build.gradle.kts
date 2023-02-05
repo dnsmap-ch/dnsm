@@ -29,7 +29,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("ch.dnsmap.dnsm.infrastructure.AppKt")
+    mainClass.set("ch.dnsmap.dnsm.application.DnsmClientAppKt")
 }
 
 kotlin {
@@ -44,7 +44,7 @@ tasks.test {
 
 tasks.withType<Jar> {
     manifest {
-        attributes["Main-Class"] = "ch.dnsmap.dnsm.infrastructure.AppKt"
+        attributes["Main-Class"] = "ch.dnsmap.dnsm.application.DnsmClientAppKt"
     }
 
     // To avoid the duplicate handling strategy error
