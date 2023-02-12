@@ -1,13 +1,10 @@
 package ch.dnsmap.dnsm.infrastructure
 
-import ch.dnsmap.dnsm.domain.model.QueryResponse
-import ch.dnsmap.dnsm.domain.model.QueryTask
 import ch.dnsmap.dnsm.domain.model.Result
-import ch.dnsmap.dnsm.domain.model.Status
-import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.QueryService
 import ch.dnsmap.dnsm.domain.service.ResultService
+import ch.dnsmap.dnsm.domain.service.TestQueryService
 import com.github.ajalt.clikt.core.BadParameterValue
 import com.github.ajalt.clikt.core.IncorrectOptionValueCount
 import com.github.ajalt.clikt.core.MissingOption
@@ -20,36 +17,21 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.junit5.KoinTestExtension
-import java.net.InetAddress
 
 class PlainCommandTest : KoinTest {
 
-    class DummyService : QueryService {
-        override fun query(
-            resolverHost: InetAddress,
-            resolverPort: Port,
-            queries: List<QueryTask>
-        ): List<QueryResponse> {
-            return listOf(
-                QueryResponse(listOf("127.0.0.1"), emptyList(), "A", Status.NO_ERROR),
-                QueryResponse(listOf("::1"), emptyList(), "AAAA", Status.NO_ERROR)
-            )
-        }
-    }
-
-    class DummyResultService2 : ResultService {
+    class TestResultService : ResultService {
         override fun run(): Result {
             return Result.emptyResult()
         }
     }
 
-    @JvmField
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
         modules(
             module {
-                single { DummyService() } bind QueryService::class
-                single { DummyResultService2() } bind ResultService::class
+                single { TestQueryService() } bind QueryService::class
+                single { TestResultService() } bind ResultService::class
             }
         )
     }

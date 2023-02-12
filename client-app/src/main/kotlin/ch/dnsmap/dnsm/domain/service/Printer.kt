@@ -12,23 +12,30 @@ class Printer {
     }
 
     fun answer(settings: PlainSettings, answers: List<QueryResponse>): List<String> {
+        if (answers.isEmpty()) {
+            return listOf("no answers available")
+        }
+
         return answers.flatMap { queryResponse ->
             if (queryResponse.ips.isNotEmpty()) {
-                listOf(
-                    "H: ${queryResponse.status}",
-                    "Q: ${settings.name.canonical} ${queryResponse.queryType} -> " +
-                        "${settings.resolverHost.hostAddress}:${settings.resolverPort.asString()}",
-                    "A: " + queryResponse.ips.joinToString(separator = ", ")
-                )
+                constructHeaderAndQuery(queryResponse, settings) +
+                    listOf(
+                        "A: " + queryResponse.ips.joinToString(separator = ", ")
+                    )
             } else {
-                listOf(
-                    "H: ${queryResponse.status}",
-                    "Q: ${settings.name.canonical} ${queryResponse.queryType} -> " +
-                        "${settings.resolverHost.hostAddress}:${settings.resolverPort.asString()}"
-                )
+                constructHeaderAndQuery(queryResponse, settings)
             }
         }.toList()
     }
+
+    private fun constructHeaderAndQuery(
+        queryResponse: QueryResponse,
+        settings: PlainSettings
+    ) = listOf(
+        "H: ${queryResponse.status}",
+        "Q: ${settings.name.canonical} ${queryResponse.queryType} -> " +
+            "${settings.resolverHost.hostAddress}:${settings.resolverPort.asString()}"
+    )
 
     fun summary(result: Result): String {
         val queryTotal = result.tasks.size
