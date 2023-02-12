@@ -1,5 +1,6 @@
 package ch.dnsmap.dnsm.infrastructure
 
+import ch.dnsmap.dnsm.Domain
 import ch.dnsmap.dnsm.domain.model.PlainSettings
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
@@ -7,7 +8,6 @@ import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.QueryType.A
 import ch.dnsmap.dnsm.domain.service.QueryType.AAAA
 import ch.dnsmap.dnsm.domain.service.ResultService
-import ch.dnsmap.dnsm.domain.service.parseInputName
 import ch.dnsmap.dnsm.domain.service.parseInputType
 import ch.dnsmap.dnsm.domain.service.parsePort
 import com.github.ajalt.clikt.core.CliktCommand
@@ -69,7 +69,7 @@ class PlainCommand(
         "--name",
         help = "DNS name to resolve"
     )
-        .convert { parseInputName(it) }
+        .convert { Domain.of(it) }
         .required()
 
     private val types by option(
