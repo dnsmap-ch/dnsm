@@ -77,7 +77,7 @@ class UdpService : QueryService {
         return Observable.fromIterable(queries)
             .map { messageBytes(it, parserOptionsOut) }
             .map { rawBytes ->
-                DatagramPacket(rawBytes, rawBytes.size, resolverHost, resolverPort.value)
+                DatagramPacket(rawBytes, rawBytes.size, resolverHost, resolverPort.port)
             }
             .subscribe { msg -> socket.send(msg) }
     }

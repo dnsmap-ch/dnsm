@@ -22,7 +22,7 @@ class TcpService : QueryService {
         resolverPort: Port,
         queries: List<QueryTask>
     ): List<QueryResponse> {
-        val socket = Socket(resolverHost, resolverPort.value)
+        val socket = Socket(resolverHost, resolverPort.port)
         val input = DataInputStream(socket.getInputStream())
         val output = DataOutputStream(socket.getOutputStream())
 

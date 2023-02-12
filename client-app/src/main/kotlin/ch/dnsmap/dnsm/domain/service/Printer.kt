@@ -8,7 +8,7 @@ class Printer {
 
     fun header(settings: PlainSettings): String {
         val protocol = settings.resolverPort.protocol
-        return "Query ${settings.resolverHost.hostAddress}:${settings.resolverPort.value}/${protocol.printName}"
+        return "Query ${settings.resolverHost.hostAddress}:${settings.resolverPort.port}/${protocol.printName}"
     }
 
     fun answer(settings: PlainSettings, answers: List<QueryResponse>): List<String> {
