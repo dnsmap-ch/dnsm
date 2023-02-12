@@ -71,7 +71,7 @@ class PrinterTest {
     @Test
     fun testNonEmptySummary() {
         val result = Printer().summary(result())
-        assertThat(result).isEqualTo("Total queries sent/answers received 1/2 in 23s")
+        assertThat(result).isEqualTo("Total queries sent/answers received 1/2 in 23.00s")
     }
 
     private fun settings() = PlainSettings(
