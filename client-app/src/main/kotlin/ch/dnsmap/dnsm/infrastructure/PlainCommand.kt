@@ -17,12 +17,17 @@ import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.types.long
+import com.github.ajalt.clikt.parameters.types.restrictTo
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 import java.net.InetAddress
+import java.util.concurrent.TimeUnit.SECONDS
 
 private const val DEFAULT_PORT_NUMBER = 53
+
+private const val DEFAULT_TIMEOUT_SECOND: Long = 3
 
 class PlainCommand(
     private val printer: Printer,
@@ -82,9 +87,17 @@ class PlainCommand(
             listOf(A, AAAA),
             defaultForHelp = "Type A and AAAA query"
         )
+    private val timeout: Long by option(
+        "--timeout",
+        help = "Timeout in seconds"
+    )
+        .long()
+        .restrictTo(1)
+        .default(DEFAULT_TIMEOUT_SECOND)
 
     override fun run() {
-        val settings = PlainSettings(resolverHost, resolverPort, name, types)
+        val settings =
+            PlainSettings(resolverHost, resolverPort, name, types, Pair(timeout, SECONDS))
         echo(printer.header(settings))
         val resultService: ResultService by inject { parametersOf(settings) }
         val result = resultService.run()

@@ -18,6 +18,7 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
 import java.net.InetAddress
+import java.util.concurrent.TimeUnit.SECONDS
 
 class PlainResultServiceTest : KoinTest {
 
@@ -51,6 +52,7 @@ class PlainResultServiceTest : KoinTest {
         InetAddress.getByName("127.0.0.1"),
         Port(53, Protocol.UDP),
         Domain.of("example.com"),
-        listOf(AAAA, A)
+        listOf(AAAA, A),
+        Pair(5, SECONDS)
     )
 }

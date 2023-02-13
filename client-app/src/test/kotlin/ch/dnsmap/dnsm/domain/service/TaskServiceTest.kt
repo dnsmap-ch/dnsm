@@ -10,6 +10,7 @@ import ch.dnsmap.dnsm.domain.service.QueryType.AAAA
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
+import java.util.concurrent.TimeUnit.SECONDS
 
 class TaskServiceTest {
 
@@ -29,6 +30,7 @@ class TaskServiceTest {
         InetAddress.getLocalHost(),
         Port(53, UDP),
         domainExampleCom,
-        listOf(AAAA, A)
+        listOf(AAAA, A),
+        Pair(5, SECONDS)
     )
 }

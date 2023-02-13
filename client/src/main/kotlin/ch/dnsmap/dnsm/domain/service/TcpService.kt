@@ -1,5 +1,6 @@
 package ch.dnsmap.dnsm.domain.service
 
+import ch.dnsmap.dnsm.domain.model.PlainSettings
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
 import ch.dnsmap.dnsm.domain.model.networking.Port
@@ -11,10 +12,11 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.InetAddress
 import java.net.Socket
+import java.net.SocketException
 import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 
-class TcpService : QueryService {
+class TcpService(private val settings: PlainSettings) : QueryService {
 
     override
     fun query(
@@ -22,22 +24,19 @@ class TcpService : QueryService {
         resolverPort: Port,
         queries: List<QueryTask>
     ): List<QueryResponse> {
-        val socket = Socket(resolverHost, resolverPort.port)
-        val input = DataInputStream(socket.getInputStream())
-        val output = DataOutputStream(socket.getOutputStream())
-
         val resultList = mutableListOf<QueryResponse>()
         val latch = CountDownLatch(1)
-        val receiver = startListener(input, queries, resultList, latch)
-        val sender = startSender(output, queries)
+        val pairOfDisposable = Socket(resolverHost, resolverPort.port).use { s ->
+            val input = DataInputStream(s.getInputStream())
+            val output = DataOutputStream(s.getOutputStream())
 
-        latch.await()
-        receiver.dispose()
-        sender.dispose()
-
-        input.close()
-        output.close()
-        socket.close()
+            val receiver = startListener(input, queries, resultList, latch)
+            val sender = startSender(output, queries)
+            latch.await(settings.timeout.first, settings.timeout.second)
+            Pair(receiver, sender)
+        }
+        pairOfDisposable.first.dispose()
+        pairOfDisposable.second.dispose()
         return resultList
     }
 
@@ -49,16 +48,21 @@ class TcpService : QueryService {
     ): Disposable {
         val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()
         var counter = 0
+        var stayInLoop = true
         return Observable.create { emitter ->
-            while (input.available() != -1) {
-                val length = ByteBuffer.wrap(input.readNBytes(2)).short
-                val dataBuffer = ByteArray(length.toInt())
-                input.readNBytes(dataBuffer, 0, length.toInt())
-                emitter.onNext(dataBuffer)
+            while (stayInLoop && input.available() != -1) {
+                try {
+                    val length = ByteBuffer.wrap(input.readNBytes(2)).short
+                    val dataBuffer = ByteArray(length.toInt())
+                    input.readNBytes(dataBuffer, 0, length.toInt())
+                    emitter.onNext(dataBuffer)
+                } catch (_: SocketException) {
+                    stayInLoop = false
+                }
                 counter++
                 if (counter == queries.size) {
                     emitter.onComplete()
-                    break
+                    stayInLoop = false
                 }
             }
         }
