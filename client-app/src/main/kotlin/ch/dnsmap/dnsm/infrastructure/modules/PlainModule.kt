@@ -23,9 +23,9 @@ private fun provideService(
 ): ResultService {
     val settings: PlainSettings = params.get()
     val service = if (settings.resolverPort.protocol == Protocol.UDP) {
-        UdpService()
+        UdpService(settings)
     } else {
-        TcpService()
+        TcpService(settings)
     }
     return PlainResultService(settings, service, taskService)
 }

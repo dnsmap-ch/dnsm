@@ -1,5 +1,6 @@
 package ch.dnsmap.dnsm.domain.service
 
+import ch.dnsmap.dnsm.domain.model.PlainSettings
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
 import ch.dnsmap.dnsm.domain.model.networking.Port
@@ -10,11 +11,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
+import java.net.SocketException
 import java.util.concurrent.CountDownLatch
 
 private const val BUFFER_SIZE = 4096
 
-class UdpService : QueryService {
+class UdpService(private val settings: PlainSettings) : QueryService {
 
     override
     fun query(
@@ -22,16 +24,17 @@ class UdpService : QueryService {
         resolverPort: Port,
         queries: List<QueryTask>
     ): List<QueryResponse> {
-        val socket = DatagramSocket()
         val resultList = mutableListOf<QueryResponse>()
         val latch = CountDownLatch(1)
-        val receiver = startListener(socket, queries, resultList, latch)
-        val sender = startSender(resolverHost, resolverPort, socket, queries)
+        val pairOfDisposable = DatagramSocket().use { s ->
+            val receiver = startListener(s, queries, resultList, latch)
+            val sender = startSender(resolverHost, resolverPort, s, queries)
+            latch.await(settings.timeout.first, settings.timeout.second)
+            Pair(receiver, sender)
+        }
 
-        latch.await()
-        receiver.dispose()
-        sender.dispose()
-        socket.close()
+        pairOfDisposable.first.dispose()
+        pairOfDisposable.second.dispose()
         return resultList
     }
 
@@ -43,16 +46,21 @@ class UdpService : QueryService {
     ): Disposable {
         val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()
         var counter = 0
+        var stayInLoop = true
         val disposable = Observable.create { emitter ->
-            while (true) {
+            while (stayInLoop) {
                 val buf = ByteArray(BUFFER_SIZE)
                 val packetIn = DatagramPacket(buf, buf.size)
-                socket.receive(packetIn)
+                try {
+                    socket.receive(packetIn)
+                } catch (_: SocketException) {
+                    stayInLoop = false
+                }
                 emitter.onNext(packetIn.data)
                 counter++
                 if (counter == queries.size) {
                     emitter.onComplete()
-                    break
+                    stayInLoop = false
                 }
             }
         }

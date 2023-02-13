@@ -212,4 +212,40 @@ class PlainCommandTest : KoinTest {
             .isInstanceOf(BadParameterValue::class.java)
             .hasMessageStartingWith("Invalid value for \"-t\"")
     }
+
+    @Test
+    fun testInvalidNegativeTimeout() {
+        assertThatThrownBy {
+            PlainCommand(Printer()).parse(
+                listOf(
+                    "-r",
+                    "localhost",
+                    "-n",
+                    "example.com",
+                    "--timeout",
+                    "-1"
+                )
+            )
+        }
+            .isInstanceOf(BadParameterValue::class.java)
+            .hasMessageStartingWith("Invalid value for \"--timeout\": -1 is smaller than the minimum valid value of 1.")
+    }
+
+    @Test
+    fun testInvalidNonNumberTimeout() {
+        assertThatThrownBy {
+            PlainCommand(Printer()).parse(
+                listOf(
+                    "-r",
+                    "localhost",
+                    "-n",
+                    "example.com",
+                    "--timeout",
+                    "NaN"
+                )
+            )
+        }
+            .isInstanceOf(BadParameterValue::class.java)
+            .hasMessageStartingWith("Invalid value for \"--timeout\": NaN is not a valid integer")
+    }
 }
