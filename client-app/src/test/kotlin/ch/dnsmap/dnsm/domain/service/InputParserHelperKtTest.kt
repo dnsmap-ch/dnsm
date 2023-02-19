@@ -1,5 +1,6 @@
 package ch.dnsmap.dnsm.domain.service
 
+import ch.dnsmap.dnsm.domain.model.QueryType
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol
 import org.assertj.core.api.Assertions

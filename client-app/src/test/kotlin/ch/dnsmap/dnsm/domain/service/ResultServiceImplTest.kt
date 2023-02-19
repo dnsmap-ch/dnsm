@@ -1,14 +1,14 @@
 package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.Domain
-import ch.dnsmap.dnsm.domain.model.PlainSettings
+import ch.dnsmap.dnsm.domain.model.ClientSettingsPlain
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
+import ch.dnsmap.dnsm.domain.model.QueryType.A
+import ch.dnsmap.dnsm.domain.model.QueryType.AAAA
 import ch.dnsmap.dnsm.domain.model.Status
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol
-import ch.dnsmap.dnsm.domain.service.QueryType.A
-import ch.dnsmap.dnsm.domain.service.QueryType.AAAA
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -20,7 +20,7 @@ import org.koin.test.junit5.KoinTestExtension
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit.SECONDS
 
-class PlainResultServiceTest : KoinTest {
+class ResultServiceImplTest : KoinTest {
 
     @RegisterExtension
     val koinTestExtension = KoinTestExtension.create {
@@ -34,7 +34,7 @@ class PlainResultServiceTest : KoinTest {
     @Test
     fun testResultService() {
         val service: QueryService by inject()
-        val resultService = PlainResultService(settings(), service, TaskService())
+        val resultService = ResultServiceImpl(settings(), service, TaskService())
 
         val result = resultService.run()
 
@@ -48,7 +48,7 @@ class PlainResultServiceTest : KoinTest {
         )
     }
 
-    private fun settings() = PlainSettings(
+    private fun settings() = ClientSettingsPlain(
         InetAddress.getByName("127.0.0.1"),
         Port(53, Protocol.UDP),
         Domain.of("example.com"),

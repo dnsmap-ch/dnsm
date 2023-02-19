@@ -1,9 +1,12 @@
-package ch.dnsmap.dnsm.domain.service
+package ch.dnsmap.dnsm.domain.service.dot
 
-import ch.dnsmap.dnsm.domain.model.PlainSettings
+import ch.dnsmap.dnsm.domain.model.ClientSettings
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
 import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.service.QueryService
+import ch.dnsmap.dnsm.domain.service.messageBytes
+import ch.dnsmap.dnsm.domain.service.queryResponse
 import ch.dnsmap.dnsm.wire.ParserOptions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -11,12 +14,13 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.InetAddress
-import java.net.Socket
 import java.net.SocketException
 import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
 
-class TcpService(private val settings: PlainSettings) : QueryService {
+class DotService(private val settings: ClientSettings) : QueryService {
 
     override
     fun query(
@@ -26,18 +30,26 @@ class TcpService(private val settings: PlainSettings) : QueryService {
     ): List<QueryResponse> {
         val resultList = mutableListOf<QueryResponse>()
         val latch = CountDownLatch(1)
-        val pairOfDisposable = Socket(resolverHost, resolverPort.port).use { s ->
-            val input = DataInputStream(s.getInputStream())
-            val output = DataOutputStream(s.getOutputStream())
+        val pairOfDisposable = createSocket(resolverHost, resolverPort).use { s ->
+            val input = DataInputStream(s.inputStream)
+            val output = DataOutputStream(s.outputStream)
 
             val receiver = startListener(input, queries, resultList, latch)
             val sender = startSender(output, queries)
-            latch.await(settings.timeout.first, settings.timeout.second)
+            latch.await(settings.timeout().first, settings.timeout().second)
             Pair(receiver, sender)
         }
         pairOfDisposable.first.dispose()
         pairOfDisposable.second.dispose()
         return resultList
+    }
+
+    private fun createSocket(host: InetAddress, port: Port): SSLSocket {
+        val socket: SSLSocket =
+            SSLSocketFactory.getDefault().createSocket(host, port.port) as SSLSocket
+//        socket.setEnabledProtocols(protocols);
+//        socket.setEnabledCipherSuites(cipher_suites);
+        return socket
     }
 
     private fun startListener(
@@ -68,12 +80,12 @@ class TcpService(private val settings: PlainSettings) : QueryService {
         }
             .map { rawDns -> queryResponse(parserOptionsIn, rawDns) }
             .subscribeOn(Schedulers.io())
-            .subscribe { msg ->
+            .subscribe({ msg ->
                 resultList.add(msg)
                 if (resultList.size == queries.size) {
                     latch.countDown()
                 }
-            }
+            }, { e -> println(e.message) })
     }
 
     private fun startSender(output: DataOutputStream, queries: List<QueryTask>): Disposable {

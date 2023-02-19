@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.domain.service
+package ch.dnsmap.dnsm.domain.model
 
 enum class QueryType {
     A,

@@ -1,6 +1,6 @@
 package ch.dnsmap.dnsm.domain.service
 
-import ch.dnsmap.dnsm.domain.model.PlainSettings
+import ch.dnsmap.dnsm.domain.model.ClientSettings
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
 import ch.dnsmap.dnsm.domain.model.Result
@@ -12,8 +12,8 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.TimedValue
 import kotlin.time.measureTimedValue
 
-class PlainResultService(
-    private val settings: PlainSettings,
+class ResultServiceImpl(
+    private val settings: ClientSettings,
     private val queryService: QueryService,
     private val taskService: TaskService
 ) :
@@ -31,8 +31,8 @@ class PlainResultService(
             println(
                 "error: " +
                     (
-                        "While connecting to ${settings.resolverHost.hostName}:" +
-                            "${settings.resolverPort.asString()}: ${e.message}"
+                        "While connecting to ${settings.resolverHost().hostName}:" +
+                            "${settings.resolverPort().asString()}: ${e.message}"
                         )
             )
             throw ProgramResult(ErrorCode.NETWORK_CONNECTION_ERROR.ordinal)
@@ -43,8 +43,8 @@ class PlainResultService(
     private fun execute(tasks: List<QueryTask>): TimedValue<List<QueryResponse>> {
         return measureTimedValue {
             queryService.query(
-                settings.resolverHost,
-                settings.resolverPort,
+                settings.resolverHost(),
+                settings.resolverPort(),
                 tasks
             )
         }
