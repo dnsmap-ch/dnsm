@@ -1,9 +1,12 @@
-package ch.dnsmap.dnsm.domain.service
+package ch.dnsmap.dnsm.domain.service.plain
 
-import ch.dnsmap.dnsm.domain.model.PlainSettings
+import ch.dnsmap.dnsm.domain.model.ClientSettings
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
 import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.service.QueryService
+import ch.dnsmap.dnsm.domain.service.messageBytes
+import ch.dnsmap.dnsm.domain.service.queryResponse
 import ch.dnsmap.dnsm.wire.ParserOptions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -16,7 +19,7 @@ import java.util.concurrent.CountDownLatch
 
 private const val BUFFER_SIZE = 4096
 
-class UdpService(private val settings: PlainSettings) : QueryService {
+class UdpService(private val settings: ClientSettings) : QueryService {
 
     override
     fun query(
@@ -29,7 +32,7 @@ class UdpService(private val settings: PlainSettings) : QueryService {
         val pairOfDisposable = DatagramSocket().use { s ->
             val receiver = startListener(s, queries, resultList, latch)
             val sender = startSender(resolverHost, resolverPort, s, queries)
-            latch.await(settings.timeout.first, settings.timeout.second)
+            latch.await(settings.timeout().first, settings.timeout().second)
             Pair(receiver, sender)
         }
 

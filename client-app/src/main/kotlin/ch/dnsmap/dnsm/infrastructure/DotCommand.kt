@@ -1,16 +1,15 @@
 package ch.dnsmap.dnsm.infrastructure
 
 import ch.dnsmap.dnsm.Domain
-import ch.dnsmap.dnsm.domain.model.ClientSettingsPlain
-import ch.dnsmap.dnsm.domain.model.QueryType.A
-import ch.dnsmap.dnsm.domain.model.QueryType.AAAA
+import ch.dnsmap.dnsm.domain.model.ClientSettingsDot
+import ch.dnsmap.dnsm.domain.model.QueryType
 import ch.dnsmap.dnsm.domain.model.networking.Port
-import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
+import ch.dnsmap.dnsm.domain.model.networking.Protocol
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.ResultService
 import ch.dnsmap.dnsm.domain.service.parseInputType
 import ch.dnsmap.dnsm.domain.service.parsePort
-import ch.dnsmap.dnsm.infrastructure.modules.MODULE_PLAIN
+import ch.dnsmap.dnsm.infrastructure.modules.MODULE_DOT
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
@@ -27,15 +26,13 @@ import org.koin.core.qualifier.named
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit.SECONDS
 
-private const val DEFAULT_PORT_NUMBER = 53
+private const val DEFAULT_PORT_NUMBER = 853
 private const val DEFAULT_TIMEOUT_SECOND: Long = 3
 
-class PlainCommand(
-    private val printer: Printer,
-) :
+class DotCommand(private val printer: Printer) :
     CliktCommand(
-        name = "plain",
-        help = "Send DNS query over plaintext UDP/TCP to DNS server."
+        name = "dot",
+        help = "Send DNS query over DoT to DNS server."
     ),
     KoinComponent {
 
@@ -61,13 +58,13 @@ class PlainCommand(
         "--port",
         help = """
             Query a resolver on this port number and protocol.
-            Possible values are: '53', '53/udp' '53/tcp'
+            Possible values are: '853'
         """.trimIndent()
     )
         .convert { parsePort(it) }
         .default(
-            Port(DEFAULT_PORT_NUMBER, UDP),
-            defaultForHelp = Port(DEFAULT_PORT_NUMBER, UDP).asString()
+            Port(DEFAULT_PORT_NUMBER, Protocol.TCP),
+            defaultForHelp = Port(DEFAULT_PORT_NUMBER, Protocol.TCP).asString()
         )
 
     private val name by option(
@@ -85,7 +82,7 @@ class PlainCommand(
     )
         .convert { parseInputType(it) }
         .default(
-            listOf(A, AAAA),
+            listOf(QueryType.A, QueryType.AAAA),
             defaultForHelp = "Type A and AAAA query"
         )
     private val timeout: Long by option(
@@ -98,9 +95,9 @@ class PlainCommand(
 
     override fun run() {
         val settings =
-            ClientSettingsPlain(resolverHost, resolverPort, name, types, Pair(timeout, SECONDS))
+            ClientSettingsDot(resolverHost, resolverPort, name, types, Pair(timeout, SECONDS))
         echo(printer.header(settings))
-        val resultService: ResultService by inject(qualifier = named(MODULE_PLAIN)) {
+        val resultService: ResultService by inject(qualifier = named(MODULE_DOT)) {
             parametersOf(
                 settings
             )

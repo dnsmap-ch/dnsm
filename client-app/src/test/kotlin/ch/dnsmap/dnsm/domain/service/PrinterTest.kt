@@ -1,15 +1,15 @@
 package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.Domain
-import ch.dnsmap.dnsm.domain.model.PlainSettings
+import ch.dnsmap.dnsm.domain.model.ClientSettingsPlain
 import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.QueryTask
+import ch.dnsmap.dnsm.domain.model.QueryType.A
+import ch.dnsmap.dnsm.domain.model.QueryType.AAAA
 import ch.dnsmap.dnsm.domain.model.Result
 import ch.dnsmap.dnsm.domain.model.Status
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
-import ch.dnsmap.dnsm.domain.service.QueryType.A
-import ch.dnsmap.dnsm.domain.service.QueryType.AAAA
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
@@ -75,7 +75,7 @@ class PrinterTest {
         assertThat(result).isEqualTo("Total queries sent/answers received 1/2 in 23.00s")
     }
 
-    private fun settings() = PlainSettings(
+    private fun settings() = ClientSettingsPlain(
         InetAddress.getByName("127.0.0.1"),
         Port(53, UDP),
         domainExampleCom,
