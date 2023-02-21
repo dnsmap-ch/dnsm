@@ -1,15 +1,15 @@
 package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.Domain
-import ch.dnsmap.dnsm.domain.model.ClientSettingsPlain
-import ch.dnsmap.dnsm.domain.model.QueryResponse
-import ch.dnsmap.dnsm.domain.model.QueryTask
-import ch.dnsmap.dnsm.domain.model.QueryType.A
-import ch.dnsmap.dnsm.domain.model.QueryType.AAAA
+import ch.dnsmap.dnsm.domain.model.AnswerResultType
 import ch.dnsmap.dnsm.domain.model.Result
-import ch.dnsmap.dnsm.domain.model.Status
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
+import ch.dnsmap.dnsm.domain.model.query.QueryResult
+import ch.dnsmap.dnsm.domain.model.query.QueryTask
+import ch.dnsmap.dnsm.domain.model.query.QueryType.A
+import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
@@ -83,12 +83,12 @@ class PrinterTest {
         Pair(5, SECONDS)
     )
 
-    private fun emptyIpQueryResponse(): QueryResponse {
-        return QueryResponse(emptyList(), emptyList(), "A", Status.NO_ERROR)
+    private fun emptyIpQueryResponse(): QueryResult {
+        return QueryResult(emptyList(), emptyList(), "A", AnswerResultType.NO_ERROR)
     }
 
-    private fun queryResponse(): QueryResponse {
-        return QueryResponse(listOf("127.0.0.2"), emptyList(), "A", Status.NO_ERROR)
+    private fun queryResponse(): QueryResult {
+        return QueryResult(listOf("127.0.0.2"), emptyList(), "A", AnswerResultType.NO_ERROR)
     }
 
     private fun result(): Result {

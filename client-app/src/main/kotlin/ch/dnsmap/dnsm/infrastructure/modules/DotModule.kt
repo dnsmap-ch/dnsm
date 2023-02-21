@@ -1,6 +1,6 @@
 package ch.dnsmap.dnsm.infrastructure.modules
 
-import ch.dnsmap.dnsm.domain.model.ClientSettingsDot
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDot
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.ResultService
 import ch.dnsmap.dnsm.domain.service.ResultServiceImpl

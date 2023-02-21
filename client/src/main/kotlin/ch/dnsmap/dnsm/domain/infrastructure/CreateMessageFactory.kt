@@ -1,12 +1,12 @@
-package ch.dnsmap.dnsm.domain.service
+package ch.dnsmap.dnsm.domain.infrastructure
 
 import ch.dnsmap.dnsm.DnsQueryClass
 import ch.dnsmap.dnsm.DnsQueryType
 import ch.dnsmap.dnsm.Domain
 import ch.dnsmap.dnsm.Message
 import ch.dnsmap.dnsm.Question
-import ch.dnsmap.dnsm.domain.model.QueryTask
-import ch.dnsmap.dnsm.domain.model.QueryType
+import ch.dnsmap.dnsm.domain.model.query.QueryTask
+import ch.dnsmap.dnsm.domain.model.query.QueryType
 import ch.dnsmap.dnsm.header.Header
 import ch.dnsmap.dnsm.header.HeaderBitFlags
 import ch.dnsmap.dnsm.header.HeaderCount

@@ -1,7 +1,7 @@
 package ch.dnsmap.dnsm.domain.service
 
-import ch.dnsmap.dnsm.domain.model.ClientSettings
-import ch.dnsmap.dnsm.domain.model.QueryTask
+import ch.dnsmap.dnsm.domain.model.query.QueryTask
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 
 class TaskService {
 

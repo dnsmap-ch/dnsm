@@ -1,8 +1,8 @@
 package ch.dnsmap.dnsm.domain.service
 
-import ch.dnsmap.dnsm.domain.model.ClientSettings
-import ch.dnsmap.dnsm.domain.model.QueryResponse
 import ch.dnsmap.dnsm.domain.model.Result
+import ch.dnsmap.dnsm.domain.model.query.QueryResult
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -13,7 +13,7 @@ class Printer {
         return "Query ${settings.resolverHost().hostAddress}:${settings.resolverPort().port}/${protocol.printName}"
     }
 
-    fun answer(settings: ClientSettings, answers: List<QueryResponse>): List<String> {
+    fun answer(settings: ClientSettings, answers: List<QueryResult>): List<String> {
         if (answers.isEmpty()) {
             return listOf("no answers available")
         }
@@ -31,11 +31,11 @@ class Printer {
     }
 
     private fun constructHeaderAndQuery(
-        queryResponse: QueryResponse,
+        queryResult: QueryResult,
         settings: ClientSettings
     ) = listOf(
-        "H: ${queryResponse.status}",
-        "Q: ${settings.name().canonical} ${queryResponse.queryType} -> " +
+        "H: ${queryResult.answerResultType}",
+        "Q: ${settings.name().canonical} ${queryResult.queryType} -> " +
             "${settings.resolverHost().hostAddress}:${settings.resolverPort().asString()}"
     )
 

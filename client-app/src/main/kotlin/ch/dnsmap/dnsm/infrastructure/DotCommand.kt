@@ -1,10 +1,10 @@
 package ch.dnsmap.dnsm.infrastructure
 
 import ch.dnsmap.dnsm.Domain
-import ch.dnsmap.dnsm.domain.model.ClientSettingsDot
-import ch.dnsmap.dnsm.domain.model.QueryType
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol
+import ch.dnsmap.dnsm.domain.model.query.QueryType
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDot
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.ResultService
 import ch.dnsmap.dnsm.domain.service.parseInputType

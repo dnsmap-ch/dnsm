@@ -1,21 +1,20 @@
-package ch.dnsmap.dnsm.domain.service
+package ch.dnsmap.dnsm.domain.model.query
 
 import ch.dnsmap.dnsm.Message
-import ch.dnsmap.dnsm.domain.model.QueryResponse
-import ch.dnsmap.dnsm.domain.model.Status
+import ch.dnsmap.dnsm.domain.model.AnswerResultType
 import ch.dnsmap.dnsm.header.HeaderRcode
 import ch.dnsmap.dnsm.record.ResourceRecordA
 import ch.dnsmap.dnsm.record.ResourceRecordAaaa
 import ch.dnsmap.dnsm.wire.DnsInput
 import ch.dnsmap.dnsm.wire.ParserOptions
 
-fun queryResponse(parserOptionsIn: ParserOptions, rawDns: ByteArray?): QueryResponse {
+fun queryResponse(parserOptionsIn: ParserOptions, rawDns: ByteArray?): QueryResult {
     val response = DnsInput.fromWire(parserOptionsIn, rawDns)
     val resMsg = response.message
     val ips = ipResults(resMsg)
     val logs = parserOptionsIn.log.map { it.formatted() }
     val status = status(resMsg)
-    return QueryResponse(ips, logs, resMsg.question.questionType.name, status)
+    return QueryResult(ips, logs, resMsg.question.questionType.name, status)
 }
 
 private fun ipResults(msg: Message): List<String> {
@@ -30,13 +29,13 @@ private fun ipResults(msg: Message): List<String> {
     }.toList()
 }
 
-private fun status(resMsg: Message): Status {
+private fun status(resMsg: Message): AnswerResultType {
     return when (resMsg.header.flags.rcode!!) {
-        HeaderRcode.NO_ERROR -> Status.NO_ERROR
-        HeaderRcode.FORMAT_ERROR -> Status.FORMAT_ERROR
-        HeaderRcode.SERVER_FAILURE -> Status.SERVER_FAILURE
-        HeaderRcode.NAME_ERROR -> Status.NAME_ERROR
-        HeaderRcode.NOT_IMPLEMENTED -> Status.NOT_IMPLEMENTED
-        HeaderRcode.REFUSED -> Status.REFUSED
+        HeaderRcode.NO_ERROR -> AnswerResultType.NO_ERROR
+        HeaderRcode.FORMAT_ERROR -> AnswerResultType.FORMAT_ERROR
+        HeaderRcode.SERVER_FAILURE -> AnswerResultType.SERVER_FAILURE
+        HeaderRcode.NAME_ERROR -> AnswerResultType.NAME_ERROR
+        HeaderRcode.NOT_IMPLEMENTED -> AnswerResultType.NOT_IMPLEMENTED
+        HeaderRcode.REFUSED -> AnswerResultType.REFUSED
     }
 }

@@ -1,8 +1,8 @@
 package ch.dnsmap.dnsm.domain.service
 
-import ch.dnsmap.dnsm.domain.model.QueryType
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol
+import ch.dnsmap.dnsm.domain.model.query.QueryType
 
 fun parseInputType(rawTypeInput: String): List<QueryType> {
     return rawTypeInput.split(",")

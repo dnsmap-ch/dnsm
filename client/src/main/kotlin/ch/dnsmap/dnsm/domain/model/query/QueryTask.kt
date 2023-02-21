@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.domain.model
+package ch.dnsmap.dnsm.domain.model.query
 
 import ch.dnsmap.dnsm.Domain
 

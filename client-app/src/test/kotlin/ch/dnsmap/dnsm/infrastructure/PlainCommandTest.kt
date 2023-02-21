@@ -3,8 +3,8 @@ package ch.dnsmap.dnsm.infrastructure
 import ch.dnsmap.dnsm.domain.model.Result
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.QueryService
+import ch.dnsmap.dnsm.domain.service.QueryServiceTest
 import ch.dnsmap.dnsm.domain.service.ResultService
-import ch.dnsmap.dnsm.domain.service.TestQueryService
 import ch.dnsmap.dnsm.infrastructure.modules.MODULE_PLAIN
 import com.github.ajalt.clikt.core.BadParameterValue
 import com.github.ajalt.clikt.core.IncorrectOptionValueCount
@@ -32,7 +32,7 @@ class PlainCommandTest : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
         modules(
             module {
-                single { TestQueryService() } bind QueryService::class
+                single { QueryServiceTest() } bind QueryService::class
                 single(named(MODULE_PLAIN)) { TestResultService() } bind ResultService::class
             }
         )

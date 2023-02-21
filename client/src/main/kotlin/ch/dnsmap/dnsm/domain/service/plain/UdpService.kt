@@ -1,12 +1,12 @@
 package ch.dnsmap.dnsm.domain.service.plain
 
-import ch.dnsmap.dnsm.domain.model.ClientSettings
-import ch.dnsmap.dnsm.domain.model.QueryResponse
-import ch.dnsmap.dnsm.domain.model.QueryTask
+import ch.dnsmap.dnsm.domain.infrastructure.messageBytes
 import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.model.query.QueryResult
+import ch.dnsmap.dnsm.domain.model.query.QueryTask
+import ch.dnsmap.dnsm.domain.model.query.queryResponse
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 import ch.dnsmap.dnsm.domain.service.QueryService
-import ch.dnsmap.dnsm.domain.service.messageBytes
-import ch.dnsmap.dnsm.domain.service.queryResponse
 import ch.dnsmap.dnsm.wire.ParserOptions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -26,8 +26,8 @@ class UdpService(private val settings: ClientSettings) : QueryService {
         resolverHost: InetAddress,
         resolverPort: Port,
         queries: List<QueryTask>
-    ): List<QueryResponse> {
-        val resultList = mutableListOf<QueryResponse>()
+    ): List<QueryResult> {
+        val resultList = mutableListOf<QueryResult>()
         val latch = CountDownLatch(1)
         val pairOfDisposable = DatagramSocket().use { s ->
             val receiver = startListener(s, queries, resultList, latch)
@@ -44,7 +44,7 @@ class UdpService(private val settings: ClientSettings) : QueryService {
     private fun startListener(
         socket: DatagramSocket,
         queries: List<QueryTask>,
-        resultList: MutableList<QueryResponse>,
+        resultList: MutableList<QueryResult>,
         latch: CountDownLatch
     ): Disposable {
         val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()

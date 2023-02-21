@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.infrastructure
+package ch.dnsmap.dnsm.domain.model
 
 enum class ErrorCode {
     SUCCESSFUL,
