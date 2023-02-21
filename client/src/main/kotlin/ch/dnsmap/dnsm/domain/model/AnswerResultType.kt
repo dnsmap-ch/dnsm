@@ -1,6 +1,6 @@
 package ch.dnsmap.dnsm.domain.model
 
-enum class Status {
+enum class AnswerResultType {
     NO_ERROR,
     FORMAT_ERROR,
     SERVER_FAILURE,

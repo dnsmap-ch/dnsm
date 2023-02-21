@@ -1,14 +1,14 @@
 package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.Domain
-import ch.dnsmap.dnsm.domain.model.ClientSettingsPlain
-import ch.dnsmap.dnsm.domain.model.QueryResponse
-import ch.dnsmap.dnsm.domain.model.QueryTask
-import ch.dnsmap.dnsm.domain.model.QueryType.A
-import ch.dnsmap.dnsm.domain.model.QueryType.AAAA
-import ch.dnsmap.dnsm.domain.model.Status
+import ch.dnsmap.dnsm.domain.model.AnswerResultType
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol
+import ch.dnsmap.dnsm.domain.model.query.QueryResult
+import ch.dnsmap.dnsm.domain.model.query.QueryTask
+import ch.dnsmap.dnsm.domain.model.query.QueryType.A
+import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -26,7 +26,7 @@ class ResultServiceImplTest : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
         modules(
             module {
-                single { TestQueryService() } bind QueryService::class
+                single { QueryServiceTest() } bind QueryService::class
             }
         )
     }
@@ -39,8 +39,8 @@ class ResultServiceImplTest : KoinTest {
         val result = resultService.run()
 
         assertThat(result.responses).containsExactlyInAnyOrder(
-            QueryResponse(listOf("127.0.0.1"), emptyList(), "A", Status.NO_ERROR),
-            QueryResponse(listOf("::1"), emptyList(), "AAAA", Status.NO_ERROR)
+            QueryResult(listOf("127.0.0.1"), emptyList(), "A", AnswerResultType.NO_ERROR),
+            QueryResult(listOf("::1"), emptyList(), "AAAA", AnswerResultType.NO_ERROR)
         )
         assertThat(result.tasks).containsExactlyInAnyOrder(
             QueryTask(Domain.of("example.com"), A),

@@ -1,10 +1,10 @@
 package ch.dnsmap.dnsm.domain.service
 
-import ch.dnsmap.dnsm.domain.model.ClientSettings
-import ch.dnsmap.dnsm.domain.model.QueryResponse
-import ch.dnsmap.dnsm.domain.model.QueryTask
+import ch.dnsmap.dnsm.domain.model.ErrorCode
 import ch.dnsmap.dnsm.domain.model.Result
-import ch.dnsmap.dnsm.infrastructure.ErrorCode
+import ch.dnsmap.dnsm.domain.model.query.QueryResult
+import ch.dnsmap.dnsm.domain.model.query.QueryTask
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 import com.github.ajalt.clikt.core.ProgramResult
 import org.koin.core.component.KoinComponent
 import java.io.IOException
@@ -40,7 +40,7 @@ class ResultServiceImpl(
     }
 
     @OptIn(ExperimentalTime::class)
-    private fun execute(tasks: List<QueryTask>): TimedValue<List<QueryResponse>> {
+    private fun execute(tasks: List<QueryTask>): TimedValue<List<QueryResult>> {
         return measureTimedValue {
             queryService.query(
                 settings.resolverHost(),
