@@ -11,15 +11,15 @@ import ch.dnsmap.dnsm.wire.ParserOptions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.io.DataInputStream
-import java.io.DataOutputStream
+import java.net.DatagramPacket
+import java.net.DatagramSocket
 import java.net.InetAddress
-import java.net.Socket
 import java.net.SocketException
-import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 
-class TcpService(private val settings: ClientSettings) : QueryService {
+private const val BUFFER_SIZE = 4096
+
+class PlainUdpService(private val settings: ClientSettings) : QueryService {
 
     override
     fun query(
@@ -29,22 +29,20 @@ class TcpService(private val settings: ClientSettings) : QueryService {
     ): List<QueryResult> {
         val resultList = mutableListOf<QueryResult>()
         val latch = CountDownLatch(1)
-        val pairOfDisposable = Socket(resolverHost, resolverPort.port).use { s ->
-            val input = DataInputStream(s.getInputStream())
-            val output = DataOutputStream(s.getOutputStream())
-
-            val receiver = startListener(input, queries, resultList, latch)
-            val sender = startSender(output, queries)
+        val pairOfDisposable = DatagramSocket().use { s ->
+            val receiver = startListener(s, queries, resultList, latch)
+            val sender = startSender(resolverHost, resolverPort, s, queries)
             latch.await(settings.timeout().first, settings.timeout().second)
             Pair(receiver, sender)
         }
+
         pairOfDisposable.first.dispose()
         pairOfDisposable.second.dispose()
         return resultList
     }
 
     private fun startListener(
-        input: DataInputStream,
+        socket: DatagramSocket,
         queries: List<QueryTask>,
         resultList: MutableList<QueryResult>,
         latch: CountDownLatch
@@ -52,16 +50,16 @@ class TcpService(private val settings: ClientSettings) : QueryService {
         val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()
         var counter = 0
         var stayInLoop = true
-        return Observable.create { emitter ->
-            while (stayInLoop && input.available() != -1) {
+        val disposable = Observable.create { emitter ->
+            while (stayInLoop) {
+                val buf = ByteArray(BUFFER_SIZE)
+                val packetIn = DatagramPacket(buf, buf.size)
                 try {
-                    val length = ByteBuffer.wrap(input.readNBytes(2)).short
-                    val dataBuffer = ByteArray(length.toInt())
-                    input.readNBytes(dataBuffer, 0, length.toInt())
-                    emitter.onNext(dataBuffer)
+                    socket.receive(packetIn)
                 } catch (_: SocketException) {
                     stayInLoop = false
                 }
+                emitter.onNext(packetIn.data)
                 counter++
                 if (counter == queries.size) {
                     emitter.onComplete()
@@ -77,12 +75,21 @@ class TcpService(private val settings: ClientSettings) : QueryService {
                     latch.countDown()
                 }
             }
+        return disposable
     }
 
-    private fun startSender(output: DataOutputStream, queries: List<QueryTask>): Disposable {
-        val parserOptionsOut = ParserOptions.Builder.builder().setTcp().build()
+    private fun startSender(
+        resolverHost: InetAddress,
+        resolverPort: Port,
+        socket: DatagramSocket,
+        queries: List<QueryTask>
+    ): Disposable {
+        val parserOptionsOut = ParserOptions.Builder.builder().build()
         return Observable.fromIterable(queries)
             .map { messageBytes(it, parserOptionsOut) }
-            .subscribe { msg -> output.write(msg) }
+            .map { rawBytes ->
+                DatagramPacket(rawBytes, rawBytes.size, resolverHost, resolverPort.port)
+            }
+            .subscribe { msg -> socket.send(msg) }
     }
 }
