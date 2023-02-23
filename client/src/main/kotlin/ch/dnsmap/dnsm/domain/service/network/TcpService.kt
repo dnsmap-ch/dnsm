@@ -1,4 +1,4 @@
-package ch.dnsmap.dnsm.domain.service.plain
+package ch.dnsmap.dnsm.domain.service.network
 
 import ch.dnsmap.dnsm.domain.infrastructure.messageBytes
 import ch.dnsmap.dnsm.domain.model.networking.Port
@@ -11,15 +11,15 @@ import ch.dnsmap.dnsm.wire.ParserOptions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.net.DatagramPacket
-import java.net.DatagramSocket
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.net.InetAddress
+import java.net.Socket
 import java.net.SocketException
+import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 
-private const val BUFFER_SIZE = 4096
-
-class UdpService(private val settings: ClientSettings) : QueryService {
+class TcpService(private val settings: ClientSettings, private val socket: Socket) : QueryService {
 
     override
     fun query(
@@ -29,20 +29,22 @@ class UdpService(private val settings: ClientSettings) : QueryService {
     ): List<QueryResult> {
         val resultList = mutableListOf<QueryResult>()
         val latch = CountDownLatch(1)
-        val pairOfDisposable = DatagramSocket().use { s ->
-            val receiver = startListener(s, queries, resultList, latch)
-            val sender = startSender(resolverHost, resolverPort, s, queries)
+        val pairOfDisposable = socket.use { s ->
+            val input = DataInputStream(s.getInputStream())
+            val output = DataOutputStream(s.getOutputStream())
+
+            val receiver = startListener(input, queries, resultList, latch)
+            val sender = startSender(output, queries)
             latch.await(settings.timeout().first, settings.timeout().second)
             Pair(receiver, sender)
         }
-
         pairOfDisposable.first.dispose()
         pairOfDisposable.second.dispose()
         return resultList
     }
 
     private fun startListener(
-        socket: DatagramSocket,
+        input: DataInputStream,
         queries: List<QueryTask>,
         resultList: MutableList<QueryResult>,
         latch: CountDownLatch
@@ -50,16 +52,16 @@ class UdpService(private val settings: ClientSettings) : QueryService {
         val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()
         var counter = 0
         var stayInLoop = true
-        val disposable = Observable.create { emitter ->
-            while (stayInLoop) {
-                val buf = ByteArray(BUFFER_SIZE)
-                val packetIn = DatagramPacket(buf, buf.size)
+        return Observable.create { emitter ->
+            while (stayInLoop && input.available() != -1) {
                 try {
-                    socket.receive(packetIn)
+                    val length = ByteBuffer.wrap(input.readNBytes(2)).short
+                    val dataBuffer = ByteArray(length.toInt())
+                    input.readNBytes(dataBuffer, 0, length.toInt())
+                    emitter.onNext(dataBuffer)
                 } catch (_: SocketException) {
                     stayInLoop = false
                 }
-                emitter.onNext(packetIn.data)
                 counter++
                 if (counter == queries.size) {
                     emitter.onComplete()
@@ -75,21 +77,12 @@ class UdpService(private val settings: ClientSettings) : QueryService {
                     latch.countDown()
                 }
             }
-        return disposable
     }
 
-    private fun startSender(
-        resolverHost: InetAddress,
-        resolverPort: Port,
-        socket: DatagramSocket,
-        queries: List<QueryTask>
-    ): Disposable {
-        val parserOptionsOut = ParserOptions.Builder.builder().build()
+    private fun startSender(output: DataOutputStream, queries: List<QueryTask>): Disposable {
+        val parserOptionsOut = ParserOptions.Builder.builder().setTcp().build()
         return Observable.fromIterable(queries)
             .map { messageBytes(it, parserOptionsOut) }
-            .map { rawBytes ->
-                DatagramPacket(rawBytes, rawBytes.size, resolverHost, resolverPort.port)
-            }
-            .subscribe { msg -> socket.send(msg) }
+            .subscribe { msg -> output.write(msg) }
     }
 }
