@@ -5,7 +5,6 @@ import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.ResultService
 import ch.dnsmap.dnsm.domain.service.ResultServiceImpl
-import ch.dnsmap.dnsm.domain.service.TaskService
 import ch.dnsmap.dnsm.domain.service.plain.TcpService
 import ch.dnsmap.dnsm.domain.service.plain.UdpService
 import org.koin.core.parameter.ParametersHolder
@@ -16,19 +15,15 @@ const val MODULE_PLAIN = "plain"
 
 val plainModule = module {
     single { Printer() }
-    single<ResultService>(named(MODULE_PLAIN)) { provideService(it, get()) }
-    single { TaskService() }
+    single<ResultService>(named(MODULE_PLAIN)) { provideService(it) }
 }
 
-private fun provideService(
-    params: ParametersHolder,
-    taskService: TaskService
-): ResultService {
+private fun provideService(params: ParametersHolder): ResultService {
     val settings: ClientSettingsPlain = params.get()
     val service = if (settings.resolverPort.protocol == Protocol.UDP) {
         UdpService(settings)
     } else {
         TcpService(settings)
     }
-    return ResultServiceImpl(settings, service, taskService)
+    return ResultServiceImpl(settings, service)
 }
