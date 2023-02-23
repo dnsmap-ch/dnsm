@@ -34,7 +34,7 @@ class ResultServiceImplTest : KoinTest {
     @Test
     fun testResultService() {
         val service: QueryService by inject()
-        val resultService = ResultServiceImpl(settings(), service, TaskService())
+        val resultService = ResultServiceImpl(settings(), service)
 
         val result = resultService.run()
 

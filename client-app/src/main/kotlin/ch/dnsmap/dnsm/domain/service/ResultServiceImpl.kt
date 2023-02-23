@@ -15,7 +15,6 @@ import kotlin.time.measureTimedValue
 class ResultServiceImpl(
     private val settings: ClientSettings,
     private val queryService: QueryService,
-    private val taskService: TaskService
 ) :
     ResultService,
     KoinComponent {
@@ -24,7 +23,7 @@ class ResultServiceImpl(
     override
     fun run(): Result {
         try {
-            val tasks = taskService.queryTasks(settings)
+            val tasks = queryTasks(settings)
             val result = execute(tasks)
             return Result(result.duration, result.value, tasks)
         } catch (e: IOException) {
@@ -37,6 +36,12 @@ class ResultServiceImpl(
             )
             throw ProgramResult(ErrorCode.NETWORK_CONNECTION_ERROR.ordinal)
         }
+    }
+
+    private fun queryTasks(settings: ClientSettings): List<QueryTask> {
+        return settings.types()
+            .map { type -> QueryTask(settings.name(), type) }
+            .toList()
     }
 
     @OptIn(ExperimentalTime::class)
