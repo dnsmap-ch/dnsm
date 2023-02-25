@@ -2,6 +2,7 @@ package ch.dnsmap.dnsm.domain.service.plain
 
 import ch.dnsmap.dnsm.domain.infrastructure.messageBytes
 import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.query.queryResponse
@@ -26,10 +27,11 @@ class PlainUdpService(private val settings: ClientSettings) : QueryService {
     private var resolverPort: Port? = null
 
     override
-    fun connect(resolverHost: InetAddress, resolverPort: Port) {
+    fun connect(resolverHost: InetAddress, resolverPort: Port): ConnectionResult {
         socket = DatagramSocket()
         this.resolverHost = resolverHost
         this.resolverPort = resolverPort
+        return ConnectionResult(resolverHost, resolverPort)
     }
 
     override

@@ -103,7 +103,7 @@ class DotCommand(private val printer: Printer) :
             )
         }
         val result = resultService.run()
-        printer.answer(settings, result.responses).forEach { echo(it) }
+        printer.answer(settings, result.queryResultTimed.queryResults).forEach { echo(it) }
         echo(printer.summary(result))
     }
 }

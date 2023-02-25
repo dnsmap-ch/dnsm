@@ -1,6 +1,13 @@
 package ch.dnsmap.dnsm.infrastructure
 
+import ch.dnsmap.dnsm.domain.model.AnswerResultType
 import ch.dnsmap.dnsm.domain.model.Result
+import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.model.networking.Protocol
+import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
+import ch.dnsmap.dnsm.domain.model.query.ConnectionResultTimed
+import ch.dnsmap.dnsm.domain.model.query.QueryResult
+import ch.dnsmap.dnsm.domain.model.query.QueryResultTimed
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.QueryService
 import ch.dnsmap.dnsm.domain.service.QueryServiceTest
@@ -19,12 +26,25 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.junit5.KoinTestExtension
+import java.net.InetAddress
+import kotlin.time.Duration
 
 class DotCommandTest : KoinTest {
 
     class TestResultService : ResultService {
         override fun run(): Result {
-            return Result.emptyResult()
+            return emptyResult()
+        }
+
+        private fun emptyResult(): Result {
+            val connectionResult =
+                ConnectionResult(InetAddress.getByName("127.0.0.1"), Port(53, Protocol.UDP))
+            val queryResult = QueryResult(emptyList(), emptyList(), "", AnswerResultType.NO_ERROR)
+            return Result(
+                emptyList(),
+                ConnectionResultTimed(connectionResult, Duration.ZERO),
+                QueryResultTimed(listOf(queryResult), Duration.ZERO)
+            )
         }
     }
 

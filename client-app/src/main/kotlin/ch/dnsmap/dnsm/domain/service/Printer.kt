@@ -41,8 +41,9 @@ class Printer {
 
     fun summary(result: Result): String {
         val queryTotal = result.tasks.size
-        val answerTotal = result.responses.size
-        val elapsed = formatDuration(result.duration)
+        val answerTotal = result.queryResultTimed.queryResults.size
+        val elapsed =
+            formatDuration(result.connectionResultTimed.duration + result.queryResultTimed.duration)
         return "Total queries sent/answers received $queryTotal/$answerTotal in $elapsed"
     }
 
