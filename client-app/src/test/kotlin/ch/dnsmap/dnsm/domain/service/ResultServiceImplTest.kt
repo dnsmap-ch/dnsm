@@ -38,7 +38,7 @@ class ResultServiceImplTest : KoinTest {
 
         val result = resultService.run()
 
-        assertThat(result.responses).containsExactlyInAnyOrder(
+        assertThat(result.queryResultTimed.queryResults).containsExactlyInAnyOrder(
             QueryResult(listOf("127.0.0.1"), emptyList(), "A", AnswerResultType.NO_ERROR),
             QueryResult(listOf("::1"), emptyList(), "AAAA", AnswerResultType.NO_ERROR)
         )

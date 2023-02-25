@@ -2,6 +2,8 @@ package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.domain.model.AnswerResultType
 import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
+import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import java.net.InetAddress
@@ -9,8 +11,8 @@ import java.net.InetAddress
 class QueryServiceTest : QueryService {
 
     override
-    fun connect(resolverHost: InetAddress, resolverPort: Port) {
-        // noop
+    fun connect(resolverHost: InetAddress, resolverPort: Port): ConnectionResult {
+        return ConnectionResult(InetAddress.getByName("127.0.0.1"), Port(53, UDP))
     }
 
     override

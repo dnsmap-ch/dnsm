@@ -1,6 +1,7 @@
 package ch.dnsmap.dnsm.domain.service.dot
 
 import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
@@ -16,8 +17,9 @@ class DotService(private val settings: ClientSettings) : QueryService {
     private var socket: Socket? = null
 
     override
-    fun connect(resolverHost: InetAddress, resolverPort: Port) {
+    fun connect(resolverHost: InetAddress, resolverPort: Port): ConnectionResult {
         socket = createSocket(resolverHost, resolverPort)
+        return ConnectionResult(resolverHost, resolverPort)
     }
 
     override

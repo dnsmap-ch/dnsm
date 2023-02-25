@@ -1,11 +1,14 @@
 package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.Domain
-import ch.dnsmap.dnsm.domain.model.AnswerResultType
+import ch.dnsmap.dnsm.domain.model.AnswerResultType.NO_ERROR
 import ch.dnsmap.dnsm.domain.model.Result
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
+import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
+import ch.dnsmap.dnsm.domain.model.query.ConnectionResultTimed
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
+import ch.dnsmap.dnsm.domain.model.query.QueryResultTimed
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.query.QueryType.A
 import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
@@ -14,6 +17,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -65,14 +69,14 @@ class PrinterTest {
 
     @Test
     fun testEmptySummary() {
-        val result = Printer().summary(Result.emptyResult())
+        val result = Printer().summary(emptyResult())
         assertThat(result).isEqualTo("Total queries sent/answers received 0/0 in 0s")
     }
 
     @Test
     fun testNonEmptySummary() {
         val result = Printer().summary(result())
-        assertThat(result).isEqualTo("Total queries sent/answers received 1/2 in 23.00s")
+        assertThat(result).isEqualTo("Total queries sent/answers received 1/2 in 1.08m")
     }
 
     private fun settings() = ClientSettingsPlain(
@@ -84,18 +88,33 @@ class PrinterTest {
     )
 
     private fun emptyIpQueryResponse(): QueryResult {
-        return QueryResult(emptyList(), emptyList(), "A", AnswerResultType.NO_ERROR)
+        return QueryResult(emptyList(), emptyList(), "A", NO_ERROR)
     }
 
     private fun queryResponse(): QueryResult {
-        return QueryResult(listOf("127.0.0.2"), emptyList(), "A", AnswerResultType.NO_ERROR)
+        return QueryResult(listOf("127.0.0.2"), emptyList(), "A", NO_ERROR)
+    }
+
+    private fun emptyResult(): Result {
+        val connectionResult = ConnectionResult(InetAddress.getByName("127.0.0.1"), Port(53, UDP))
+        val queryResult = QueryResult(emptyList(), emptyList(), "", NO_ERROR)
+        return Result(
+            emptyList(),
+            ConnectionResultTimed(connectionResult, Duration.ZERO),
+            QueryResultTimed(emptyList(), Duration.ZERO)
+        )
     }
 
     private fun result(): Result {
+        val connectionResult = ConnectionResult(InetAddress.getByName("127.0.0.1"), Port(53, UDP))
+        val queryResult = QueryResult(emptyList(), emptyList(), "", NO_ERROR)
         return Result(
-            23.toDuration(DurationUnit.SECONDS),
-            listOf(queryResponse(), queryResponse()),
-            listOf(QueryTask(Domain.of("example.com"), A))
+            listOf(QueryTask(Domain.of("example.com"), A)),
+            ConnectionResultTimed(connectionResult, 23.toDuration(DurationUnit.SECONDS)),
+            QueryResultTimed(
+                listOf(queryResponse(), queryResult),
+                42.toDuration(DurationUnit.SECONDS)
+            )
         )
     }
 }
