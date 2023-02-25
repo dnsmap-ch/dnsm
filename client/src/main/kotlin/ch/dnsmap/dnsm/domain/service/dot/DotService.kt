@@ -20,7 +20,7 @@ class DotService(private val settings: ClientSettings) : QueryService {
     ): List<QueryResult> {
         val socket = createSocket(resolverHost, resolverPort)
         val tcp = TcpService(settings, socket)
-        return tcp.query(resolverHost, resolverPort, queries)
+        return tcp.query(queries)
     }
 
     private fun createSocket(host: InetAddress, port: Port): SSLSocket {

@@ -19,6 +19,6 @@ class PlainTcpService(private val settings: ClientSettings) : QueryService {
     ): List<QueryResult> {
         val socket = Socket(resolverHost, resolverPort.port)
         val tcp = TcpService(settings, socket)
-        return tcp.query(resolverHost, resolverPort, queries)
+        return tcp.query(queries)
     }
 }
