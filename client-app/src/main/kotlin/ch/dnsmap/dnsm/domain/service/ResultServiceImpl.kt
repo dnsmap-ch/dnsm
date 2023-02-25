@@ -47,11 +47,8 @@ class ResultServiceImpl(
     @OptIn(ExperimentalTime::class)
     private fun execute(tasks: List<QueryTask>): TimedValue<List<QueryResult>> {
         return measureTimedValue {
-            queryService.query(
-                settings.resolverHost(),
-                settings.resolverPort(),
-                tasks
-            )
+            queryService.connect(settings.resolverHost(), settings.resolverPort())
+            queryService.query(tasks)
         }
     }
 }

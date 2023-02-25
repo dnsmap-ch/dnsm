@@ -7,19 +7,23 @@ import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 import ch.dnsmap.dnsm.domain.service.QueryService
 import ch.dnsmap.dnsm.domain.service.network.TcpService
 import java.net.InetAddress
+import java.net.Socket
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
 
 class DotService(private val settings: ClientSettings) : QueryService {
 
+    private var socket: Socket? = null
+
     override
-    fun query(
-        resolverHost: InetAddress,
-        resolverPort: Port,
-        queries: List<QueryTask>
-    ): List<QueryResult> {
-        val socket = createSocket(resolverHost, resolverPort)
-        val tcp = TcpService(settings, socket)
+    fun connect(resolverHost: InetAddress, resolverPort: Port) {
+        socket = createSocket(resolverHost, resolverPort)
+    }
+
+    override
+    fun query(queries: List<QueryTask>): List<QueryResult> {
+        requireNotNull(socket)
+        val tcp = TcpService(settings, socket!!)
         return tcp.query(queries)
     }
 

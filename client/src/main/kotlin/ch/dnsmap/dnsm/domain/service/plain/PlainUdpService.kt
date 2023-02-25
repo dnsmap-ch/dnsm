@@ -21,17 +21,25 @@ private const val BUFFER_SIZE = 4096
 
 class PlainUdpService(private val settings: ClientSettings) : QueryService {
 
+    private var socket: DatagramSocket? = null
+    private var resolverHost: InetAddress? = null
+    private var resolverPort: Port? = null
+
     override
-    fun query(
-        resolverHost: InetAddress,
-        resolverPort: Port,
-        queries: List<QueryTask>
-    ): List<QueryResult> {
+    fun connect(resolverHost: InetAddress, resolverPort: Port) {
+        socket = DatagramSocket()
+        this.resolverHost = resolverHost
+        this.resolverPort = resolverPort
+    }
+
+    override
+    fun query(queries: List<QueryTask>): List<QueryResult> {
         val resultList = mutableListOf<QueryResult>()
         val latch = CountDownLatch(1)
-        val pairOfDisposable = DatagramSocket().use { s ->
+        requireNotNull(socket)
+        val pairOfDisposable = socket!!.use { s ->
             val receiver = startListener(s, queries, resultList, latch)
-            val sender = startSender(resolverHost, resolverPort, s, queries)
+            val sender = startSender(s, queries)
             latch.await(settings.timeout().first, settings.timeout().second)
             Pair(receiver, sender)
         }
@@ -78,18 +86,13 @@ class PlainUdpService(private val settings: ClientSettings) : QueryService {
         return disposable
     }
 
-    private fun startSender(
-        resolverHost: InetAddress,
-        resolverPort: Port,
-        socket: DatagramSocket,
-        queries: List<QueryTask>
-    ): Disposable {
+    private fun startSender(socket: DatagramSocket, queries: List<QueryTask>): Disposable {
+        requireNotNull(resolverHost)
+        requireNotNull(resolverPort)
         val parserOptionsOut = ParserOptions.Builder.builder().build()
         return Observable.fromIterable(queries)
             .map { messageBytes(it, parserOptionsOut) }
-            .map { rawBytes ->
-                DatagramPacket(rawBytes, rawBytes.size, resolverHost, resolverPort.port)
-            }
-            .subscribe { msg -> socket.send(msg) }
+            .map { DatagramPacket(it, it.size, resolverHost!!, resolverPort!!.port) }
+            .subscribe { socket.send(it) }
     }
 }
