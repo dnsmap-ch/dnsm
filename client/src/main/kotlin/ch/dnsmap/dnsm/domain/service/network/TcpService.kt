@@ -1,32 +1,24 @@
 package ch.dnsmap.dnsm.domain.service.network
 
 import ch.dnsmap.dnsm.domain.infrastructure.messageBytes
-import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.query.queryResponse
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
-import ch.dnsmap.dnsm.domain.service.QueryService
 import ch.dnsmap.dnsm.wire.ParserOptions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.net.InetAddress
 import java.net.Socket
 import java.net.SocketException
 import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 
-class TcpService(private val settings: ClientSettings, private val socket: Socket) : QueryService {
+class TcpService(private val settings: ClientSettings, private val socket: Socket) {
 
-    override
-    fun query(
-        resolverHost: InetAddress,
-        resolverPort: Port,
-        queries: List<QueryTask>
-    ): List<QueryResult> {
+    fun query(queries: List<QueryTask>): List<QueryResult> {
         val resultList = mutableListOf<QueryResult>()
         val latch = CountDownLatch(1)
         val pairOfDisposable = socket.use { s ->
