@@ -11,14 +11,19 @@ import java.net.Socket
 
 class PlainTcpService(private val settings: ClientSettings) : QueryService {
 
+    private var socket: Socket? = null
+
+    override
+    fun connect(resolverHost: InetAddress, resolverPort: Port) {
+        socket = Socket(resolverHost, resolverPort.port)
+    }
+
     override
     fun query(
-        resolverHost: InetAddress,
-        resolverPort: Port,
         queries: List<QueryTask>
     ): List<QueryResult> {
-        val socket = Socket(resolverHost, resolverPort.port)
-        val tcp = TcpService(settings, socket)
+        requireNotNull(socket)
+        val tcp = TcpService(settings, socket!!)
         return tcp.query(queries)
     }
 }

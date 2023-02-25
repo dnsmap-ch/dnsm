@@ -7,5 +7,7 @@ import java.net.InetAddress
 
 interface QueryService {
 
-    fun query(resolverHost: InetAddress, resolverPort: Port, queries: List<QueryTask>): List<QueryResult>
+    fun connect(resolverHost: InetAddress, resolverPort: Port)
+
+    fun query(queries: List<QueryTask>): List<QueryResult>
 }

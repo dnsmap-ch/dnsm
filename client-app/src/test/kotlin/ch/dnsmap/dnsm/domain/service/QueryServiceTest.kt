@@ -8,11 +8,13 @@ import java.net.InetAddress
 
 class QueryServiceTest : QueryService {
 
-    override fun query(
-        resolverHost: InetAddress,
-        resolverPort: Port,
-        queries: List<QueryTask>
-    ): List<QueryResult> {
+    override
+    fun connect(resolverHost: InetAddress, resolverPort: Port) {
+        // noop
+    }
+
+    override
+    fun query(queries: List<QueryTask>): List<QueryResult> {
         return listOf(
             QueryResult(listOf("127.0.0.1"), emptyList(), "A", AnswerResultType.NO_ERROR),
             QueryResult(listOf("::1"), emptyList(), "AAAA", AnswerResultType.NO_ERROR)
