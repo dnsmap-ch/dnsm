@@ -29,7 +29,7 @@ fun main(args: Array<String>) {
     }
 
     DnsmClientApp()
-        .versionOption(version = "0.3.0", names = setOf("-V", "--version"))
+        .versionOption(version = "0.4.0-SNAPSHOT", names = setOf("-V", "--version"))
         .subcommands(
             DotCommand(Printer()),
             PlainCommand(Printer()),
