@@ -7,30 +7,41 @@ import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
 data class ClientSettingsPlain(
-    val resolverHost: InetAddress,
+    val resolverHost: String,
+    val resolverIp: InetAddress,
     val resolverPort: Port,
     val name: Domain,
     val types: List<QueryType>,
     val timeout: Pair<Long, TimeUnit>
 ) : ClientSettings {
 
-    override fun resolverHost(): InetAddress {
+    override
+    fun resolverHost(): String {
         return resolverHost
     }
 
-    override fun resolverPort(): Port {
+    override
+    fun resolverIp(): InetAddress {
+        return resolverIp
+    }
+
+    override
+    fun resolverPort(): Port {
         return resolverPort
     }
 
-    override fun name(): Domain {
+    override
+    fun name(): Domain {
         return name
     }
 
-    override fun types(): List<QueryType> {
+    override
+    fun types(): List<QueryType> {
         return types
     }
 
-    override fun timeout(): Pair<Long, TimeUnit> {
+    override
+    fun timeout(): Pair<Long, TimeUnit> {
         return timeout
     }
 }

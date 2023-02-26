@@ -49,6 +49,7 @@ class ResultServiceImplTest : KoinTest {
     }
 
     private fun settings() = ClientSettingsPlain(
+        "localhost",
         InetAddress.getByName("127.0.0.1"),
         Port(53, Protocol.UDP),
         Domain.of("example.com"),

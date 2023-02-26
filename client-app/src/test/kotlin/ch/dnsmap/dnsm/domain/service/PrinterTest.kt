@@ -26,9 +26,15 @@ class PrinterTest {
     private val domainExampleCom = Domain.of("example.com")
 
     @Test
-    fun testHeader() {
+    fun testHeaderWithIpResolver() {
+        val result = Printer().header(settings("127.0.0.1"))
+        assertThat(result).isEqualTo("\nQuery DNS server 127.0.0.1 over 53/udp")
+    }
+
+    @Test
+    fun testHeaderWithHostnameResolver() {
         val result = Printer().header(settings())
-        assertThat(result).isEqualTo("Query 127.0.0.1:53/udp")
+        assertThat(result).isEqualTo("\nQuery DNS server localhost/127.0.0.1 over 53/udp")
     }
 
     @Test
@@ -43,7 +49,7 @@ class PrinterTest {
         val result = Printer().answer(settings(), listOf(queryResponse()))
         assertThat(result.size).isEqualTo(3)
         assertThat(result[0]).isEqualTo("H: NO_ERROR")
-        assertThat(result[1]).isEqualTo("Q: example.com. A -> 127.0.0.1:53/udp")
+        assertThat(result[1]).isEqualTo("Q: example.com. A")
         assertThat(result[2]).isEqualTo("A: 127.0.0.2")
     }
 
@@ -52,10 +58,10 @@ class PrinterTest {
         val result = Printer().answer(settings(), listOf(queryResponse(), queryResponse()))
         assertThat(result.size).isEqualTo(6)
         assertThat(result[0]).isEqualTo("H: NO_ERROR")
-        assertThat(result[1]).isEqualTo("Q: example.com. A -> 127.0.0.1:53/udp")
+        assertThat(result[1]).isEqualTo("Q: example.com. A")
         assertThat(result[2]).isEqualTo("A: 127.0.0.2")
         assertThat(result[3]).isEqualTo("H: NO_ERROR")
-        assertThat(result[4]).isEqualTo("Q: example.com. A -> 127.0.0.1:53/udp")
+        assertThat(result[4]).isEqualTo("Q: example.com. A")
         assertThat(result[5]).isEqualTo("A: 127.0.0.2")
     }
 
@@ -64,7 +70,7 @@ class PrinterTest {
         val result = Printer().answer(settings(), listOf(emptyIpQueryResponse()))
         assertThat(result.size).isEqualTo(2)
         assertThat(result[0]).isEqualTo("H: NO_ERROR")
-        assertThat(result[1]).isEqualTo("Q: example.com. A -> 127.0.0.1:53/udp")
+        assertThat(result[1]).isEqualTo("Q: example.com. A")
     }
 
     @Test
@@ -79,7 +85,17 @@ class PrinterTest {
         assertThat(result).isEqualTo("Total queries sent/answers received 1/2 in 1.08m")
     }
 
+    private fun settings(ip: String) = ClientSettingsPlain(
+        ip,
+        InetAddress.getByName(ip),
+        Port(53, UDP),
+        domainExampleCom,
+        listOf(AAAA, A),
+        Pair(5, SECONDS)
+    )
+
     private fun settings() = ClientSettingsPlain(
+        "localhost",
         InetAddress.getByName("127.0.0.1"),
         Port(53, UDP),
         domainExampleCom,
@@ -97,7 +113,6 @@ class PrinterTest {
 
     private fun emptyResult(): Result {
         val connectionResult = ConnectionResult(InetAddress.getByName("127.0.0.1"), Port(53, UDP))
-        val queryResult = QueryResult(emptyList(), emptyList(), "", NO_ERROR)
         return Result(
             emptyList(),
             ConnectionResultTimed(connectionResult, Duration.ZERO),

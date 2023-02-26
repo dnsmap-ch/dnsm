@@ -8,7 +8,8 @@ import java.util.concurrent.TimeUnit
 
 interface ClientSettings {
 
-    fun resolverHost(): InetAddress
+    fun resolverHost(): String
+    fun resolverIp(): InetAddress
     fun resolverPort(): Port
     fun name(): Domain
     fun types(): List<QueryType>
