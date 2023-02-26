@@ -8,6 +8,7 @@ import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.ResultService
+import ch.dnsmap.dnsm.domain.service.StubResolverService
 import ch.dnsmap.dnsm.domain.service.parseInputType
 import ch.dnsmap.dnsm.domain.service.parsePort
 import ch.dnsmap.dnsm.infrastructure.modules.MODULE_PLAIN
@@ -24,7 +25,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
-import java.net.InetAddress
 import java.util.concurrent.TimeUnit.SECONDS
 
 private const val DEFAULT_PORT_NUMBER = 53
@@ -51,9 +51,12 @@ class PlainCommand(
     private val resolverHost by option(
         "-r",
         "--resolver",
-        help = "DNS server to send the messages to."
+        help = """
+            DNS server to send the messages to.
+            Host stub resolver is used to translate a hostname into an IP address, if a hostname is
+            specified."""
+            .trimIndent()
     )
-        .convert { InetAddress.getByName(it) }
         .required()
 
     private val resolverPort by option(
@@ -96,9 +99,19 @@ class PlainCommand(
         .restrictTo(1)
         .default(DEFAULT_TIMEOUT_SECOND)
 
+    private val stubResolverService: StubResolverService by inject()
+
     override fun run() {
+        val resolverIp = stubResolverService.resolve(resolverHost)
         val settings =
-            ClientSettingsPlain(resolverHost, resolverPort, name, types, Pair(timeout, SECONDS))
+            ClientSettingsPlain(
+                resolverHost,
+                resolverIp,
+                resolverPort,
+                name,
+                types,
+                Pair(timeout, SECONDS)
+            )
         echo(printer.header(settings))
         val resultService: ResultService by inject(qualifier = named(MODULE_PLAIN)) {
             parametersOf(

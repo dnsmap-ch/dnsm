@@ -30,7 +30,7 @@ class ResultServiceImpl(
             println(
                 "error: " +
                     (
-                        "While connecting to ${settings.resolverHost().hostName}:" +
+                        "While connecting to ${settings.resolverIp().hostAddress} on " +
                             "${settings.resolverPort().asString()}: ${e.message}"
                         )
             )
@@ -47,7 +47,7 @@ class ResultServiceImpl(
     @OptIn(ExperimentalTime::class)
     private fun connectToServer(settings: ClientSettings): ConnectionResultTimed {
         val timedValue = measureTimedValue {
-            queryService.connect(settings.resolverHost(), settings.resolverPort())
+            queryService.connect(settings.resolverIp(), settings.resolverPort())
         }
         return ConnectionResultTimed(timedValue.value, timedValue.duration)
     }

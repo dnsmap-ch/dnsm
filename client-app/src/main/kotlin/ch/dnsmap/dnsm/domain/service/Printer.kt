@@ -9,8 +9,12 @@ import kotlin.time.DurationUnit
 class Printer {
 
     fun header(settings: ClientSettings): String {
-        val protocol = settings.resolverPort().protocol
-        return "Query ${settings.resolverHost().hostAddress}:${settings.resolverPort().port}/${protocol.printName}"
+        val server = if (settings.resolverHost() == settings.resolverIp().hostAddress) {
+            settings.resolverHost()
+        } else {
+            settings.resolverHost() + '/' + settings.resolverIp().hostAddress
+        }
+        return "\nQuery DNS server $server over ${settings.resolverPort().asString()}"
     }
 
     fun answer(settings: ClientSettings, answers: List<QueryResult>): List<String> {
@@ -35,8 +39,7 @@ class Printer {
         settings: ClientSettings
     ) = listOf(
         "H: ${queryResult.answerResultType}",
-        "Q: ${settings.name().canonical} ${queryResult.queryType} -> " +
-            "${settings.resolverHost().hostAddress}:${settings.resolverPort().asString()}"
+        "Q: ${settings.name().canonical} ${queryResult.queryType}"
     )
 
     fun summary(result: Result): String {
