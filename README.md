@@ -3,4 +3,10 @@
 
 # dnsmap
 
-Library and tools to play around with the DNS protocol
+Library and tools to play around with the DNS protocol.
+
+Project consists of the following modules:
+
+* [client-app](client/) - DNS CLI client application
+* [client](client/) - DNS networking client library
+* [core](core/) - DNS message parsing library
