@@ -22,6 +22,8 @@ import com.github.ajalt.clikt.core.UsageError
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -53,8 +55,9 @@ class DotCommandTest : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
         modules(
             module {
-                single { QueryServiceTest() } bind QueryService::class
-                single { StubResolverService() }
+                singleOf(::Printer)
+                singleOf(::QueryServiceTest) { bind<QueryService>() }
+                singleOf(::StubResolverService)
                 single(named(MODULE_DOT)) { TestResultService() } bind ResultService::class
             }
         )
@@ -62,28 +65,28 @@ class DotCommandTest : KoinTest {
 
     @Test
     fun testEmptyArgList() {
-        assertThatThrownBy { DotCommand(Printer()).parse(emptyList()) }
+        assertThatThrownBy { DotCommand().parse(emptyList()) }
             .isInstanceOf(MissingOption::class.java)
             .hasMessage("Missing option \"--resolver\"")
     }
 
     @Test
     fun testNonsenseArgList() {
-        assertThatThrownBy { DotCommand(Printer()).parse(listOf("foo", "bar")) }
+        assertThatThrownBy { DotCommand().parse(listOf("foo", "bar")) }
             .isInstanceOf(UsageError::class.java)
             .hasMessage("Got unexpected extra arguments (foo bar)")
     }
 
     @Test
     fun testHelp() {
-        assertThatThrownBy { DotCommand(Printer()).parse(listOf("--help")) }
+        assertThatThrownBy { DotCommand().parse(listOf("--help")) }
             .isInstanceOf(PrintHelpMessage::class.java)
     }
 
     @Test
     fun testResolverButMissingName() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "--resolver",
                     "localhost"
@@ -96,10 +99,10 @@ class DotCommandTest : KoinTest {
 
     @Test
     fun testMinimalArgSet() {
-        DotCommand(Printer()).parse(
+        DotCommand().parse(
             listOf("-r", "localhost", "-n", "example.com")
         )
-        DotCommand(Printer()).parse(
+        DotCommand().parse(
             listOf("--resolver", "localhost", "--name", "example.com")
         )
     }
@@ -107,7 +110,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testInvalidLabelName() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -122,16 +125,16 @@ class DotCommandTest : KoinTest {
 
     @Test
     fun testValidPorts() {
-        DotCommand(Printer()).parse(
+        DotCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "-p", "53")
         )
-        DotCommand(Printer()).parse(
+        DotCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "--port", "53")
         )
-        DotCommand(Printer()).parse(
+        DotCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "-p", "53/udp")
         )
-        DotCommand(Printer()).parse(
+        DotCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "-p", "53/tcp")
         )
     }
@@ -139,7 +142,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testInvalidZeroPort() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -157,7 +160,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testInvalidNegativePort() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -175,7 +178,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testInvalidToHighPort() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -193,7 +196,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testInvalidPort() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -210,10 +213,10 @@ class DotCommandTest : KoinTest {
 
     @Test
     fun testValidType() {
-        DotCommand(Printer()).parse(
+        DotCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "-t", "a,A,AAAA")
         )
-        DotCommand(Printer()).parse(
+        DotCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "--type", "a,A,AAAA")
         )
     }
@@ -221,7 +224,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testMissingValueForType() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -238,7 +241,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testInvalidType() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -256,7 +259,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testInvalidNegativeTimeout() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -274,7 +277,7 @@ class DotCommandTest : KoinTest {
     @Test
     fun testInvalidNonNumberTimeout() {
         assertThatThrownBy {
-            DotCommand(Printer()).parse(
+            DotCommand().parse(
                 listOf(
                     "-r",
                     "localhost",

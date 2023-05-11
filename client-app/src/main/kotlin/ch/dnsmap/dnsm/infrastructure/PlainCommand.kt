@@ -30,9 +30,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 private const val DEFAULT_PORT_NUMBER = 53
 private const val DEFAULT_TIMEOUT_SECOND: Long = 3
 
-class PlainCommand(
-    private val printer: Printer,
-) :
+class PlainCommand :
     CliktCommand(
         name = "plain",
         help = "Send DNS query over plaintext UDP/TCP to DNS server."
@@ -100,6 +98,7 @@ class PlainCommand(
         .default(DEFAULT_TIMEOUT_SECOND)
 
     private val stubResolverService: StubResolverService by inject()
+    private val printer: Printer by inject()
 
     override fun run() {
         val resolverIp = stubResolverService.resolve(resolverHost)

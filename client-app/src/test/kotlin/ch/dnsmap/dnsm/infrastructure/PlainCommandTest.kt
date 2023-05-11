@@ -22,6 +22,8 @@ import com.github.ajalt.clikt.core.UsageError
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -53,8 +55,9 @@ class PlainCommandTest : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
         modules(
             module {
-                single { QueryServiceTest() } bind QueryService::class
-                single { StubResolverService() }
+                singleOf(::Printer)
+                singleOf(::QueryServiceTest) { bind<QueryService>() }
+                singleOf(::StubResolverService)
                 single(named(MODULE_PLAIN)) { TestResultService() } bind ResultService::class
             }
         )
@@ -62,60 +65,60 @@ class PlainCommandTest : KoinTest {
 
     @Test
     fun testEmptyArgList() {
-        assertThatThrownBy { PlainCommand(Printer()).parse(emptyList()) }
+        assertThatThrownBy { PlainCommand().parse(emptyList()) }
             .isInstanceOf(MissingOption::class.java)
             .hasMessage("Missing option \"--resolver\"")
     }
 
     @Test
     fun testNonsenseArgList() {
-        assertThatThrownBy { PlainCommand(Printer()).parse(listOf("foo", "bar")) }
+        assertThatThrownBy { PlainCommand().parse(listOf("foo", "bar")) }
             .isInstanceOf(UsageError::class.java)
             .hasMessage("Got unexpected extra arguments (foo bar)")
     }
 
     @Test
     fun testHelp() {
-        assertThatThrownBy { PlainCommand(Printer()).parse(listOf("--help")) }
+        assertThatThrownBy { PlainCommand().parse(listOf("--help")) }
             .isInstanceOf(PrintHelpMessage::class.java)
     }
 
     @Test
     fun testResolverButMissingName() {
-        assertThatThrownBy { PlainCommand(Printer()).parse(listOf("--resolver", "localhost")) }
+        assertThatThrownBy { PlainCommand().parse(listOf("--resolver", "localhost")) }
             .isInstanceOf(MissingOption::class.java)
             .hasMessage("Missing option \"--name\"")
     }
 
     @Test
     fun testMinimalArgSet() {
-        PlainCommand(Printer()).parse(
+        PlainCommand().parse(
             listOf("-r", "localhost", "-n", "example.com")
         )
-        PlainCommand(Printer()).parse(
+        PlainCommand().parse(
             listOf("--resolver", "localhost", "--name", "example.com")
         )
     }
 
     @Test
     fun testInvalidLabelName() {
-        assertThatThrownBy { PlainCommand(Printer()).parse(listOf("-r", "localhost", "-n", "111")) }
+        assertThatThrownBy { PlainCommand().parse(listOf("-r", "localhost", "-n", "111")) }
             .isInstanceOf(BadParameterValue::class.java)
             .hasMessage("Invalid value for \"-n\": label must start with alpha character")
     }
 
     @Test
     fun testValidPorts() {
-        PlainCommand(Printer()).parse(
+        PlainCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "-p", "53")
         )
-        PlainCommand(Printer()).parse(
+        PlainCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "--port", "53")
         )
-        PlainCommand(Printer()).parse(
+        PlainCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "-p", "53/udp")
         )
-        PlainCommand(Printer()).parse(
+        PlainCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "-p", "53/tcp")
         )
     }
@@ -123,7 +126,7 @@ class PlainCommandTest : KoinTest {
     @Test
     fun testInvalidZeroPort() {
         assertThatThrownBy {
-            PlainCommand(Printer()).parse(
+            PlainCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -141,7 +144,7 @@ class PlainCommandTest : KoinTest {
     @Test
     fun testInvalidNegativePort() {
         assertThatThrownBy {
-            PlainCommand(Printer()).parse(
+            PlainCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -159,7 +162,7 @@ class PlainCommandTest : KoinTest {
     @Test
     fun testInvalidToHighPort() {
         assertThatThrownBy {
-            PlainCommand(Printer()).parse(
+            PlainCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -177,7 +180,7 @@ class PlainCommandTest : KoinTest {
     @Test
     fun testInvalidPort() {
         assertThatThrownBy {
-            PlainCommand(Printer()).parse(
+            PlainCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -194,10 +197,10 @@ class PlainCommandTest : KoinTest {
 
     @Test
     fun testValidType() {
-        PlainCommand(Printer()).parse(
+        PlainCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "-t", "a,A,AAAA")
         )
-        PlainCommand(Printer()).parse(
+        PlainCommand().parse(
             listOf("-r", "localhost", "-n", "example.com", "--type", "a,A,AAAA")
         )
     }
@@ -205,7 +208,7 @@ class PlainCommandTest : KoinTest {
     @Test
     fun testMissingValueForType() {
         assertThatThrownBy {
-            PlainCommand(Printer()).parse(
+            PlainCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -222,7 +225,7 @@ class PlainCommandTest : KoinTest {
     @Test
     fun testInvalidType() {
         assertThatThrownBy {
-            PlainCommand(Printer()).parse(
+            PlainCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -240,7 +243,7 @@ class PlainCommandTest : KoinTest {
     @Test
     fun testInvalidNegativeTimeout() {
         assertThatThrownBy {
-            PlainCommand(Printer()).parse(
+            PlainCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
@@ -258,7 +261,7 @@ class PlainCommandTest : KoinTest {
     @Test
     fun testInvalidNonNumberTimeout() {
         assertThatThrownBy {
-            PlainCommand(Printer()).parse(
+            PlainCommand().parse(
                 listOf(
                     "-r",
                     "localhost",
