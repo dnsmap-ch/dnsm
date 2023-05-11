@@ -7,7 +7,7 @@ class StubResolverServiceTest {
 
     @Test
     fun testIpResolution() {
-        val result = StubResolverService().resolve("127.0.0.1")
+        val result = StubResolverServiceImpl().resolve("127.0.0.1")
         assertThat(result.hostAddress).isEqualTo("127.0.0.1")
     }
 }

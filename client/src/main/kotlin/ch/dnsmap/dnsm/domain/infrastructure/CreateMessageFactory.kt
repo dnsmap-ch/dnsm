@@ -18,39 +18,55 @@ import ch.dnsmap.dnsm.wire.DnsOutput
 import ch.dnsmap.dnsm.wire.ParserOptions
 
 fun messageBytes(task: QueryTask, parserOptions: ParserOptions): ByteArray {
-    val msg = createQuery(task.name, task.type)
-    val dnsOutput =
-        DnsOutput.toWire(
-            parserOptions,
-            msg.header,
-            msg.question,
-            emptyList(),
-            emptyList(),
-            emptyList()
-        )
-    return dnsOutput.message
+    val msg = createQuery(task.name, task.type, header(HeaderId.ofRandom()))
+    return createDnsOutput(parserOptions, msg).message
 }
 
-private fun createQuery(name: Domain, type: QueryType): Message {
+fun messageBytesZeroId(task: QueryTask, parserOptions: ParserOptions): ByteArray {
+    val msg = createQuery(task.name, task.type, header(HeaderId.ofZero()))
+    return createDnsOutput(parserOptions, msg).message
+}
+
+private fun createQuery(name: Domain, type: QueryType, header: Header): Message {
     return when (type) {
-        QueryType.A -> createAQuery(name)
-        QueryType.AAAA -> createAaaaQuery(name)
+        QueryType.A -> createAQuery(name, header)
+        QueryType.AAAA -> createAaaaQuery(name, header)
     }
 }
 
-private fun createAQuery(name: Domain): Message {
-    return createMessage(Question(name, DnsQueryType.A, DnsQueryClass.IN))
+private fun createAQuery(name: Domain, header: Header): Message {
+    return createMessage(
+        header,
+        Question(name, DnsQueryType.A, DnsQueryClass.IN)
+    )
 }
 
-private fun createAaaaQuery(name: Domain): Message {
-    return createMessage(Question(name, DnsQueryType.AAAA, DnsQueryClass.IN))
+private fun createAaaaQuery(name: Domain, header: Header): Message {
+    return createMessage(
+        header,
+        Question(name, DnsQueryType.AAAA, DnsQueryClass.IN)
+    )
 }
 
-private fun createMessage(question: Question): Message {
-    val header = Header(
-        HeaderId.ofRandom(),
+private fun createMessage(header: Header, question: Question): Message {
+    return Message(header, question, null, null, null)
+}
+
+private fun header(headerId: HeaderId): Header {
+    return Header(
+        headerId,
         HeaderFlags(HeaderOpcode.QUERY, HeaderRcode.NO_ERROR, HeaderBitFlags.RD),
         HeaderCount.of(1, 0, 0, 0)
     )
-    return Message(header, question, null, null, null)
+}
+
+private fun createDnsOutput(parserOptions: ParserOptions, msg: Message): DnsOutput {
+    return DnsOutput.toWire(
+        parserOptions,
+        msg.header,
+        msg.question,
+        emptyList(),
+        emptyList(),
+        emptyList()
+    )
 }

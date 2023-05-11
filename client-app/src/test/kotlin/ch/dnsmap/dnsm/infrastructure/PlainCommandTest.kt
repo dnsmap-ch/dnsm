@@ -8,6 +8,7 @@ import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
 import ch.dnsmap.dnsm.domain.model.query.ConnectionResultTimed
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryResultTimed
+import ch.dnsmap.dnsm.domain.service.DummyStubResolverServiceImpl
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.QueryService
 import ch.dnsmap.dnsm.domain.service.QueryServiceTest
@@ -57,7 +58,7 @@ class PlainCommandTest : KoinTest {
             module {
                 singleOf(::Printer)
                 singleOf(::QueryServiceTest) { bind<QueryService>() }
-                singleOf(::StubResolverService)
+                singleOf(::DummyStubResolverServiceImpl) { bind<StubResolverService>() }
                 single(named(MODULE_PLAIN)) { TestResultService() } bind ResultService::class
             }
         )
@@ -109,18 +110,10 @@ class PlainCommandTest : KoinTest {
 
     @Test
     fun testValidPorts() {
-        PlainCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "-p", "53")
-        )
-        PlainCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "--port", "53")
-        )
-        PlainCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "-p", "53/udp")
-        )
-        PlainCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "-p", "53/tcp")
-        )
+        PlainCommand().parse(listOf("-r", "localhost", "-n", "example.com", "-p", "53"))
+        PlainCommand().parse(listOf("-r", "localhost", "-n", "example.com", "--port", "53"))
+        PlainCommand().parse(listOf("-r", "localhost", "-n", "example.com", "-p", "53/udp"))
+        PlainCommand().parse(listOf("-r", "localhost", "-n", "example.com", "-p", "53/tcp"))
     }
 
     @Test

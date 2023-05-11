@@ -15,6 +15,7 @@ repositories {
 dependencies {
     implementation(libs.clikt)
     implementation(libs.kotlin.stdlib.jdk8)
+    implementation(libs.okhttp)
     implementation(libs.rxjava)
     implementation(platform(libs.kotlin.bom))
     api(project(":core"))

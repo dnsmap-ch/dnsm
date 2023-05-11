@@ -1,17 +1,17 @@
 package ch.dnsmap.dnsm.infrastructure
 
 import ch.dnsmap.dnsm.Domain
+import ch.dnsmap.dnsm.domain.model.HttpMethod
+import ch.dnsmap.dnsm.domain.model.HttpMethod.POST
 import ch.dnsmap.dnsm.domain.model.networking.Port
-import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
-import ch.dnsmap.dnsm.domain.model.query.QueryType.A
-import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
-import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
+import ch.dnsmap.dnsm.domain.model.networking.Protocol.TCP
+import ch.dnsmap.dnsm.domain.model.query.QueryType
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDohImpl
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.ResultService
 import ch.dnsmap.dnsm.domain.service.StubResolverService
 import ch.dnsmap.dnsm.domain.service.parseInputType
-import ch.dnsmap.dnsm.domain.service.parsePort
-import ch.dnsmap.dnsm.infrastructure.modules.MODULE_PLAIN
+import ch.dnsmap.dnsm.infrastructure.modules.MODULE_DOH
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.output.CliktHelpFormatter
@@ -19,21 +19,23 @@ import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.long
 import com.github.ajalt.clikt.parameters.types.restrictTo
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
-import java.util.concurrent.TimeUnit.SECONDS
+import java.net.URI
+import java.util.concurrent.TimeUnit
 
-private const val DEFAULT_PORT_NUMBER = 53
+private const val DEFAULT_PORT_NUMBER = 443
 private const val DEFAULT_TIMEOUT_SECOND: Long = 3
 
-class PlainCommand :
+class DohCommand :
     CliktCommand(
-        name = "plain",
-        help = "Send DNS query over plaintext UDP/TCP to DNS server"
+        name = "doh",
+        help = "Send DNS query over DNS-over-HTTPS (DoH) to DNS server."
     ),
     KoinComponent {
 
@@ -46,30 +48,24 @@ class PlainCommand :
         }
     }
 
-    private val resolverHost by option(
-        "-r",
-        "--resolver",
+    private val resolverUrl by option(
+        "-u",
+        "--url",
         help = """
-            DNS server to send the messages to.
-            Host stub resolver is used to translate a hostname into an IP address, if a hostname is
-            specified."""
+            DNS server to send the messages to
+            """
             .trimIndent()
     )
         .required()
 
-    private val resolverPort by option(
-        "-p",
-        "--port",
+    private val method by option(
+        "-m",
+        "--method",
         help = """
-            Query a resolver on this port number and protocol.
-            Possible values are: '53', '53/udp' '53/tcp'
+            HTTP method to use to resolve the domain name
         """.trimIndent()
-    )
-        .convert { parsePort(it) }
-        .default(
-            Port(DEFAULT_PORT_NUMBER, UDP),
-            defaultForHelp = Port(DEFAULT_PORT_NUMBER, UDP).asString()
-        )
+    ).enum<HttpMethod>()
+        .default(POST)
 
     private val name by option(
         "-n",
@@ -86,7 +82,7 @@ class PlainCommand :
     )
         .convert { parseInputType(it) }
         .default(
-            listOf(A, AAAA),
+            listOf(QueryType.A, QueryType.AAAA),
             defaultForHelp = "Type A and AAAA query"
         )
     private val timeout: Long by option(
@@ -101,18 +97,21 @@ class PlainCommand :
     private val printer: Printer by inject()
 
     override fun run() {
-        val resolverIp = stubResolverService.resolve(resolverHost)
+        val hostname = URI.create(resolverUrl).host
+        val resolverIp = stubResolverService.resolve(hostname)
         val settings =
-            ClientSettingsPlain(
-                resolverHost,
+            ClientSettingsDohImpl(
+                hostname,
                 resolverIp,
-                resolverPort,
+                Port(DEFAULT_PORT_NUMBER, TCP),
                 name,
                 types,
-                Pair(timeout, SECONDS)
+                Pair(timeout, TimeUnit.SECONDS),
+                url = URI.create(resolverUrl),
+                method = method
             )
         echo(printer.header(settings))
-        val resultService: ResultService by inject(qualifier = named(MODULE_PLAIN)) {
+        val resultService: ResultService by inject(qualifier = named(MODULE_DOH)) {
             parametersOf(
                 settings
             )

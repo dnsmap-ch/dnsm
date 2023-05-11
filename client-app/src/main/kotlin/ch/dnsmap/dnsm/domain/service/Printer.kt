@@ -3,18 +3,36 @@ package ch.dnsmap.dnsm.domain.service
 import ch.dnsmap.dnsm.domain.model.Result
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDoh
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDot
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
+import java.io.Serializable
+import java.net.InetAddress
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 class Printer {
 
     fun header(settings: ClientSettings): String {
-        val server = if (settings.resolverHost() == settings.resolverIp().hostAddress) {
-            settings.resolverHost()
+        val server = resolveServerAddress(settings.resolverHost(), settings.resolverIp())
+        val protocol = inferProtocol(settings)
+        return "\nQuery DNS server $server over ${settings.resolverPort().asString()} ($protocol)"
+    }
+    private fun resolveServerAddress(host: String, address: InetAddress): String {
+        return if (host == address.hostAddress) {
+            host
         } else {
-            settings.resolverHost() + '/' + settings.resolverIp().hostAddress
+            host + '/' + address.hostAddress
         }
-        return "\nQuery DNS server $server over ${settings.resolverPort().asString()}"
+    }
+
+    private fun inferProtocol(settings: ClientSettings): Serializable {
+        return when (settings) {
+            is ClientSettingsDoh -> "DoH"
+            is ClientSettingsDot -> "DoT"
+            is ClientSettingsPlain -> "plain"
+            else -> RuntimeException("Invalid settings")
+        }
     }
 
     fun answer(settings: ClientSettings, answers: List<QueryResult>): List<String> {

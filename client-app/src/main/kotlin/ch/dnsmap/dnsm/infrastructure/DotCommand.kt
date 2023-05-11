@@ -32,7 +32,7 @@ private const val DEFAULT_TIMEOUT_SECOND: Long = 3
 class DotCommand :
     CliktCommand(
         name = "dot",
-        help = "Send DNS query over DoT to DNS server."
+        help = "Send DNS query over DNS-over-TLS (DoT) to DNS server"
     ),
     KoinComponent {
 

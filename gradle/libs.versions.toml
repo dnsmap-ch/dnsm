@@ -5,6 +5,7 @@ detekt = "1.22.0"
 jupiter = "5.8.1"
 koin = "3.3.2"
 kotlin = "1.8.0"
+okhttp = "4.11.0"
 rxjava = "3.1.6"
 
 [libraries]
@@ -17,6 +18,7 @@ koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 koin-test-junit5 = { module = "io.insert-koin:koin-test-junit5", version.ref = "koin" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom" }
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 rxjava = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
 
 [plugins]

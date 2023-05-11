@@ -8,6 +8,7 @@ import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
 import ch.dnsmap.dnsm.domain.model.query.ConnectionResultTimed
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryResultTimed
+import ch.dnsmap.dnsm.domain.service.DummyStubResolverServiceImpl
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.QueryService
 import ch.dnsmap.dnsm.domain.service.QueryServiceTest
@@ -57,7 +58,7 @@ class DotCommandTest : KoinTest {
             module {
                 singleOf(::Printer)
                 singleOf(::QueryServiceTest) { bind<QueryService>() }
-                singleOf(::StubResolverService)
+                singleOf(::DummyStubResolverServiceImpl) { bind<StubResolverService>() }
                 single(named(MODULE_DOT)) { TestResultService() } bind ResultService::class
             }
         )
@@ -85,58 +86,30 @@ class DotCommandTest : KoinTest {
 
     @Test
     fun testResolverButMissingName() {
-        assertThatThrownBy {
-            DotCommand().parse(
-                listOf(
-                    "--resolver",
-                    "localhost"
-                )
-            )
-        }
+        assertThatThrownBy { DotCommand().parse(listOf("--resolver", "localhost")) }
             .isInstanceOf(MissingOption::class.java)
             .hasMessage("Missing option \"--name\"")
     }
 
     @Test
     fun testMinimalArgSet() {
-        DotCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com")
-        )
-        DotCommand().parse(
-            listOf("--resolver", "localhost", "--name", "example.com")
-        )
+        DotCommand().parse(listOf("-r", "localhost", "-n", "example.com"))
+        DotCommand().parse(listOf("--resolver", "localhost", "--name", "example.com"))
     }
 
     @Test
     fun testInvalidLabelName() {
-        assertThatThrownBy {
-            DotCommand().parse(
-                listOf(
-                    "-r",
-                    "localhost",
-                    "-n",
-                    "111"
-                )
-            )
-        }
+        assertThatThrownBy { DotCommand().parse(listOf("-r", "localhost", "-n", "111")) }
             .isInstanceOf(BadParameterValue::class.java)
             .hasMessage("Invalid value for \"-n\": label must start with alpha character")
     }
 
     @Test
     fun testValidPorts() {
-        DotCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "-p", "53")
-        )
-        DotCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "--port", "53")
-        )
-        DotCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "-p", "53/udp")
-        )
-        DotCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "-p", "53/tcp")
-        )
+        DotCommand().parse(listOf("-r", "localhost", "-n", "example.com", "-p", "53"))
+        DotCommand().parse(listOf("-r", "localhost", "-n", "example.com", "--port", "53"))
+        DotCommand().parse(listOf("-r", "localhost", "-n", "example.com", "-p", "53/udp"))
+        DotCommand().parse(listOf("-r", "localhost", "-n", "example.com", "-p", "53/tcp"))
     }
 
     @Test
@@ -213,12 +186,8 @@ class DotCommandTest : KoinTest {
 
     @Test
     fun testValidType() {
-        DotCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "-t", "a,A,AAAA")
-        )
-        DotCommand().parse(
-            listOf("-r", "localhost", "-n", "example.com", "--type", "a,A,AAAA")
-        )
+        DotCommand().parse(listOf("-r", "localhost", "-n", "example.com", "-t", "a,A,AAAA"))
+        DotCommand().parse(listOf("-r", "localhost", "-n", "example.com", "--type", "a,A,AAAA"))
     }
 
     @Test
@@ -230,7 +199,7 @@ class DotCommandTest : KoinTest {
                     "localhost",
                     "-n",
                     "example.com",
-                    "-t",
+                    "-t"
                 )
             )
         }
