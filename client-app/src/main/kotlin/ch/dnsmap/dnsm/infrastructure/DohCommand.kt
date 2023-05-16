@@ -35,7 +35,7 @@ private const val DEFAULT_TIMEOUT_SECOND: Long = 3
 class DohCommand :
     CliktCommand(
         name = "doh",
-        help = "Send DNS query over DNS-over-HTTPS (DoH) to DNS server."
+        help = "DNS-over-HTTPS (DoH) client. Send DNS query to a DoH server."
     ),
     KoinComponent {
 
@@ -49,18 +49,15 @@ class DohCommand :
     }
 
     private val resolverUrl by option(
-        "-u",
-        "--url",
+        names = arrayOf("-u", "--url"),
         help = """
             DNS server to send the messages to
-            """
-            .trimIndent()
+            """.trimIndent()
     )
         .required()
 
     private val method by option(
-        "-m",
-        "--method",
+        names = arrayOf("-m", "--method"),
         help = """
             HTTP method to use to resolve the domain name
         """.trimIndent()
@@ -68,16 +65,14 @@ class DohCommand :
         .default(POST)
 
     private val name by option(
-        "-n",
-        "--name",
+        names = arrayOf("-n", "--name"),
         help = "DNS name to resolve"
     )
         .convert { Domain.of(it) }
         .required()
 
     private val types by option(
-        "-t",
-        "--type",
+        names = arrayOf("-t", "--type"),
         help = "DNS type to resolve the name"
     )
         .convert { parseInputType(it) }
@@ -86,7 +81,7 @@ class DohCommand :
             defaultForHelp = "Type A and AAAA query"
         )
     private val timeout: Long by option(
-        "--timeout",
+        names = arrayOf("--timeout"),
         help = "Timeout in seconds"
     )
         .long()
@@ -97,25 +92,31 @@ class DohCommand :
     private val printer: Printer by inject()
 
     override fun run() {
-        val hostname = URI.create(resolverUrl).host
+        val url = URI.create(resolverUrl)
+        val hostname = url.host
         val resolverIp = stubResolverService.resolve(hostname)
+        val parsePort = if (url.port == -1) { DEFAULT_PORT_NUMBER } else { url.port }
+        val resPort = Port(parsePort, TCP)
+
         val settings =
             ClientSettingsDohImpl(
-                hostname,
-                resolverIp,
-                Port(DEFAULT_PORT_NUMBER, TCP),
-                name,
-                types,
-                Pair(timeout, TimeUnit.SECONDS),
-                url = URI.create(resolverUrl),
+                resolverHost = hostname,
+                resolverIp = resolverIp,
+                resolverPort = resPort,
+                name = name,
+                types = types,
+                timeout = Pair(timeout, TimeUnit.SECONDS),
+                url = url,
                 method = method
             )
         echo(printer.header(settings))
+
         val resultService: ResultService by inject(qualifier = named(MODULE_DOH)) {
             parametersOf(
                 settings
             )
         }
+
         val result = resultService.run()
         printer.answer(settings, result.queryResultTimed.queryResults).forEach { echo(it) }
         echo(printer.summary(result))

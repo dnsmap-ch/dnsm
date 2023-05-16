@@ -1,6 +1,6 @@
 package ch.dnsmap.dnsm.infrastructure.modules
 
-import ch.dnsmap.dnsm.domain.model.networking.Protocol
+import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
 import ch.dnsmap.dnsm.domain.service.ResultService
 import ch.dnsmap.dnsm.domain.service.ResultServiceImpl
@@ -18,7 +18,7 @@ val plainModule = module {
 
 private fun provideService(params: ParametersHolder): ResultService {
     val settings: ClientSettingsPlain = params.get()
-    val service = if (settings.resolverPort.protocol == Protocol.UDP) {
+    val service = if (settings.resolverPort.protocol == UDP) {
         PlainUdpService(settings)
     } else {
         PlainTcpService(settings)

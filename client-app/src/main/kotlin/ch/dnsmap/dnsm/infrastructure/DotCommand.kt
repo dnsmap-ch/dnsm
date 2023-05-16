@@ -2,8 +2,9 @@ package ch.dnsmap.dnsm.infrastructure
 
 import ch.dnsmap.dnsm.Domain
 import ch.dnsmap.dnsm.domain.model.networking.Port
-import ch.dnsmap.dnsm.domain.model.networking.Protocol
-import ch.dnsmap.dnsm.domain.model.query.QueryType
+import ch.dnsmap.dnsm.domain.model.networking.Protocol.TCP
+import ch.dnsmap.dnsm.domain.model.query.QueryType.A
+import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDot
 import ch.dnsmap.dnsm.domain.service.Printer
 import ch.dnsmap.dnsm.domain.service.ResultService
@@ -32,7 +33,7 @@ private const val DEFAULT_TIMEOUT_SECOND: Long = 3
 class DotCommand :
     CliktCommand(
         name = "dot",
-        help = "Send DNS query over DNS-over-TLS (DoT) to DNS server"
+        help = "DNS-over-TLS (DoT) client. Send DNS query to a DoT server."
     ),
     KoinComponent {
 
@@ -46,8 +47,7 @@ class DotCommand :
     }
 
     private val resolverHost by option(
-        "-r",
-        "--resolver",
+        names = arrayOf("-r", "--resolver"),
         help = """
             DNS server to send the messages to.
             Host stub resolver is used to translate a hostname into an IP address, if a hostname is
@@ -57,8 +57,7 @@ class DotCommand :
         .required()
 
     private val resolverPort by option(
-        "-p",
-        "--port",
+        names = arrayOf("-p", "--port"),
         help = """
             Query a resolver on this port number and protocol.
             Possible values are: '853'
@@ -66,30 +65,28 @@ class DotCommand :
     )
         .convert { parsePort(it) }
         .default(
-            Port(DEFAULT_PORT_NUMBER, Protocol.TCP),
-            defaultForHelp = Port(DEFAULT_PORT_NUMBER, Protocol.TCP).asString()
+            value = Port(DEFAULT_PORT_NUMBER, TCP),
+            defaultForHelp = Port(DEFAULT_PORT_NUMBER, TCP).asString()
         )
 
     private val name by option(
-        "-n",
-        "--name",
+        names = arrayOf("-n", "--name"),
         help = "DNS name to resolve"
     )
         .convert { Domain.of(it) }
         .required()
 
     private val types by option(
-        "-t",
-        "--type",
+        names = arrayOf("-t", "--type"),
         help = "DNS type to resolve the name"
     )
         .convert { parseInputType(it) }
         .default(
-            listOf(QueryType.A, QueryType.AAAA),
+            value = listOf(A, AAAA),
             defaultForHelp = "Type A and AAAA query"
         )
     private val timeout: Long by option(
-        "--timeout",
+        names = arrayOf("--timeout"),
         help = "Timeout in seconds"
     )
         .long()
@@ -101,21 +98,24 @@ class DotCommand :
 
     override fun run() {
         val resolverIp = stubResolverService.resolve(resolverHost)
+
         val settings =
             ClientSettingsDot(
-                resolverHost,
-                resolverIp,
-                resolverPort,
-                name,
-                types,
-                Pair(timeout, SECONDS)
+                resolverHost = resolverHost,
+                resolverIp = resolverIp,
+                resolverPort = resolverPort,
+                name = name,
+                types = types,
+                timeout = Pair(timeout, SECONDS)
             )
+
         echo(printer.header(settings))
         val resultService: ResultService by inject(qualifier = named(MODULE_DOT)) {
             parametersOf(
                 settings
             )
         }
+
         val result = resultService.run()
         printer.answer(settings, result.queryResultTimed.queryResults).forEach { echo(it) }
         echo(printer.summary(result))

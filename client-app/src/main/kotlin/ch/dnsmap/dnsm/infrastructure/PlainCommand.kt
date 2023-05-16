@@ -33,7 +33,7 @@ private const val DEFAULT_TIMEOUT_SECOND: Long = 3
 class PlainCommand :
     CliktCommand(
         name = "plain",
-        help = "Send DNS query over plaintext UDP/TCP to DNS server"
+        help = "Plaintext DNS client. Send DNS query to a Do53 server."
     ),
     KoinComponent {
 
@@ -47,8 +47,7 @@ class PlainCommand :
     }
 
     private val resolverHost by option(
-        "-r",
-        "--resolver",
+        names = arrayOf("-r", "--resolver"),
         help = """
             DNS server to send the messages to.
             Host stub resolver is used to translate a hostname into an IP address, if a hostname is
@@ -58,8 +57,7 @@ class PlainCommand :
         .required()
 
     private val resolverPort by option(
-        "-p",
-        "--port",
+        names = arrayOf("-p", "--port"),
         help = """
             Query a resolver on this port number and protocol.
             Possible values are: '53', '53/udp' '53/tcp'
@@ -72,16 +70,14 @@ class PlainCommand :
         )
 
     private val name by option(
-        "-n",
-        "--name",
+        names = arrayOf("-n", "--name"),
         help = "DNS name to resolve"
     )
         .convert { Domain.of(it) }
         .required()
 
     private val types by option(
-        "-t",
-        "--type",
+        names = arrayOf("-t", "--type"),
         help = "DNS type to resolve the name"
     )
         .convert { parseInputType(it) }
@@ -90,7 +86,7 @@ class PlainCommand :
             defaultForHelp = "Type A and AAAA query"
         )
     private val timeout: Long by option(
-        "--timeout",
+        names = arrayOf("--timeout"),
         help = "Timeout in seconds"
     )
         .long()
@@ -104,19 +100,21 @@ class PlainCommand :
         val resolverIp = stubResolverService.resolve(resolverHost)
         val settings =
             ClientSettingsPlain(
-                resolverHost,
-                resolverIp,
-                resolverPort,
-                name,
-                types,
-                Pair(timeout, SECONDS)
+                resolverHost = resolverHost,
+                resolverIp = resolverIp,
+                resolverPort = resolverPort,
+                name = name,
+                types = types,
+                timeout = Pair(timeout, SECONDS)
             )
         echo(printer.header(settings))
+
         val resultService: ResultService by inject(qualifier = named(MODULE_PLAIN)) {
             parametersOf(
                 settings
             )
         }
+
         val result = resultService.run()
         printer.answer(settings, result.queryResultTimed.queryResults).forEach { echo(it) }
         echo(printer.summary(result))

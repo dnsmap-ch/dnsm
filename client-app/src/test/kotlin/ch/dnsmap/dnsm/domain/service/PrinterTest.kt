@@ -4,7 +4,6 @@ import ch.dnsmap.dnsm.Domain
 import ch.dnsmap.dnsm.domain.model.AnswerResultType.NO_ERROR
 import ch.dnsmap.dnsm.domain.model.Result
 import ch.dnsmap.dnsm.domain.model.networking.Port
-import ch.dnsmap.dnsm.domain.model.networking.Protocol.TCP
 import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
 import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
 import ch.dnsmap.dnsm.domain.model.query.ConnectionResultTimed
@@ -119,39 +118,37 @@ class PrinterTest {
     }
 
     private fun settingsPlain(ip: String) = ClientSettingsPlain(
-        ip,
-        InetAddress.getByName(ip),
-        Port(53, UDP),
-        domainExampleCom,
-        listOf(AAAA, A),
-        Pair(5, SECONDS)
+        resolverHost = ip,
+        resolverIp = InetAddress.getByName(ip),
+        name = domainExampleCom,
+        types = listOf(AAAA, A),
+        timeout = Pair(5, SECONDS)
     )
 
     private fun settingsDot(): ClientSettings {
         return settingsDot("localhost")
     }
 
-    private fun settingsDot(ip: String) = ClientSettingsDot(
-        ip,
-        InetAddress.getByName(ip),
-        Port(853, TCP),
-        domainExampleCom,
-        listOf(AAAA, A),
-        Pair(5, SECONDS)
-    )
+    private fun settingsDot(ip: String) =
+        ClientSettingsDot(
+            resolverHost = ip,
+            resolverIp = InetAddress.getByName(ip),
+            name = domainExampleCom,
+            types = listOf(AAAA, A),
+            timeout = Pair(5, SECONDS)
+        )
 
     private fun settingsDoh(): ClientSettings {
         return settingsDoh("localhost")
     }
 
     private fun settingsDoh(ip: String) = ClientSettingsDohImpl(
-        ip,
-        InetAddress.getByName(ip),
-        Port(443, TCP),
-        domainExampleCom,
-        listOf(AAAA, A),
-        Pair(5, SECONDS),
-        URI.create("https://example.org")
+        resolverHost = ip,
+        resolverIp = InetAddress.getByName(ip),
+        name = domainExampleCom,
+        types = listOf(AAAA, A),
+        timeout = Pair(5, SECONDS),
+        url = URI.create("https://example.org")
     )
 
     private fun emptyIpQueryResponse(): QueryResult {
