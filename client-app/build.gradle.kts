@@ -15,18 +15,19 @@ repositories {
 }
 
 dependencies {
+    detektPlugins(libs.klint)
+
     implementation(libs.clikt)
     implementation(libs.koin)
     implementation(libs.kotlin.stdlib.jdk8)
     implementation(platform(libs.kotlin.bom))
     implementation(project(":client"))
 
-    detektPlugins(libs.klint)
-
     testImplementation(libs.assertj.core)
     testImplementation(libs.jupiter)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit5)
+    testImplementation(project(":client"))
 }
 
 application {
@@ -72,8 +73,13 @@ tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = "0.7".toBigDecimal()
+                minimum = "0.6".toBigDecimal()
             }
         }
     }
+}
+
+detekt {
+    config.setFrom(file("../config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
 }

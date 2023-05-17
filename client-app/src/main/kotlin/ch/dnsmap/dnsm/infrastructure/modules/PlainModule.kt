@@ -1,27 +1,21 @@
 package ch.dnsmap.dnsm.infrastructure.modules
 
-import ch.dnsmap.dnsm.domain.model.networking.Protocol.UDP
-import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
+import ch.dnsmap.dnsm.domain.service.QueryService
 import ch.dnsmap.dnsm.domain.service.ResultService
 import ch.dnsmap.dnsm.domain.service.ResultServiceImpl
+import ch.dnsmap.dnsm.domain.service.mainloop.MainLoop
+import ch.dnsmap.dnsm.domain.service.mainloop.PlainMainLoop
+import ch.dnsmap.dnsm.domain.service.plain.PlainQueryService
 import ch.dnsmap.dnsm.domain.service.plain.PlainTcpService
 import ch.dnsmap.dnsm.domain.service.plain.PlainUdpService
-import org.koin.core.parameter.ParametersHolder
-import org.koin.core.qualifier.named
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-const val MODULE_PLAIN = "plain"
-
 val plainModule = module {
-    single<ResultService>(named(MODULE_PLAIN)) { provideService(it) }
-}
-
-private fun provideService(params: ParametersHolder): ResultService {
-    val settings: ClientSettingsPlain = params.get()
-    val service = if (settings.resolverPort.protocol == UDP) {
-        PlainUdpService(settings)
-    } else {
-        PlainTcpService(settings)
-    }
-    return ResultServiceImpl(settings, service)
+    singleOf(::PlainMainLoop) { bind<MainLoop>() }
+    singleOf(::PlainQueryService) { bind<QueryService>() }
+    singleOf(::PlainTcpService)
+    singleOf(::PlainUdpService)
+    singleOf(::ResultServiceImpl) { bind<ResultService>() }
 }

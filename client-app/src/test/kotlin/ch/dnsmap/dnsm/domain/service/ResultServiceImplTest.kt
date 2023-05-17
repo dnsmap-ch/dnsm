@@ -26,7 +26,7 @@ class ResultServiceImplTest : KoinTest {
     val koinTestExtension = KoinTestExtension.create {
         modules(
             module {
-                single { QueryServiceTest() } bind QueryService::class
+                single { DummyQueryService() } bind QueryService::class
             }
         )
     }
@@ -34,13 +34,13 @@ class ResultServiceImplTest : KoinTest {
     @Test
     fun testResultService() {
         val service: QueryService by inject()
-        val resultService = ResultServiceImpl(settings(), service)
+        val resultService = ResultServiceImpl(service)
 
-        val result = resultService.run()
+        val result = resultService.run(settings())
 
         assertThat(result.queryResultTimed.queryResults).containsExactlyInAnyOrder(
-            QueryResult(listOf("127.0.0.1"), emptyList(), "A", AnswerResultType.NO_ERROR),
-            QueryResult(listOf("::1"), emptyList(), "AAAA", AnswerResultType.NO_ERROR)
+            QueryResult(Domain.root(), listOf("127.0.0.1"), "A", AnswerResultType.NO_ERROR),
+            QueryResult(Domain.root(), listOf("::1"), "AAAA", AnswerResultType.NO_ERROR)
         )
         assertThat(result.tasks).containsExactlyInAnyOrder(
             QueryTask(Domain.of("example.com"), A),
@@ -48,12 +48,12 @@ class ResultServiceImplTest : KoinTest {
         )
     }
 
-    private fun settings() = ClientSettingsPlain(
-        "localhost",
-        InetAddress.getByName("127.0.0.1"),
-        Port(53, Protocol.UDP),
-        Domain.of("example.com"),
-        listOf(AAAA, A),
-        Pair(5, SECONDS)
-    )
+    private fun settings() = ClientSettingsPlain.ClientSettingsPlainBuilder()
+        .resolverHost("localhost")
+        .resolverIp(InetAddress.getByName("127.0.0.1"))
+        .resolverPort(Port(53, Protocol.UDP))
+        .name(Domain.of("example.com"))
+        .types(listOf(AAAA, A))
+        .timeout(Pair(5, SECONDS))
+        .build()
 }

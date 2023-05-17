@@ -1,40 +1,50 @@
 package ch.dnsmap.dnsm.domain.service.doh
 
-import ch.dnsmap.dnsm.domain.model.networking.Port
+import ch.dnsmap.dnsm.domain.model.HttpMethod
 import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.query.queryResponse
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDoh
 import ch.dnsmap.dnsm.domain.service.QueryService
+import ch.dnsmap.dnsm.domain.service.logging.Output
+import ch.dnsmap.dnsm.domain.service.parser.DnsMessageParserImpl
 import ch.dnsmap.dnsm.wire.ParserOptions
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import java.io.IOException
-import java.net.InetAddress
 import java.util.concurrent.CountDownLatch
 
-class DohService(private val settings: ClientSettingsDoh, private val dohExecutor: DohQueryExecutor) : QueryService {
+class DohQueryService(private val out: Output) : QueryService {
 
+    private var dohExecutor: DohQueryExecutor? = null
     private val httpClientBuilder = OkHttpClient().newBuilder()
     private var httpClient: OkHttpClient? = null
+    private val parser = DnsMessageParserImpl(ParserOptions.Builder.builder().build())
 
-    override fun connect(resolverHost: InetAddress, resolverPort: Port): ConnectionResult {
-        val staticResolver = StaticDns(resolverHost)
+    override fun connect(settings: ClientSettings): ConnectionResult {
+        val staticResolver = StaticDns(settings.resolverIp())
         httpClientBuilder.dns(staticResolver)
         val timeout = settings.timeout()
         httpClientBuilder.connectTimeout(timeout.first, timeout.second)
         httpClient = httpClientBuilder.build()
-        return ConnectionResult(resolverHost, resolverPort)
+
+        dohExecutor = when ((settings as ClientSettingsDoh).method()) {
+            HttpMethod.POST -> DohPostQueryExecutor(settings, parser, out)
+            HttpMethod.GET -> DohGetQueryExecutor(settings, parser, out)
+        }
+
+        return ConnectionResult(settings.resolverIp(), settings.resolverPort())
     }
 
     override fun query(queries: List<QueryTask>): List<QueryResult> {
         val resultList = mutableListOf<QueryResult>()
 
         val latch = CountDownLatch(queries.size)
-        val requests = dohExecutor.execute(queries)
+        val requests = dohExecutor!!.execute(queries)
 
         requests.stream()
             .map {
@@ -58,7 +68,8 @@ class DohService(private val settings: ClientSettingsDoh, private val dohExecuto
                                 println("$name: $value")
                             }
 
-                            resultList.add(parseResponseBytes(response.body!!.bytes()))
+                            val rawBytes = response.body!!.bytes()
+                            resultList.add(parseResponseBytes(rawBytes))
                             latch.countDown()
                         }
                     }
@@ -70,8 +81,13 @@ class DohService(private val settings: ClientSettingsDoh, private val dohExecuto
         return resultList
     }
 
-    fun parseResponseBytes(rawMessage: ByteArray): QueryResult {
-        val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()
-        return queryResponse(parserOptionsIn, rawMessage)
+    fun parseResponseBytes(rawDnsMessage: ByteArray): QueryResult {
+        val message = parser.parseBytesToMessage(rawDnsMessage)
+
+        out.printSizeIn(rawDnsMessage.size.toLong())
+        out.printMessage(message)
+        out.printRawMessage(rawDnsMessage)
+
+        return queryResponse(message)
     }
 }

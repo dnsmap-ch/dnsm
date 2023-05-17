@@ -13,12 +13,14 @@ repositories {
 }
 
 dependencies {
+    api(project(":core"))
+
     implementation(libs.clikt)
     implementation(libs.kotlin.stdlib.jdk8)
+    implementation(libs.kotlinx)
     implementation(libs.okhttp)
     implementation(libs.rxjava)
     implementation(platform(libs.kotlin.bom))
-    api(project(":core"))
 
     detektPlugins(libs.klint)
 
@@ -36,4 +38,9 @@ java {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+detekt {
+    config.setFrom(file("../config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
 }

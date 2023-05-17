@@ -7,13 +7,15 @@ import ch.dnsmap.dnsm.domain.model.query.QueryType
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
-data class ClientSettingsPlain(
-    val resolverHost: String,
-    val resolverIp: InetAddress,
-    val resolverPort: Port = Port(53, UDP),
-    val name: Domain,
-    val types: List<QueryType>,
-    val timeout: Pair<Long, TimeUnit>
+private const val PLAIN_DEFAULT_PORT = 53
+
+class ClientSettingsPlain private constructor(
+    private val resolverHost: String,
+    private val resolverIp: InetAddress,
+    private val resolverPort: Port,
+    private val name: Domain,
+    private val types: List<QueryType>,
+    private val timeout: Pair<Long, TimeUnit>
 ) : ClientSettings {
 
     override
@@ -44,5 +46,31 @@ data class ClientSettingsPlain(
     override
     fun timeout(): Pair<Long, TimeUnit> {
         return timeout
+    }
+
+    data class ClientSettingsPlainBuilder(
+        var resolverHost: String? = null,
+        var resolverIp: InetAddress? = null,
+        var resolverPort: Port = Port(PLAIN_DEFAULT_PORT, UDP),
+        var name: Domain? = null,
+        var types: List<QueryType>? = null,
+        var timeout: Pair<Long, TimeUnit>? = null
+    ) {
+
+        fun resolverHost(resolverHost: String) = apply { this.resolverHost = resolverHost }
+        fun resolverIp(resolverIp: InetAddress) = apply { this.resolverIp = resolverIp }
+        fun resolverPort(resolverPort: Port) = apply { this.resolverPort = resolverPort }
+        fun name(name: Domain) = apply { this.name = name }
+        fun types(types: List<QueryType>) = apply { this.types = types }
+        fun timeout(timeout: Pair<Long, TimeUnit>) = apply { this.timeout = timeout }
+
+        fun build() = ClientSettingsPlain(
+            resolverHost!!,
+            resolverIp!!,
+            resolverPort,
+            name!!,
+            types!!,
+            timeout!!
+        )
     }
 }

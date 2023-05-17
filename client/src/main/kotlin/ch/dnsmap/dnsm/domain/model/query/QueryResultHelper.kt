@@ -5,16 +5,12 @@ import ch.dnsmap.dnsm.domain.model.AnswerResultType
 import ch.dnsmap.dnsm.header.HeaderRcode
 import ch.dnsmap.dnsm.record.ResourceRecordA
 import ch.dnsmap.dnsm.record.ResourceRecordAaaa
-import ch.dnsmap.dnsm.wire.DnsInput
-import ch.dnsmap.dnsm.wire.ParserOptions
 
-fun queryResponse(parserOptionsIn: ParserOptions, rawDns: ByteArray?): QueryResult {
-    val response = DnsInput.fromWire(parserOptionsIn, rawDns)
-    val resMsg = response.message
-    val ips = ipResults(resMsg)
-    val logs = parserOptionsIn.log.map { it.formatted() }
-    val status = status(resMsg)
-    return QueryResult(ips, logs, resMsg.question.questionType.name, status)
+fun queryResponse(message: Message): QueryResult {
+    val query = message.question.questionName
+    val ips = ipResults(message)
+    val status = status(message)
+    return QueryResult(query, ips, message.question.questionType.name, status)
 }
 
 private fun ipResults(msg: Message): List<String> {

@@ -6,7 +6,7 @@ import ch.dnsmap.dnsm.domain.model.query.QueryType
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 
-interface ClientSettings {
+sealed interface ClientSettings {
 
     fun resolverHost(): String
     fun resolverIp(): InetAddress

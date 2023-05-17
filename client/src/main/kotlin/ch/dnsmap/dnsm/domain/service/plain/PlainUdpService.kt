@@ -7,7 +7,10 @@ import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.query.queryResponse
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
 import ch.dnsmap.dnsm.domain.service.QueryService
+import ch.dnsmap.dnsm.domain.service.logging.Output
+import ch.dnsmap.dnsm.domain.service.parser.DnsMessageParserImpl
 import ch.dnsmap.dnsm.wire.ParserOptions
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -20,18 +23,21 @@ import java.util.concurrent.CountDownLatch
 
 private const val BUFFER_SIZE = 4096
 
-class PlainUdpService(private val settings: ClientSettings) : QueryService {
+class PlainUdpService(private val out: Output) : QueryService {
 
     private var socket: DatagramSocket? = null
     private var resolverHost: InetAddress? = null
     private var resolverPort: Port? = null
+    private var settings: ClientSettingsPlain? = null
+    private val parser = DnsMessageParserImpl(ParserOptions.Builder.builder().build())
 
     override
-    fun connect(resolverHost: InetAddress, resolverPort: Port): ConnectionResult {
+    fun connect(settings: ClientSettings): ConnectionResult {
+        this.settings = settings as ClientSettingsPlain
         socket = DatagramSocket()
-        this.resolverHost = resolverHost
-        this.resolverPort = resolverPort
-        return ConnectionResult(resolverHost, resolverPort)
+        this.resolverHost = settings.resolverIp()
+        this.resolverPort = settings.resolverPort()
+        return ConnectionResult(settings.resolverIp(), settings.resolverPort())
     }
 
     override
@@ -42,7 +48,7 @@ class PlainUdpService(private val settings: ClientSettings) : QueryService {
         val pairOfDisposable = socket!!.use { s ->
             val receiver = startListener(s, queries, resultList, latch)
             val sender = startSender(s, queries)
-            latch.await(settings.timeout().first, settings.timeout().second)
+            latch.await(settings!!.timeout().first, settings!!.timeout().second)
             Pair(receiver, sender)
         }
 
@@ -57,7 +63,6 @@ class PlainUdpService(private val settings: ClientSettings) : QueryService {
         resultList: MutableList<QueryResult>,
         latch: CountDownLatch
     ): Disposable {
-        val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()
         var counter = 0
         var stayInLoop = true
         val disposable = Observable.create { emitter ->
@@ -77,7 +82,15 @@ class PlainUdpService(private val settings: ClientSettings) : QueryService {
                 }
             }
         }
-            .map { rawDns -> queryResponse(parserOptionsIn, rawDns) }
+            .map { rawDnsMessage ->
+                val message = parser.parseBytesToMessage(rawDnsMessage)
+
+                out.printSizeIn(rawDnsMessage.size.toLong())
+                out.printMessage(message)
+                out.printRawMessage(rawDnsMessage)
+
+                queryResponse(message)
+            }
             .subscribeOn(Schedulers.io())
             .subscribe { msg ->
                 resultList.add(msg)
@@ -91,9 +104,17 @@ class PlainUdpService(private val settings: ClientSettings) : QueryService {
     private fun startSender(socket: DatagramSocket, queries: List<QueryTask>): Disposable {
         requireNotNull(resolverHost)
         requireNotNull(resolverPort)
-        val parserOptionsOut = ParserOptions.Builder.builder().build()
         return Observable.fromIterable(queries)
-            .map { messageBytes(it, parserOptionsOut) }
+            .map { messageBytes(it) }
+            .map {
+                val dnsMessage = parser.parseMessageToBytes(it)
+
+                out.printSizeOut(dnsMessage.size.toLong())
+                out.printMessage(it)
+                out.printRawMessage(dnsMessage)
+
+                dnsMessage
+            }
             .map { DatagramPacket(it, it.size, resolverHost!!, resolverPort!!.port) }
             .subscribe { socket.send(it) }
     }

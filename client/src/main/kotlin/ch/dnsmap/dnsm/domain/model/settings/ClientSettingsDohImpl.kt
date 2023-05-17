@@ -12,55 +12,90 @@ import java.util.concurrent.TimeUnit
 
 private const val DOH_DEFAULT_PORT = 443
 
-data class ClientSettingsDohImpl(
-    val resolverHost: String,
-    val resolverIp: InetAddress,
-    val resolverPort: Port = Port(DOH_DEFAULT_PORT, TCP),
-    val name: Domain,
-    val types: List<QueryType>,
-    val timeout: Pair<Long, TimeUnit>,
-    val url: URI,
-    val path: String = "dns-query",
-    val method: HttpMethod = POST
+class ClientSettingsDohImpl private constructor(
+    private val resolverHost: String?,
+    private val resolverIp: InetAddress?,
+    private val resolverPort: Port?,
+    private val name: Domain?,
+    private val types: List<QueryType>?,
+    private val timeout: Pair<Long, TimeUnit>?,
+    private val url: URI?,
+    private val path: String?,
+    private val method: HttpMethod?,
 ) : ClientSettingsDoh {
 
     override
     fun resolverHost(): String {
-        return resolverHost
+        return resolverHost!!
     }
 
     override
     fun resolverIp(): InetAddress {
-        return resolverIp
+        return resolverIp!!
     }
 
     override
     fun resolverPort(): Port {
-        return resolverPort
+        return resolverPort!!
     }
 
     override
     fun name(): Domain {
-        return name
+        return name!!
     }
 
     override
     fun types(): List<QueryType> {
-        return types
+        return types!!
     }
 
     override
     fun timeout(): Pair<Long, TimeUnit> {
-        return timeout
+        return timeout!!
     }
 
     override
     fun url(): URI {
-        return url.resolve(path)
+        return url!!.resolve(path)
     }
 
     override
     fun method(): HttpMethod {
-        return method
+        return method!!
+    }
+
+    data class ClientSettingsDohImplBuilder(
+        var resolverHost: String? = null,
+        var resolverIp: InetAddress? = null,
+        var resolverPort: Port = Port(DOH_DEFAULT_PORT, TCP),
+        var name: Domain? = null,
+        var types: List<QueryType>? = null,
+        var timeout: Pair<Long, TimeUnit>? = null,
+        var url: URI? = null,
+        var path: String = "dns-query",
+        var method: HttpMethod = POST,
+    ) {
+
+        fun resolverHost(resolverHost: String) = apply { this.resolverHost = resolverHost }
+        fun resolverIp(resolverIp: InetAddress) = apply { this.resolverIp = resolverIp }
+        fun resolverPort(resolverPort: Port) = apply { this.resolverPort = resolverPort }
+        fun name(name: Domain) = apply { this.name = name }
+        fun types(types: List<QueryType>) = apply { this.types = types }
+        fun timeout(timeout: Pair<Long, TimeUnit>) = apply { this.timeout = timeout }
+        fun url(url: URI) = apply { this.url = url }
+        fun path(path: String) = apply { this.path = path }
+        fun method(method: HttpMethod) = apply { this.method = method }
+
+        fun build() = ClientSettingsDohImpl(
+            resolverHost,
+            resolverIp,
+            resolverPort,
+            name,
+            types,
+            timeout,
+            url,
+            path,
+            method
+        )
     }
 }

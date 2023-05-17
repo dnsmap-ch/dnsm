@@ -7,20 +7,14 @@ import ch.dnsmap.dnsm.domain.model.query.QueryResultTimed
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 import com.github.ajalt.clikt.core.ProgramResult
-import org.koin.core.component.KoinComponent
 import java.io.IOException
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-class ResultServiceImpl(
-    private val settings: ClientSettings,
-    private val queryService: QueryService,
-) :
-    ResultService,
-    KoinComponent {
+class ResultServiceImpl(private val queryService: QueryService) : ResultService {
 
     override
-    fun run(): Result {
+    fun run(settings: ClientSettings): Result {
         try {
             val tasks = queryTasks(settings)
             val connectionResult = connectToServer(settings)
@@ -47,7 +41,7 @@ class ResultServiceImpl(
     @OptIn(ExperimentalTime::class)
     private fun connectToServer(settings: ClientSettings): ConnectionResultTimed {
         val timedValue = measureTimedValue {
-            queryService.connect(settings.resolverIp(), settings.resolverPort())
+            queryService.connect(settings)
         }
         return ConnectionResultTimed(timedValue.value, timedValue.duration)
     }

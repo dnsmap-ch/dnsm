@@ -5,7 +5,8 @@ import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.query.queryResponse
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
-import ch.dnsmap.dnsm.wire.ParserOptions
+import ch.dnsmap.dnsm.domain.service.logging.Output
+import ch.dnsmap.dnsm.domain.service.parser.DnsMessageParser
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -13,10 +14,15 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
 import java.net.SocketException
-import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 
-class TcpService(private val settings: ClientSettings, private val socket: Socket) {
+class TcpService(
+    private val settings: ClientSettings,
+    private val socket: Socket,
+    private val parserOutput: DnsMessageParser,
+    private val parserInput: DnsMessageParser,
+    private val out: Output
+) {
 
     fun query(queries: List<QueryTask>): List<QueryResult> {
         val resultList = mutableListOf<QueryResult>()
@@ -41,15 +47,13 @@ class TcpService(private val settings: ClientSettings, private val socket: Socke
         resultList: MutableList<QueryResult>,
         latch: CountDownLatch
     ): Disposable {
-        val parserOptionsIn = ParserOptions.Builder.builder().setDomainLabelTolerant().build()
         var counter = 0
         var stayInLoop = true
         return Observable.create { emitter ->
             while (stayInLoop && input.available() != -1) {
                 try {
-                    val length = ByteBuffer.wrap(input.readNBytes(2)).short
-                    val dataBuffer = ByteArray(length.toInt())
-                    input.readNBytes(dataBuffer, 0, length.toInt())
+                    val length = input.readShort()
+                    val dataBuffer = input.readNBytes(length.toInt())
                     emitter.onNext(dataBuffer)
                 } catch (_: SocketException) {
                     stayInLoop = false
@@ -61,7 +65,15 @@ class TcpService(private val settings: ClientSettings, private val socket: Socke
                 }
             }
         }
-            .map { rawDns -> queryResponse(parserOptionsIn, rawDns) }
+            .map { rawDnsMessage ->
+                val message = parserInput.parseBytesToMessage(rawDnsMessage)
+
+                out.printSizeIn(rawDnsMessage.size.toLong())
+                out.printMessage(message)
+                out.printRawMessage(rawDnsMessage)
+
+                queryResponse(message)
+            }
             .subscribeOn(Schedulers.io())
             .subscribe { msg ->
                 resultList.add(msg)
@@ -72,9 +84,17 @@ class TcpService(private val settings: ClientSettings, private val socket: Socke
     }
 
     private fun startSender(output: DataOutputStream, queries: List<QueryTask>): Disposable {
-        val parserOptionsOut = ParserOptions.Builder.builder().setTcp().build()
         return Observable.fromIterable(queries)
-            .map { messageBytes(it, parserOptionsOut) }
+            .map { messageBytes(it) }
+            .map {
+                val dnsMessage = parserOutput.parseMessageToBytes(it)
+
+                out.printSizeOut(dnsMessage.size.toLong())
+                out.printMessage(it)
+                out.printRawMessage(dnsMessage)
+
+                dnsMessage
+            }
             .subscribe { msg -> output.write(msg) }
     }
 }

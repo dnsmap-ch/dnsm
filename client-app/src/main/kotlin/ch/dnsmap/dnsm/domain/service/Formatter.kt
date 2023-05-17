@@ -1,6 +1,7 @@
 package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.domain.model.Result
+import ch.dnsmap.dnsm.domain.model.Summary
 import ch.dnsmap.dnsm.domain.model.query.QueryResult
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDoh
@@ -11,13 +12,14 @@ import java.net.InetAddress
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-class Printer {
+class Formatter {
 
     fun header(settings: ClientSettings): String {
         val server = resolveServerAddress(settings.resolverHost(), settings.resolverIp())
         val protocol = inferProtocol(settings)
         return "\nQuery DNS server $server over ${settings.resolverPort().asString()} ($protocol)"
     }
+
     private fun resolveServerAddress(host: String, address: InetAddress): String {
         return if (host == address.hostAddress) {
             host
@@ -31,41 +33,40 @@ class Printer {
             is ClientSettingsDoh -> "DoH"
             is ClientSettingsDot -> "DoT"
             is ClientSettingsPlain -> "plain"
-            else -> RuntimeException("Invalid settings")
         }
     }
 
-    fun answer(settings: ClientSettings, answers: List<QueryResult>): List<String> {
-        if (answers.isEmpty()) {
-            return listOf("no answers available")
+    fun result(result: Result): String {
+        if (result.queryResultTimed.queryResults.isEmpty()) {
+            return "no answers available"
         }
 
-        return answers.flatMap { queryResponse ->
-            if (queryResponse.ips.isNotEmpty()) {
-                constructHeaderAndQuery(queryResponse, settings) +
-                    listOf(
-                        "A: " + queryResponse.ips.joinToString(separator = ", ")
+        return result.queryResultTimed.queryResults.stream()
+            .map { queryResponse ->
+                if (queryResponse.ips.isNotEmpty()) {
+                    constructHeaderAndQuery(queryResponse) + listOf(
+                        "A: " + queryResponse.ips.joinToString(
+                            separator = ", "
+                        )
                     )
-            } else {
-                constructHeaderAndQuery(queryResponse, settings)
+                } else {
+                    constructHeaderAndQuery(queryResponse)
+                }
             }
-        }.toList()
+            .toList()
+            .flatten()
+            .joinToString(separator = "\n")
     }
 
-    private fun constructHeaderAndQuery(
-        queryResult: QueryResult,
-        settings: ClientSettings
-    ) = listOf(
+    private fun constructHeaderAndQuery(queryResult: QueryResult) = listOf(
         "H: ${queryResult.answerResultType}",
-        "Q: ${settings.name().canonical} ${queryResult.queryType}"
+        "Q: ${queryResult.query.canonical} ${queryResult.queryType}"
     )
 
-    fun summary(result: Result): String {
-        val queryTotal = result.tasks.size
-        val answerTotal = result.queryResultTimed.queryResults.size
+    fun summary(summary: Summary): String {
         val elapsed =
-            formatDuration(result.connectionResultTimed.duration + result.queryResultTimed.duration)
-        return "Total queries sent/answers received $queryTotal/$answerTotal in $elapsed"
+            formatDuration(summary.connectionResultTimed.duration + summary.queryResultTimed.duration)
+        return "Total queries sent/answers received ${summary.queryTotal}/${summary.answerTotal} in $elapsed"
     }
 
     private fun formatDuration(duration: Duration): String {

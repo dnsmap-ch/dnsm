@@ -14,17 +14,13 @@ import ch.dnsmap.dnsm.header.HeaderFlags
 import ch.dnsmap.dnsm.header.HeaderId
 import ch.dnsmap.dnsm.header.HeaderOpcode
 import ch.dnsmap.dnsm.header.HeaderRcode
-import ch.dnsmap.dnsm.wire.DnsOutput
-import ch.dnsmap.dnsm.wire.ParserOptions
 
-fun messageBytes(task: QueryTask, parserOptions: ParserOptions): ByteArray {
-    val msg = createQuery(task.name, task.type, header(HeaderId.ofRandom()))
-    return createDnsOutput(parserOptions, msg).message
+fun messageBytes(task: QueryTask): Message {
+    return createQuery(task.name, task.type, header(HeaderId.ofRandom()))
 }
 
-fun messageBytesZeroId(task: QueryTask, parserOptions: ParserOptions): ByteArray {
-    val msg = createQuery(task.name, task.type, header(HeaderId.ofZero()))
-    return createDnsOutput(parserOptions, msg).message
+fun messageBytesZeroId(task: QueryTask): Message {
+    return createQuery(task.name, task.type, header(HeaderId.ofZero()))
 }
 
 private fun createQuery(name: Domain, type: QueryType, header: Header): Message {
@@ -57,16 +53,5 @@ private fun header(headerId: HeaderId): Header {
         headerId,
         HeaderFlags(HeaderOpcode.QUERY, HeaderRcode.NO_ERROR, HeaderBitFlags.RD),
         HeaderCount.of(1, 0, 0, 0)
-    )
-}
-
-private fun createDnsOutput(parserOptions: ParserOptions, msg: Message): DnsOutput {
-    return DnsOutput.toWire(
-        parserOptions,
-        msg.header,
-        msg.question,
-        emptyList(),
-        emptyList(),
-        emptyList()
     )
 }

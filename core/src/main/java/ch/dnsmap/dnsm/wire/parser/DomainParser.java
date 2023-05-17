@@ -1,8 +1,5 @@
 package ch.dnsmap.dnsm.wire.parser;
 
-import static ch.dnsmap.dnsm.wire.ParsingLog.error;
-import static ch.dnsmap.dnsm.wire.ParsingLog.warn;
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import ch.dnsmap.dnsm.Domain;
@@ -59,9 +56,7 @@ public final class DomainParser
     int labelLength = wireData.readUInt8();
     bytesRead += labelLength;
     if (bytesRead > length) {
-      Domain domain = Domain.of(labels);
-      options.log(error(format("domain '%s' longer than message length", domain)));
-      return domain;
+      return Domain.of(labels);
     }
 
     byte[] labelBytes = wireData.readData(labelLength);
@@ -78,7 +73,6 @@ public final class DomainParser
       try {
         label = Label.of(labelBytes);
       } catch (IllegalArgumentException e) {
-        options.log(warn(e.getMessage()));
         label = Label.tolerantOf(labelBytes);
       }
     } else {
