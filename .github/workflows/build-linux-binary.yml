@@ -1,22 +1,20 @@
-name: CI Release
+name: CI Build Linux Binary
 
 on:
   workflow_dispatch:
   push:
-    tags:
-      - v*
+  pull_request:
+    branches: [ main ]
+  workflow_call:
 
 jobs:
   call-workflow-ci-build:
     uses: ./.github/workflows/build.yml
 
   build-native:
-    name: dnsmap client on ${{ matrix.os }}
+    name: dnsmap client on ubuntu-latest
     needs: call-workflow-ci-build
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ubuntu-latest
     steps:
       - name: Download java-build
         uses: actions/download-artifact@v3
@@ -34,5 +32,5 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v3
         with:
-          name: native-${{ matrix.os }}
+          name: native-ubuntu-latest
           path: dnsm*
