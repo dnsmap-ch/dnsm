@@ -82,12 +82,12 @@ class DohQueryService(private val out: Output) : QueryService {
     }
 
     fun parseResponseBytes(rawDnsMessage: ByteArray): QueryResult {
-        val message = parser.parseBytesToMessage(rawDnsMessage)
+        val parsedMessage = parser.parseBytesToMessage(rawDnsMessage)
 
         out.printSizeIn(rawDnsMessage.size.toLong())
-        out.printMessage(message)
+        out.printMessage(parsedMessage.first)
         out.printRawMessage(rawDnsMessage)
 
-        return queryResponse(message)
+        return queryResponse(parsedMessage.first)
     }
 }

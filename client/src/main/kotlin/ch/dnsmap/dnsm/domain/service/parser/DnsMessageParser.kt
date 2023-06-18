@@ -8,7 +8,7 @@ interface DnsMessageParser {
      * Translates raw bytes into a DNS message.
      * Input expected is without length field (as used for TCP connections).
      */
-    fun parseBytesToMessage(rawDnsMessage: ByteArray): Message
+    fun parseBytesToMessage(rawDnsMessage: ByteArray): Pair<Message, Long>
 
     /**
      * Translates a DNS message to its raw bytes.

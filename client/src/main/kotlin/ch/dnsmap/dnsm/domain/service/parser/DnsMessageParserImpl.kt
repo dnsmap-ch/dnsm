@@ -7,8 +7,12 @@ import ch.dnsmap.dnsm.wire.ParserOptions
 
 class DnsMessageParserImpl(private val parserOptions: ParserOptions) : DnsMessageParser {
 
-    override fun parseBytesToMessage(rawDnsMessage: ByteArray): Message {
-        return DnsInput.fromWire(parserOptions, rawDnsMessage).message
+    override
+    fun parseBytesToMessage(rawDnsMessage: ByteArray): Pair<Message, Long> {
+        val dnsInput = DnsInput.fromWire(parserOptions, rawDnsMessage)
+        val message = dnsInput.message
+        val parsedBytes = dnsInput.bytesParsed()
+        return Pair(message, parsedBytes)
     }
 
     override fun parseMessageToBytes(message: Message): ByteArray {

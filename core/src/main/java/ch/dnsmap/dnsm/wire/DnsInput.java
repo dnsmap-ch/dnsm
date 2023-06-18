@@ -51,6 +51,13 @@ public final class DnsInput {
         getAdditional());
   }
 
+  /**
+   * Get the amount of bytes pared by {@code DnsInput}.
+   */
+  public long bytesParsed() {
+    return networkByte.getPosition();
+  }
+
   public Header getHeader() {
     if (header != null) {
       return header;

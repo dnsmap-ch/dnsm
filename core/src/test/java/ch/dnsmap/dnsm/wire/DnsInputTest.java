@@ -38,8 +38,11 @@ class DnsInputTest {
     ParserOptions parserOptions = ParserOptions.Builder.builder().unsetTcp().build();
     var dnsInput = DnsInput.fromWire(parserOptions, UDP_HEADER_QUESTION_BYTES);
 
+    assertThat(dnsInput.bytesParsed()).isEqualTo(0);
     assertThat(dnsInput.getHeader()).isEqualTo(HEADER);
+    assertThat(dnsInput.bytesParsed()).isEqualTo(12);
     assertThat(dnsInput.getQuestion()).isEqualTo(List.of(QUESTION));
+    assertThat(dnsInput.bytesParsed()).isEqualTo(33);
     assertThat(dnsInput.getAnswers()).isEqualTo(List.of());
     assertThat(dnsInput.getAuthority()).isEqualTo(List.of());
     assertThat(dnsInput.getAdditional()).isEqualTo(List.of());
@@ -52,8 +55,11 @@ class DnsInputTest {
     ParserOptions parserOptions = ParserOptions.Builder.builder().setTcp().build();
     var dnsInput = DnsInput.fromWire(parserOptions, TCP_HEADER_QUESTION_BYTES);
 
+    assertThat(dnsInput.bytesParsed()).isEqualTo(0);
     assertThat(dnsInput.getHeader()).isEqualTo(HEADER);
+    assertThat(dnsInput.bytesParsed()).isEqualTo(14);
     assertThat(dnsInput.getQuestion()).isEqualTo(List.of(QUESTION));
+    assertThat(dnsInput.bytesParsed()).isEqualTo(35);
     assertThat(dnsInput.getAnswers()).isEqualTo(List.of());
     assertThat(dnsInput.getAuthority()).isEqualTo(List.of());
     assertThat(dnsInput.getAdditional()).isEqualTo(List.of());

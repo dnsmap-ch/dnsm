@@ -66,13 +66,13 @@ class TcpService(
             }
         }
             .map { rawDnsMessage ->
-                val message = parserInput.parseBytesToMessage(rawDnsMessage)
+                val parsedMessage = parserInput.parseBytesToMessage(rawDnsMessage)
 
                 out.printSizeIn(rawDnsMessage.size.toLong())
-                out.printMessage(message)
+                out.printMessage(parsedMessage.first)
                 out.printRawMessage(rawDnsMessage)
 
-                queryResponse(message)
+                queryResponse(parsedMessage.first)
             }
             .subscribeOn(Schedulers.io())
             .subscribe { msg ->

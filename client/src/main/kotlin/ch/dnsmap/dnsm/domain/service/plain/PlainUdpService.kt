@@ -1,5 +1,6 @@
 package ch.dnsmap.dnsm.domain.service.plain
 
+import ch.dnsmap.dnsm.Message
 import ch.dnsmap.dnsm.domain.infrastructure.messageBytes
 import ch.dnsmap.dnsm.domain.model.networking.Port
 import ch.dnsmap.dnsm.domain.model.query.ConnectionResult
@@ -82,14 +83,20 @@ class PlainUdpService(private val out: Output) : QueryService {
                 }
             }
         }
-            .map { rawDnsMessage ->
-                val message = parser.parseBytesToMessage(rawDnsMessage)
+            .map { rawDnsMessage: ByteArray ->
+                val cloneOfRawDnsMessage: ByteArray = rawDnsMessage.clone()
+                val parsedMessage = parser.parseBytesToMessage(rawDnsMessage)
+                val length = parsedMessage.second
+                val rawMessage = cloneOfRawDnsMessage.copyOfRange(0, length.toInt())
+                Pair(rawMessage, parsedMessage.first)
+            }
+            .map { rawDnsMessage: Pair<ByteArray, Message> ->
 
-                out.printSizeIn(rawDnsMessage.size.toLong())
-                out.printMessage(message)
-                out.printRawMessage(rawDnsMessage)
+                out.printSizeIn(rawDnsMessage.first.size.toLong())
+                out.printMessage(rawDnsMessage.second)
+                out.printRawMessage(rawDnsMessage.first)
 
-                queryResponse(message)
+                queryResponse(rawDnsMessage.second)
             }
             .subscribeOn(Schedulers.io())
             .subscribe { msg ->
