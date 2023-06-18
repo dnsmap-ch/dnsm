@@ -6,12 +6,14 @@ import ch.dnsmap.dnsm.domain.model.query.ConnectionResultTimed
 import ch.dnsmap.dnsm.domain.model.query.QueryResultTimed
 import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
+import ch.dnsmap.dnsm.domain.service.logging.Output
 import com.github.ajalt.clikt.core.ProgramResult
 import java.io.IOException
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-class ResultServiceImpl(private val queryService: QueryService) : ResultService {
+class ResultServiceImpl(private val queryService: QueryService, private val out: Output) :
+    ResultService {
 
     override
     fun run(settings: ClientSettings): Result {
@@ -21,7 +23,7 @@ class ResultServiceImpl(private val queryService: QueryService) : ResultService 
             val queryResult = runQueries(tasks)
             return Result(tasks, connectionResult, queryResult)
         } catch (e: IOException) {
-            println(
+            out.print(
                 "error: " +
                     (
                         "While connecting to ${settings.resolverIp().hostAddress} on " +

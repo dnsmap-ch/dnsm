@@ -9,6 +9,7 @@ import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.query.QueryType.A
 import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
+import ch.dnsmap.dnsm.domain.service.logging.SilentOutput
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -34,7 +35,7 @@ class ResultServiceImplTest : KoinTest {
     @Test
     fun testResultService() {
         val service: QueryService by inject()
-        val resultService = ResultServiceImpl(service)
+        val resultService = ResultServiceImpl(service, SilentOutput(System.out::println))
 
         val result = resultService.run(settings())
 

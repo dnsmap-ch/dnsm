@@ -36,7 +36,7 @@ class DohMainLoopTest {
 
     private val stubResolverService = DummyStubResolverServiceImpl()
     private val queryService = DummyQueryService()
-    private val resultService = ResultServiceImpl(queryService)
+    private val resultService = ResultServiceImpl(queryService, SilentOutput(System.out::println))
     private val dohMainLoop =
         DohMainLoop(stubResolverService, resultService, Formatter(), SilentOutput(::println))
 

@@ -65,7 +65,7 @@ class DohQueryService(private val out: Output) : QueryService {
                             if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
                             for ((name, value) in response.headers) {
-                                println("$name: $value")
+                                out.printDebug("$name: $value")
                             }
 
                             val rawBytes = response.body!!.bytes()
