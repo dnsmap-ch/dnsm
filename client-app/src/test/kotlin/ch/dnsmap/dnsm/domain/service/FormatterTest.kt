@@ -2,6 +2,7 @@ package ch.dnsmap.dnsm.domain.service
 
 import ch.dnsmap.dnsm.Domain
 import ch.dnsmap.dnsm.domain.model.AnswerResultType.NO_ERROR
+import ch.dnsmap.dnsm.domain.model.HttpMethod.GET
 import ch.dnsmap.dnsm.domain.model.Result
 import ch.dnsmap.dnsm.domain.model.Summary
 import ch.dnsmap.dnsm.domain.model.networking.Port
@@ -14,7 +15,7 @@ import ch.dnsmap.dnsm.domain.model.query.QueryTask
 import ch.dnsmap.dnsm.domain.model.query.QueryType.A
 import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
-import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDohImpl
+import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDohImpl.ClientSettingsDohImplBuilder
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDot
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
 import org.assertj.core.api.Assertions.assertThat
@@ -55,15 +56,27 @@ class FormatterTest {
     }
 
     @Test
-    fun testDohSettingsHeaderWithIpResolver() {
-        val result = Formatter().header(settingsDoh("127.0.0.1"))
-        assertThat(result).isEqualTo("\nQuery DNS server 127.0.0.1 over 443/tcp (DoH)")
+    fun testDohPostSettingsHeaderWithIpResolver() {
+        val result = Formatter().header(settingsDohPost("127.0.0.1"))
+        assertThat(result).isEqualTo("\nQuery DNS server 127.0.0.1 over 443/tcp (DoH/POST)")
     }
 
     @Test
-    fun testDohSettingsHeaderWithHostnameResolver() {
-        val result = Formatter().header(settingsDoh())
-        assertThat(result).isEqualTo("\nQuery DNS server localhost/127.0.0.1 over 443/tcp (DoH)")
+    fun testDohGetSettingsHeaderWithIpResolver() {
+        val result = Formatter().header(settingsDohGet("127.0.0.1"))
+        assertThat(result).isEqualTo("\nQuery DNS server 127.0.0.1 over 443/tcp (DoH/GET)")
+    }
+
+    @Test
+    fun testDohPostSettingsHeaderWithHostnameResolver() {
+        val result = Formatter().header(settingsDohPost())
+        assertThat(result).isEqualTo("\nQuery DNS server localhost/127.0.0.1 over 443/tcp (DoH/POST)")
+    }
+
+    @Test
+    fun testDohGetSettingsHeaderWithHostnameResolver() {
+        val result = Formatter().header(settingsDohGet())
+        assertThat(result).isEqualTo("\nQuery DNS server localhost/127.0.0.1 over 443/tcp (DoH/GET)")
     }
 
     @Test
@@ -138,17 +151,31 @@ class FormatterTest {
             .timeout(Pair(5, SECONDS))
             .build()
 
-    private fun settingsDoh(): ClientSettings {
-        return settingsDoh("localhost")
+    private fun settingsDohPost(): ClientSettings {
+        return settingsDohPost("localhost")
     }
 
-    private fun settingsDoh(ip: String) = ClientSettingsDohImpl.ClientSettingsDohImplBuilder()
+    private fun settingsDohGet(): ClientSettings {
+        return settingsDohGet("localhost")
+    }
+
+    private fun settingsDohPost(ip: String) = ClientSettingsDohImplBuilder()
         .resolverHost(ip)
         .resolverIp(InetAddress.getByName(ip))
         .name(domainExampleCom)
         .types(listOf(AAAA, A))
         .timeout(Pair(5, SECONDS))
         .url(URI.create("https://example.org"))
+        .build()
+
+    private fun settingsDohGet(ip: String) = ClientSettingsDohImplBuilder()
+        .resolverHost(ip)
+        .resolverIp(InetAddress.getByName(ip))
+        .name(domainExampleCom)
+        .types(listOf(AAAA, A))
+        .timeout(Pair(5, SECONDS))
+        .url(URI.create("https://example.org"))
+        .method(GET)
         .build()
 
     private fun queryResponse(): QueryResult {

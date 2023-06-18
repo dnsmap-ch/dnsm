@@ -7,7 +7,6 @@ import ch.dnsmap.dnsm.domain.model.settings.ClientSettings
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDoh
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsDot
 import ch.dnsmap.dnsm.domain.model.settings.ClientSettingsPlain
-import java.io.Serializable
 import java.net.InetAddress
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -28,12 +27,16 @@ class Formatter {
         }
     }
 
-    private fun inferProtocol(settings: ClientSettings): Serializable {
+    private fun inferProtocol(settings: ClientSettings): String {
         return when (settings) {
-            is ClientSettingsDoh -> "DoH"
+            is ClientSettingsDoh -> inferDohProtocol(settings)
             is ClientSettingsDot -> "DoT"
             is ClientSettingsPlain -> "plain"
         }
+    }
+
+    private fun inferDohProtocol(settings: ClientSettingsDoh): String {
+        return "DoH/" + settings.method().name
     }
 
     fun result(result: Result): String {
