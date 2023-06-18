@@ -17,7 +17,7 @@ import java.net.URI
 private val QUERY_EXAMPLE_ORG_A = QueryTask(Domain.of("example.org"), A)
 private val QUERY_EXAMPLE_ORG_AAAA = QueryTask(Domain.of("example.org"), AAAA)
 
-private const val QUERY_URL = "https://doh.example.org/dns-query?dns="
+private const val QUERY_URL = "https://doh.example.org/?dns="
 
 class DohGetQueryExecutorTest {
 

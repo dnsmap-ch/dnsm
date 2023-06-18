@@ -4,7 +4,8 @@ import ch.dnsmap.dnsm.Domain
 import ch.dnsmap.dnsm.domain.model.HttpMethod
 import ch.dnsmap.dnsm.domain.model.HttpMethod.POST
 import ch.dnsmap.dnsm.domain.model.OptionFlags
-import ch.dnsmap.dnsm.domain.model.query.QueryType
+import ch.dnsmap.dnsm.domain.model.query.QueryType.A
+import ch.dnsmap.dnsm.domain.model.query.QueryType.AAAA
 import ch.dnsmap.dnsm.domain.service.logging.DebugOutput
 import ch.dnsmap.dnsm.domain.service.logging.MessageOutput
 import ch.dnsmap.dnsm.domain.service.logging.MessageSizeOutput
@@ -51,41 +52,46 @@ class DohCommand :
 
     private val resolverUrl by option(
         names = arrayOf("-u", "--url"),
-        help = """DNS server to send the messages to""".trimIndent()
+        help = """
+            DoH server to send the query to. Host stub resolver is used to translate a hostname into
+            an IP address, if a hostname is specified."""
+            .trimIndent()
     )
         .required()
 
     private val method by option(
         names = arrayOf("-m", "--method"),
-        help = """
-            HTTP method to use to resolve the domain name
-        """.trimIndent()
-    ).enum<HttpMethod>()
+        help = "HTTP method to use to resolve the domain name."
+    )
+        .enum<HttpMethod>()
         .default(POST)
 
     private val name by option(
         names = arrayOf("-n", "--name"),
-        help = "DNS name to resolve"
+        help = "Domain name to resolve."
     )
         .convert { Domain.of(it) }
         .required()
 
     private val types by option(
         names = arrayOf("-t", "--type"),
-        help = "DNS type to resolve the name"
+        help = "Type to query."
     )
         .convert { parseInputType(it) }
         .default(
-            listOf(QueryType.A, QueryType.AAAA),
-            defaultForHelp = "Type A and AAAA query"
+            listOf(A, AAAA),
+            defaultForHelp = "$A and $AAAA"
         )
     private val timeout: Long by option(
         names = arrayOf("--timeout"),
-        help = "Timeout in seconds"
+        help = "Timeout in seconds."
     )
         .long()
         .restrictTo(1)
-        .default(DEFAULT_TIMEOUT_SECOND)
+        .default(
+            DEFAULT_TIMEOUT_SECOND,
+            defaultForHelp = "$DEFAULT_TIMEOUT_SECOND seconds"
+        )
 
     private val verbosity by option(
         names = arrayOf("-v"),
@@ -93,8 +99,8 @@ class DohCommand :
             Makes dnsm verbose during the operation. Useful for debugging and seeing what's going on
             "under  the  hood". A line starting with '>' means data sent by dnsm, '<' means data 
             received by dnsm that is hidden in normal cases, and a line starting  with '*' means 
-            additional info provided by dnsm.
-        """.trimIndent()
+            additional info provided by dnsm."""
+            .trimIndent()
     )
         .counted()
 

@@ -74,7 +74,7 @@ class DohMainLoopTest {
             assertThat(it.resolverPort()).isEqualTo(Port(8443, TCP))
             assertThat(it.timeout()).isEqualTo(Pair(1337L, SECONDS))
             assertThat(it.types()).containsExactly(AAAA, A)
-            assertThat(it.url()).isEqualTo(URI.create("https://dns.example.org:8443/dns-query"))
+            assertThat(it.url()).isEqualTo(URI.create("https://dns.example.org:8443/"))
         })
     }
 
@@ -98,7 +98,7 @@ class DohMainLoopTest {
             assertThat(it.resolverPort()).isEqualTo(Port(443, TCP))
             assertThat(it.timeout()).isEqualTo(Pair(1337L, SECONDS))
             assertThat(it.types()).containsExactly(AAAA, A)
-            assertThat(it.url()).isEqualTo(URI.create("https://dns.example.org/dns-query"))
+            assertThat(it.url()).isEqualTo(URI.create("https://dns.example.org/"))
         })
     }
 

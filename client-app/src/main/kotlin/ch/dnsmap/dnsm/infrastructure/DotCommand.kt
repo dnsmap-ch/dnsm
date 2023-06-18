@@ -54,19 +54,15 @@ class DotCommand :
     private val resolverHost by option(
         names = arrayOf("-r", "--resolver"),
         help = """
-            DNS server to send the messages to.
-            Host stub resolver is used to translate a hostname into an IP address, if a hostname is
-            specified."""
+            DoT server to send the query to. Host stub resolver is used to translate a hostname into
+            an IP address, if a hostname is specified."""
             .trimIndent()
     )
         .required()
 
     private val resolverPort by option(
         names = arrayOf("-p", "--port"),
-        help = """
-            Query a resolver on this port number and protocol.
-            Possible values are: '853'
-        """.trimIndent()
+        help = "Query a resolver on this port number and protocol."
     )
         .convert { parsePort(it) }
         .default(
@@ -76,19 +72,19 @@ class DotCommand :
 
     private val name by option(
         names = arrayOf("-n", "--name"),
-        help = "DNS name to resolve"
+        help = "DNS name to resolve."
     )
         .convert { Domain.of(it) }
         .required()
 
     private val types by option(
         names = arrayOf("-t", "--type"),
-        help = "DNS type to resolve the name"
+        help = "Type to query."
     )
         .convert { parseInputType(it) }
         .default(
             value = listOf(A, AAAA),
-            defaultForHelp = "Type A and AAAA query"
+            defaultForHelp = "$A and $AAAA"
         )
     private val timeout: Long by option(
         names = arrayOf("--timeout"),
@@ -96,7 +92,10 @@ class DotCommand :
     )
         .long()
         .restrictTo(1)
-        .default(DEFAULT_TIMEOUT_SECOND)
+        .default(
+            DEFAULT_TIMEOUT_SECOND,
+            defaultForHelp = "$DEFAULT_TIMEOUT_SECOND seconds"
+        )
 
     private val verbosity by option(
         names = arrayOf("-v"),
@@ -104,8 +103,8 @@ class DotCommand :
             Makes dnsm verbose during the operation. Useful for debugging and seeing what's going on
             "under  the  hood". A line starting with '>' means data sent by dnsm, '<' means data 
             received by dnsm that is hidden in normal cases, and a line starting  with '*' means 
-            additional info provided by dnsm.
-        """.trimIndent()
+            additional info provided by dnsm."""
+            .trimIndent()
     )
         .counted()
 

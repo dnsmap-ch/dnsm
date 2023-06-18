@@ -20,7 +20,6 @@ class ClientSettingsDohImpl private constructor(
     private val types: List<QueryType>?,
     private val timeout: Pair<Long, TimeUnit>?,
     private val url: URI?,
-    private val path: String?,
     private val method: HttpMethod?,
 ) : ClientSettingsDoh {
 
@@ -56,7 +55,7 @@ class ClientSettingsDohImpl private constructor(
 
     override
     fun url(): URI {
-        return url!!.resolve(path)
+        return url!!.resolve("/")
     }
 
     override
@@ -72,7 +71,6 @@ class ClientSettingsDohImpl private constructor(
         var types: List<QueryType>? = null,
         var timeout: Pair<Long, TimeUnit>? = null,
         var url: URI? = null,
-        var path: String = "dns-query",
         var method: HttpMethod = POST,
     ) {
 
@@ -83,7 +81,6 @@ class ClientSettingsDohImpl private constructor(
         fun types(types: List<QueryType>) = apply { this.types = types }
         fun timeout(timeout: Pair<Long, TimeUnit>) = apply { this.timeout = timeout }
         fun url(url: URI) = apply { this.url = url }
-        fun path(path: String) = apply { this.path = path }
         fun method(method: HttpMethod) = apply { this.method = method }
 
         fun build() = ClientSettingsDohImpl(
@@ -94,7 +91,6 @@ class ClientSettingsDohImpl private constructor(
             types,
             timeout,
             url,
-            path,
             method
         )
     }
